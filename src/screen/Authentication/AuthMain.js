@@ -16,12 +16,12 @@ import {COLORS, SIZES, FONTS} from '../../constants';
 import TextButton from '../../components/TextButton';
 
 const AuthMain = ({navigation}) => {
-  const [mode, setMode] = useState('SignIn');
+  const [mode, setMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [number, setNumber] = useState(0);
-  const [click, setClick] = useState(true);
+  const [click, setClick] = useState(false);
 
   function SignInFunction() {
     return (
@@ -119,33 +119,17 @@ const AuthMain = ({navigation}) => {
                 }}
                 onPress={() => navigation.navigate('MyTab')}
               />
-              <View style={{alignItems: 'flex-start'}}>
-                <Text style={{paddingHorizontal: SIZES.padding}}>
-                  If you are not register user{' '}
-                </Text>
-                <TextButton
-                  label={'Register now'}
-                  contentContainerStyle={{
-                    backgroundColor: 'null',
-                  }}
-                  labelStyle={{
-                    color: COLORS.support1,
-                    ...FONTS.h4,
-                    paddingHorizontal: SIZES.padding,
-                  }}
-                  onPress={() => SignUpFunction()}
-                />
-              </View>
             </KeyboardAwareScrollView>
           </View>
         </Shadow>
       </Animated.View>
     );
   }
+
   function SignUpFunction() {
     return (
       <Animated.View
-        style={{marginTop: SIZES.padding, height: SIZES.height * 0.55}}
+        style={{marginTop: SIZES.padding, height: SIZES.height * 0.6}}
       >
         <Shadow>
           <View style={styles.authContainer}>
@@ -176,12 +160,11 @@ const AuthMain = ({navigation}) => {
                   borderRadius: SIZES.radius,
                   backgroundColor: COLORS.error,
                 }}
-                placeholder="Email"
-                value={email}
-                onChange={text => setEmail(text)}
+                placeholder="Name"
+                value={name}
                 prependComponent={
                   <Image
-                    source={require('../../assets/icons/email.png')}
+                    source={require('../../assets/icons/person.png')}
                     style={{
                       width: 25,
                       height: 25,
@@ -209,20 +192,21 @@ const AuthMain = ({navigation}) => {
                   />
                 }
               />
+
               <FormInput
                 containerStyle={{
                   borderRadius: SIZES.radius,
                   backgroundColor: COLORS.error,
                 }}
-                placeholder="Email"
-                value={email}
-                onChange={text => setEmail(text)}
+                placeholder="Number"
+                value={number}
+                onChange={number => setNumber(number)}
                 prependComponent={
                   <Image
-                    source={require('../../assets/icons/email.png')}
+                    source={require('../../assets/icons/call.png')}
                     style={{
-                      width: 25,
-                      height: 25,
+                      width: 20,
+                      height: 20,
                       marginRight: SIZES.base,
                     }}
                   />
@@ -296,24 +280,6 @@ const AuthMain = ({navigation}) => {
                   ...FONTS.h4,
                 }}
               />
-
-              <View style={{alignItems: 'flex-start'}}>
-                <TextButton
-                  label={'if are you register user login'}
-                  contentContainerStyle={{
-                    marginTop: SIZES.radius,
-                    backgroundColor: 'null',
-                  }}
-                  labelStyle={{
-                    color: COLORS.support1,
-                    ...FONTS.h4,
-                    paddingHorizontal: SIZES.padding,
-                  }}
-                  onPress={() => {
-                    return <SignInFunction />;
-                  }}
-                />
-              </View>
             </KeyboardAwareScrollView>
           </View>
         </Shadow>
@@ -322,10 +288,10 @@ const AuthMain = ({navigation}) => {
   }
 
   const AuthContainer = () => {
-    if (!mode == 'SignIn') {
-      return SignInFunction();
-    } else {
+    if (mode) {
       return SignUpFunction();
+    } else {
+      return SignInFunction();
     }
   };
 
@@ -349,20 +315,33 @@ const AuthMain = ({navigation}) => {
 
       <View style={styles.authContainer}>{AuthContainer()}</View>
 
-      {/* <TextButton
-        label="SignIn"
-        onPress={() => {
-          if (mode === 'SignUp') {
-            // AnimationState.transitionTo('SignUp')
-            setMode('SignUp')
-          } else {
-            // AnimationState.transitionTo('SignIn')
-            setMode('SignIn')
-          }
-        }}
-      /> */}
-
-      <View style={{flex: 2, marginTop: 350, alignItems: 'center'}}>
+      <View
+        style={{alignItems: 'flex-start', position: 'absolute', marginTop: 490}}
+      >
+        <TextButton
+          label={mode == false ? 'new user registration' : null}
+          contentContainerStyle={{
+            marginTop: SIZES.radius,
+            backgroundColor: 'null',
+            // fontSize: 35,
+          }}
+          labelStyle={{
+            color: COLORS.support1,
+            ...FONTS.h4,
+            paddingHorizontal: SIZES.padding,
+          }}
+          onPress={() => {
+            if (mode == true) {
+              setMode('SignUp');
+              SignUpFunction();
+            } else {
+              setMode('SignIn');
+              SignInFunction();
+            }
+          }}
+        />
+      </View>
+      <View style={{flex: 2, marginTop: 400, alignItems: 'center'}}>
         <Text>OR login with</Text>
         <View style={{flexDirection: 'row', marginVertical: 20}}>
           <Image

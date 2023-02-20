@@ -1,101 +1,175 @@
 import {
-  Dimensions,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
   Image,
-} from 'react-native'
-import React, { useState } from 'react'
-import { COLORS, SIZES } from '../../constants'
-import FormInput from '../FormInput'
+} from 'react-native';
+import React from 'react';
+import {COLORS, SIZES} from '../../constants';
 
-const width = Dimensions.get('window').width
-
-const Header = ({ text }) => {
-  const [search, setSearch] = useState('')
+const Header = ({
+  userName,
+  userTitle,
+  value,
+  onChangeText,
+  onPressSort,
+  rightIcon,
+  leftIcon,
+  searchBar,
+  onPressArrow,
+  iconVideoCall,
+  iconNotification,
+  textHeader,
+  userProfile,
+}) => {
   return (
-    <View style={styles.headerContainer}>
-      <View style={styles.headerFlex}>
-        <Text style={styles.myFavText}>{text}</Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: COLORS.light,
-            padding: 10,
-            borderRadius: SIZES.radius,
-          }}
-        >
+    <View
+      style={{
+        backgroundColor: COLORS.support1,
+        height: (SIZES.height * 1) / 5.8,
+      }}
+    >
+      <View style={{flexDirection: 'row'}}>
+        {userProfile ? (
           <Image
-            source={require('../../assets/icons/menu.png')}
+            source={require('../../assets/images/banner-01.png')}
             style={{
-              width: 25,
-              height: 25,
-              marginRight: SIZES.base,
-              marginTop: 5,
+              width: 45,
+              height: 45,
+              borderRadius: 50,
+              top: 5,
+              left: 10,
             }}
           />
-        </TouchableOpacity>
+        ) : null}
 
-        <FormInput
-          containerStyle={
-            styles.searchContainer
-            // borderRadius: SIZES.radius,
-            // backgroundColor: COLORS.error,
-          }
-          placeholder="Search"
-          //   secureTextEntry={true}
-          value={search}
-          onChange={(text) => setSearch(text)}
-          prependComponent={
+        <View style={{margin: 10, paddingHorizontal: 10, width: '60%'}}>
+          <Text style={{fontSize: 16, color: COLORS.dark}}>{userName}</Text>
+          <Text>{userTitle}</Text>
+        </View>
+        {iconVideoCall ? (
+          <TouchableOpacity onPress={() => navigation.navigate('ChatVideo')}>
+            <Image
+              source={require('../../assets/icons/live-streaming.png')}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 50,
+                top: 10,
+              }}
+            />
+          </TouchableOpacity>
+        ) : null}
+        {iconNotification ? (
+          <TouchableOpacity onPress={() => setBellModal(true)}>
+            <Image
+              source={require('../../assets/icons/bell.png')}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 50,
+                top: 10,
+                left: 15,
+              }}
+            />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          marginHorizontal: 10,
+          width: leftIcon ? '80%' : '97%',
+        }}
+      >
+        {leftIcon ? (
+          <TouchableOpacity onPress={leftIcon ? onPressArrow : null}>
+            <Image
+              source={require('../../assets/icons/arrow-left.png')}
+              style={{
+                width: 30,
+                height: 30,
+                backgroundColor: COLORS.light,
+                borderRadius: SIZES.radius,
+                padding: 25,
+                marginHorizontal: 5,
+              }}
+            />
+          </TouchableOpacity>
+        ) : null}
+        {searchBar ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              backgroundColor: COLORS.light,
+              borderRadius: SIZES.radius,
+              width: leftIcon || rightIcon ? '85%' : '100%',
+              marginRight: 5,
+            }}
+          >
             <Image
               source={require('../../assets/icons/search.png')}
               style={{
-                width: 25,
-                height: 25,
-                // marginRight: SIZES.base,
+                width: 30,
+                height: 30,
+                borderRadius: 50,
+                left: 15,
+                marginVertical: 10,
               }}
             />
-          }
-        />
+
+            <TextInput
+              placeholder="search"
+              value={searchBar ? value : ''}
+              onChangeText={searchBar ? onChangeText : null}
+              style={{
+                borderRadius: SIZES.radius,
+                // backgroundColor: 'red',
+                width: '70%',
+                paddingHorizontal: 10,
+                marginHorizontal: 10,
+              }}
+            />
+          </View>
+        ) : (
+          <Text
+            style={{
+              backgroundColor: COLORS.light,
+              width: '70%',
+              paddingHorizontal: 10,
+              marginHorizontal: 10,
+              borderRadius: SIZES.radius,
+              fontSize: SIZES.h2,
+              textAlign: 'center',
+              alignSelf: 'center',
+              paddingVertical: 10,
+            }}
+          >
+            {textHeader}
+          </Text>
+        )}
+        {rightIcon ? (
+          <TouchableOpacity onPress={leftIcon ? onPressSort : null}>
+            <Image
+              source={require('../../assets/icons/sort.png')}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: SIZES.radius,
+                backgroundColor: COLORS.light,
+                padding: 24,
+              }}
+            />
+          </TouchableOpacity>
+        ) : null}
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    width: width,
-    height: width / 4 - 35,
-    // backgroundColor: 'white',
-    // elevation: 12,
-    padding: 10,
-  },
-  headerFlex: {
-    flexDirection: 'row-reverse',
-  },
-  searchContainer: {
-    width: '85%',
-    borderRadius: 10,
-    // paddingHorizontal: 10,
-    marginHorizontal: 5,
-  },
-  searchIconStyle: {
-    position: 'absolute',
-    marginTop: 10,
-    marginRight: width / 1 - 65,
-  },
-  menuIconStyle: {
-    backgroundColor: '#e5e5e5',
-    borderRadius: 10,
-    padding: 3,
-  },
-  myFavText: {
-    // fontFamily: fonts.medium,
-    fontSize: 25,
-    color: COLORS.dark,
-    fontWeight: '700',
-  },
-})
+const styles = StyleSheet.create({});

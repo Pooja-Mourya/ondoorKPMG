@@ -3,6 +3,9 @@ import {Text, View, Image} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {SIZES, COLORS} from '../constants';
+import MyDrawer from './MyDrawer';
+import Meeting from '../screen/mainscreen/meeting/Meeting';
+import Notes from '../screen/mainscreen/notes/Notes';
 
 const Tab = createBottomTabNavigator();
 
@@ -13,15 +16,14 @@ export default function MyTab() {
   return (
     <Tab.Navigator
       screenOptions={{
-        // tabBarActiveTintColor: COLORS.light,
-        tabBarShowLabel: false,
+        tabBarActiveTintColor: COLORS.light,
+        // tabBarShowLabel: false,
         headerShown: false,
         tabBarActiveBackgroundColor: COLORS.primary,
       }}
     >
       <Tab.Screen
         options={() => ({
-          headerShowLabel: false,
           tabBarIcon: () => {
             return (
               <View>
@@ -36,8 +38,8 @@ export default function MyTab() {
             );
           },
         })}
-        name="Chat"
-        component={Home}
+        name="Meeting"
+        component={Meeting}
       />
       <Tab.Screen
         options={() => ({
@@ -56,8 +58,8 @@ export default function MyTab() {
             );
           },
         })}
-        name="Call"
-        component={Home}
+        name="Notes"
+        component={Notes}
       />
       <Tab.Screen
         options={() => ({
@@ -77,8 +79,8 @@ export default function MyTab() {
           },
         })}
         // h={false}
-        name="Contact"
-        component={Home}
+        name="Role"
+        component={MyDrawer}
       />
     </Tab.Navigator>
   );
