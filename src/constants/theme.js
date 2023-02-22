@@ -1,5 +1,5 @@
-import { Dimensions } from 'react-native'
-const { width, height } = Dimensions.get('window')
+import {Dimensions} from 'react-native';
+const {width, height} = Dimensions.get('window');
 
 export const COLORS = {
   // Error
@@ -81,7 +81,7 @@ export const COLORS = {
   // Shadow
   shadow: 'rgba(138, 149, 158, 1)',
   shadow08: 'rgba(138, 149, 158, 0.08)',
-}
+};
 
 export const SIZES = {
   // global sizes
@@ -107,15 +107,15 @@ export const SIZES = {
   // app dimensions
   width,
   height,
-}
+};
 
 export const FONTS = {
-  largeTitle: { fontFamily: 'Poppins-Black', fontSize: SIZES.largeTitle },
-  h1: { fontFamily: 'Poppins-Bold', fontSize: SIZES.h1, lineHeight: 36 },
-  h2: { fontFamily: 'Poppins-Bold', fontSize: SIZES.h2, lineHeight: 30 },
-  h3: { fontFamily: 'Poppins-SemiBold', fontSize: SIZES.h3, lineHeight: 22 },
-  h4: { fontFamily: 'Poppins-SemiBold', fontSize: SIZES.h4, lineHeight: 22 },
-  h5: { fontFamily: 'Poppins-SemiBold', fontSize: SIZES.h5, lineHeight: 22 },
+  largeTitle: {fontFamily: 'Poppins-Black', fontSize: SIZES.largeTitle},
+  h1: {fontFamily: 'Poppins-Bold', fontSize: SIZES.h1, lineHeight: 36},
+  h2: {fontFamily: 'Poppins-Bold', fontSize: SIZES.h2, lineHeight: 30},
+  h3: {fontFamily: 'Poppins-SemiBold', fontSize: SIZES.h3, lineHeight: 22},
+  h4: {fontFamily: 'Poppins-SemiBold', fontSize: SIZES.h4, lineHeight: 22},
+  h5: {fontFamily: 'Poppins-SemiBold', fontSize: SIZES.h5, lineHeight: 22},
   body1: {
     fontFamily: 'Poppins-Regular',
     fontSize: SIZES.body1,
@@ -141,16 +141,16 @@ export const FONTS = {
     fontSize: SIZES.body5,
     lineHeight: 22,
   },
-}
+};
 
 export const darkTheme = {
   backgroundColor: COLORS.darkBackground,
-}
+};
 
 export const lightTheme = {
   backgroundColor: COLORS.white,
-}
+};
 
-const appTheme = { COLORS, SIZES, FONTS }
+const appTheme = {COLORS, SIZES, FONTS};
 
-export default appTheme
+export default appTheme;

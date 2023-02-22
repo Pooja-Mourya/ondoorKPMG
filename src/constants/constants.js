@@ -1,7 +1,7 @@
-let domain = '';
+let domain = 'meeting-api.gofactz.com/public';
 
-const base_url = `https://${domain}/api/`;
-const base_url2 = `https://${domain}/`;
+const base_url = `http://${domain}/api/`;
+const base_url2 = `http://${domain}/`;
 
 const walkthrough = [
   {
@@ -31,4 +31,11 @@ export default {
   walkthrough,
   base_url,
   base_url2,
+  AsyncStorageKey: '@user',
+  endPoint: {
+    login: 'login',
+    meetingList: 'meetings',
+    addMeeting: 'meeting',
+    logout: 'logout',
+  },
 };

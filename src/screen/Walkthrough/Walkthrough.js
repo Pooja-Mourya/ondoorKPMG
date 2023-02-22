@@ -10,21 +10,11 @@ import {
 import React, {useState} from 'react';
 import {COLORS, constants, FONTS, SIZES} from '../../constants';
 import TextButton from '../../components/TextButton';
+import {useSelector} from 'react-redux';
 
 const height = Dimensions.get('screen').height;
-const width = Dimensions.get('screen').width;
 
 const Walkthrough = ({navigation}) => {
-  //   console.log('data', constants.walkthrough)
-  //   useState for Walkthrough2
-
-  //   const [walk2Animated, setWalk2Animated] = useState(false);
-
-  //   const viewAnimatedChange = React.useRef(({viewableItems, changed}) => {
-  //     if (viewableItems[0].index == 1) {
-  //       setWalk2Animated(true);
-  //     }
-  //   });
   const Dots = () => {
     const dotPosition = Animated.divide(scrollX, SIZES.width);
     return (
@@ -134,73 +124,75 @@ const Walkthrough = ({navigation}) => {
         renderItem={({item, index}) => {
           //   console.log('index', index);
           return (
-            <View
-              style={{
-                width: SIZES.width,
-                justifyContent: 'center',
-              }}
-            >
-              {/* image section  */}
+            <>
               <View
                 style={{
-                  flex: 1,
-                  justifyContent: 'center',
                   width: SIZES.width,
-                  height: 300,
-                  alignItems: 'center',
-                  zIndex: 2,
+                  justifyContent: 'center',
                 }}
               >
-                {index == 0 && (
-                  <Image
-                    source={require('../../assets/icons/chat.png')}
-                    style={{width: 200, height: 200}}
-                  />
-                )}
-                {index == 1 && (
-                  <Image
-                    source={require('../../assets/icons/qr-code.png')}
-                    style={{width: 200, height: 200}}
-                  />
-                )}
-                {index == 2 && (
-                  <Image
-                    source={require('../../assets/icons/live-streaming.png')}
-                    style={{width: 200, height: 200}}
-                  />
-                )}
-                {index == 3 && (
-                  <Image
-                    source={require('../../assets/icons/fire.png')}
-                    style={{width: 200, height: 200}}
-                  />
-                )}
-              </View>
-
-              {/* title & description  */}
-              <View
-                style={{
-                  justifyContent: 'flex-start',
-                  alignContent: 'center',
-                  height: SIZES.height * 0.35,
-                  paddingHorizontal: SIZES.padding,
-                }}
-              >
-                <Text style={{textAlign: 'center', ...FONTS.h1}}>
-                  {item.title}
-                </Text>
-                <Text
+                {/* image section  */}
+                <View
                   style={{
-                    color: COLORS.grey,
-                    ...FONTS.body3,
-                    textAlign: 'center',
-                    marginTop: SIZES.radius,
+                    flex: 1,
+                    justifyContent: 'center',
+                    width: SIZES.width,
+                    height: 300,
+                    alignItems: 'center',
+                    zIndex: 2,
                   }}
                 >
-                  {item.sub_title}
-                </Text>
+                  {index == 0 && (
+                    <Image
+                      source={require('../../assets/icons/chat.png')}
+                      style={{width: 200, height: 200}}
+                    />
+                  )}
+                  {index == 1 && (
+                    <Image
+                      source={require('../../assets/icons/qr-code.png')}
+                      style={{width: 200, height: 200}}
+                    />
+                  )}
+                  {index == 2 && (
+                    <Image
+                      source={require('../../assets/icons/live-streaming.png')}
+                      style={{width: 200, height: 200}}
+                    />
+                  )}
+                  {index == 3 && (
+                    <Image
+                      source={require('../../assets/icons/fire.png')}
+                      style={{width: 200, height: 200}}
+                    />
+                  )}
+                </View>
+
+                {/* title & description  */}
+                <View
+                  style={{
+                    justifyContent: 'flex-start',
+                    alignContent: 'center',
+                    height: SIZES.height * 0.35,
+                    paddingHorizontal: SIZES.padding,
+                  }}
+                >
+                  <Text style={{textAlign: 'center', ...FONTS.h1}}>
+                    {item.title}
+                  </Text>
+                  <Text
+                    style={{
+                      color: COLORS.grey,
+                      ...FONTS.body3,
+                      textAlign: 'center',
+                      marginTop: SIZES.radius,
+                    }}
+                  >
+                    {item.sub_title}
+                  </Text>
+                </View>
               </View>
-            </View>
+            </>
           );
         }}
       />

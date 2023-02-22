@@ -1,9 +1,14 @@
 import React from 'react';
 import {View, Text, Image} from 'react-native';
+import {useSelector} from 'react-redux';
 import TextButton from '../../components/TextButton';
 import {FONTS, SIZES, COLORS} from '../../constants';
 
 const Welcome = ({navigation}) => {
+  const user = useSelector(state => state?.user?.user);
+
+  //   console.log('user', user);
+
   return (
     <View
       style={{
@@ -44,10 +49,14 @@ const Welcome = ({navigation}) => {
             borderRadius: SIZES.radius,
           }}
           label="Get Started"
-          onPress={() => navigation.navigate('Walkthrough')}
+          onPress={() =>
+            user == null
+              ? navigation.navigate('MyTab')
+              : navigation.navigate('Walkthrough')
+          }
         />
 
-        <TextButton
+        {/* <TextButton
           contentContainerStyle={{
             height: 50,
             marginTop: SIZES.base,
@@ -57,8 +66,8 @@ const Welcome = ({navigation}) => {
           labelStyle={{
             color: COLORS.primary,
           }}
-          //onPress
-        />
+          onPress={() => navigation.navigate('Walkthrough')}
+        /> */}
       </View>
     </View>
   );

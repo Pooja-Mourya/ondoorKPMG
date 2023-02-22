@@ -1,13 +1,13 @@
-import React from 'react'
-import { View, InputText, TextInput } from 'react-native'
-import { FONTS, SIZES, COLORS } from '../constants'
+import React from 'react';
+import {View, InputText, TextInput} from 'react-native';
+import {FONTS, SIZES, COLORS} from '../constants';
 
 const FormInput = ({
   containerStyle,
   inputContainerStyle,
   placeholder,
   inputStyle,
-  value = '',
+  value,
   prependComponent,
   appendComponent,
   onChange,
@@ -21,7 +21,7 @@ const FormInput = ({
   placeholderTextColor,
 }) => {
   return (
-    <View style={{ ...containerStyle }}>
+    <View style={{...containerStyle}}>
       <View
         style={{
           flexDirection: 'row',
@@ -48,14 +48,14 @@ const FormInput = ({
           autoCapitalize={autoCapitalize}
           autoCompleteType={autoCompleteType}
           maxLength={maxLength}
-          onChange={(text) => onChange(text)}
+          onChangeText={text => onChange(text)}
           onPressIn={onPress}
           editable={editable}
         />
         {appendComponent}
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default FormInput
+export default FormInput;

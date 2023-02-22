@@ -1,7 +1,6 @@
 import axios from 'axios';
-// import Constants from '../axiosMethod/Constants';
 import {constants} from '../constants';
-export default ApiMethod = {
+const ApiMethod = {
   getData: async (endPoint, token) => {
     let url = constants.base_url + endPoint;
     let headers = {
@@ -38,13 +37,13 @@ export default ApiMethod = {
       headers: headers,
     };
 
-    console.log('config--', config);
-    console.log('url--', url);
-    console.log('body--', body);
+    // console.log('config--', config);
+    // console.log('url--', url);
+    // console.log('body--', body);
 
     try {
       let response = await axios.post(url, body, config);
-      console.log('response', response);
+      //   console.log('response', response);
       return response;
     } catch (error) {
       console.log('error', error);
@@ -193,3 +192,5 @@ export default ApiMethod = {
     }
   },
 };
+
+export default ApiMethod;

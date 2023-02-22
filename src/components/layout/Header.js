@@ -28,7 +28,8 @@ const Header = ({
     <View
       style={{
         backgroundColor: COLORS.support1,
-        height: (SIZES.height * 1) / 5.8,
+        padding: 10,
+        // height: (SIZES.height * 1) / 5.8,
       }}
     >
       <View style={{flexDirection: 'row'}}>
@@ -41,14 +42,17 @@ const Header = ({
               borderRadius: 50,
               top: 5,
               left: 10,
+              backgroundColor: COLORS.dark,
             }}
           />
         ) : null}
+        {userTitle ? (
+          <View style={{margin: 10, paddingHorizontal: 10, width: '60%'}}>
+            <Text style={{fontSize: 16, color: COLORS.dark}}>{userName}</Text>
+            <Text>{userTitle}</Text>
+          </View>
+        ) : null}
 
-        <View style={{margin: 10, paddingHorizontal: 10, width: '60%'}}>
-          <Text style={{fontSize: 16, color: COLORS.dark}}>{userName}</Text>
-          <Text>{userTitle}</Text>
-        </View>
         {iconVideoCall ? (
           <TouchableOpacity onPress={() => navigation.navigate('ChatVideo')}>
             <Image
@@ -77,7 +81,7 @@ const Header = ({
           </TouchableOpacity>
         ) : null}
       </View>
-
+      {/* 122 */}
       <View
         style={{
           flexDirection: 'row',
@@ -92,7 +96,7 @@ const Header = ({
               style={{
                 width: 30,
                 height: 30,
-                backgroundColor: COLORS.light,
+                backgroundColor: COLORS.light20,
                 borderRadius: SIZES.radius,
                 padding: 25,
                 marginHorizontal: 5,
@@ -104,7 +108,7 @@ const Header = ({
           <View
             style={{
               flexDirection: 'row',
-              backgroundColor: COLORS.light,
+              backgroundColor: COLORS.light20,
               borderRadius: SIZES.radius,
               width: leftIcon || rightIcon ? '85%' : '100%',
               marginRight: 5,
@@ -137,7 +141,7 @@ const Header = ({
         ) : (
           <Text
             style={{
-              backgroundColor: COLORS.light,
+              backgroundColor: COLORS.light20,
               width: '70%',
               paddingHorizontal: 10,
               marginHorizontal: 10,
@@ -146,6 +150,7 @@ const Header = ({
               textAlign: 'center',
               alignSelf: 'center',
               paddingVertical: 10,
+              color: COLORS.primary,
             }}
           >
             {textHeader}
@@ -159,7 +164,7 @@ const Header = ({
                 width: 30,
                 height: 30,
                 borderRadius: SIZES.radius,
-                backgroundColor: COLORS.light,
+                backgroundColor: COLORS.light20,
                 padding: 24,
               }}
             />
