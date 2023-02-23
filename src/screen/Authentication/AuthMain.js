@@ -5,7 +5,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
-  TouchableWithoutFeedback,
+  Modal,
   Animated,
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
@@ -19,16 +19,25 @@ import {useDispatch} from 'react-redux';
 import {userLoginFun} from '../../redux/slice/UserSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ActivityIndicator} from 'react-native';
+import {useSelector} from 'react-redux';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import CheckBox from '../../components/CheckBox';
 
 const AuthMain = ({navigation}) => {
+  const token = useSelector(state => state?.user?.user);
   const [mode, setMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [number, setNumber] = useState(0);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [number, setNumber] = useState('');
+  const [designation, setDesignation] = useState('');
   const [click, setClick] = useState(false);
   const [loginUser, setLoginUser] = useState([]);
   const [load, setLoad] = useState(false);
+  const [forgetModal, setForgetModal] = useState(false);
+  const [forgetPassword, setForgetPassword] = useState('');
+  const [termChecked, setTermChecked] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -112,7 +121,7 @@ const AuthMain = ({navigation}) => {
                   ...FONTS.h4,
                   paddingHorizontal: SIZES.padding,
                 }}
-                // onPress={() => navigation.navigate('Forgot')}
+                onPress={() => setForgetModal(true)}
               />
             </View>
             <TextButton
@@ -136,9 +145,7 @@ const AuthMain = ({navigation}) => {
 
   function SignUpFunction() {
     return (
-      <Animated.View
-        style={{marginTop: SIZES.padding, height: SIZES.height * 0.6}}
-      >
+      <KeyboardAwareScrollView>
         <View style={styles.authContainer}>
           <Text
             style={{
@@ -152,146 +159,160 @@ const AuthMain = ({navigation}) => {
           >
             Sign up
           </Text>
-          <KeyboardAwareScrollView
-            enableOnAndroid={true}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps={'handled'}
-            extraScrollHeight={-300}
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: 'center',
-            }}
-          >
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-              }}
-              placeholder="Name"
-              value={name}
-              onChange={() => setName()}
-              prependComponent={
-                <Image
-                  source={require('../../assets/icons/person.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              }
-            />
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-              }}
-              placeholder="Email"
-              value={email}
-              onChange={e => setEmail(e)}
-              prependComponent={
-                <Image
-                  source={require('../../assets/icons/email.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              }
-            />
 
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-              }}
-              placeholder="Number"
-              value={number}
-              onChange={number => setNumber(number)}
-              prependComponent={
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Name"
+            value={name}
+            onChange={() => setName()}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/person.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e)}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/email.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Number"
+            value={number}
+            onChange={u => setNumber(u)}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/call.png')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Password"
+            secureTextEntry={true}
+            value={password}
+            onChange={p => setPassword(p)}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/lock.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Confirm Password"
+            secureTextEntry={click}
+            value={confirmPassword}
+            onChange={p => setConfirmPassword(p)}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/lock.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+            appendComponent={
+              <TouchableOpacity onPress={() => setClick(!click)}>
                 <Image
-                  source={require('../../assets/icons/call.png')}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              }
-            />
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-              }}
-              placeholder="Password"
-              secureTextEntry={true}
-              value={password}
-              onChange={p => setPassword(p)}
-              prependComponent={
-                <Image
-                  source={require('../../assets/icons/lock.png')}
+                  source={
+                    !click
+                      ? require('../../assets/icons/eye.png')
+                      : require('../../assets/icons/eye-off.png')
+                  }
                   style={{
                     width: 25,
                     height: 25,
                     marginRight: SIZES.base,
                   }}
                 />
-              }
-            />
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-              }}
-              placeholder="Confirm Password"
-              secureTextEntry={click}
-              value={password}
-              onChange={p => setPassword(p)}
-              prependComponent={
-                <Image
-                  source={require('../../assets/icons/lock.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              }
-              appendComponent={
-                <TouchableOpacity onPress={() => setClick(!click)}>
-                  <Image
-                    source={
-                      !click
-                        ? require('../../assets/icons/eye.png')
-                        : require('../../assets/icons/eye-off.png')
-                    }
-                    style={{
-                      width: 25,
-                      height: 25,
-                      marginRight: SIZES.base,
-                    }}
-                  />
-                </TouchableOpacity>
-              }
-            />
-            <TextButton
-              label={'Sign Up'}
-              contentContainerStyle={{
-                height: 55,
-                borderRadius: SIZES.radius,
-                margin: 10,
-              }}
-              labelStyle={{
-                color: COLORS.light,
-                ...FONTS.h4,
-              }}
-              onPress={() => HandleSignUp()}
-            />
-          </KeyboardAwareScrollView>
+              </TouchableOpacity>
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Designation"
+            value={designation}
+            onChange={d => setDesignation(d)}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/credit_card.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+          <CheckBox
+            containerStyle={{backgroundColor: '', lineHeight: 20}}
+            isSelected={termChecked}
+            onPress={() => setTermChecked(!termChecked)}
+          />
+          <TextButton
+            label={'Sign Up'}
+            contentContainerStyle={{
+              height: 55,
+              borderRadius: SIZES.radius,
+              margin: 10,
+            }}
+            labelStyle={{
+              color: COLORS.light,
+              ...FONTS.h4,
+            }}
+            onPress={() => HandleSignUp()}
+          />
         </View>
-      </Animated.View>
+      </KeyboardAwareScrollView>
     );
   }
 
@@ -334,26 +355,37 @@ const AuthMain = ({navigation}) => {
   };
 
   const HandleSignUp = async () => {
-    const url = constants.endPoint.login;
+    const url = constants.endPoint.register;
     const params = {
-      //   email: 'admin@gmail.com',
-      //   password: '12345678',
       name,
       email,
       number,
       password,
+      designation,
     };
     try {
-      const result = await ApiMethod.postData(url, params, null);
-      console.log('result', result);
+      const result = await ApiMethod.postData(url, params, token);
+      console.log('result', result, 'param', params);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
 
-      //   return;
-      setLoginUser(result?.data);
-      dispatch(userLoginFun(result?.data?.payload));
-      if (result?.data?.data?.access_token) {
-        navigation.navigate('MyTab');
+  const resetPassword = async () => {
+    try {
+      const url = await constants.endPoint.forgetPassword;
+      const params = {
+        // email: forgetPassword,
+        email: 'admin@gmail.com',
+      };
+
+      // return
+      const result = ApiMethod.postData(url, params, token);
+      console.log('result', result);
+      if (result) {
+        result.message;
+        navigation.navigate('Resetpassword');
       }
-      AsyncStorage.setItem('@user', JSON.stringify(result?.data?.payload));
     } catch (error) {
       console.log('error', error);
     }
@@ -437,7 +469,7 @@ const AuthMain = ({navigation}) => {
         <TouchableOpacity
           onPress={() => setMode(false)}
           style={{
-            marginBottom: 50,
+            marginBottom: 20,
             alignSelf: 'center',
             backgroundColor: COLORS.support3_08,
             padding: SIZES.padding,
@@ -446,6 +478,83 @@ const AuthMain = ({navigation}) => {
           <Text>if you are already register so login </Text>
         </TouchableOpacity>
       )}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={forgetModal}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setForgetModal(!forgetModal);
+        }}
+      >
+        <View
+          style={{
+            justifyContent: 'center',
+            flex: 1,
+            alignItems: 'center',
+            backgroundColor: COLORS.lightGrey80,
+          }}
+        >
+          <View
+            style={{
+              width: '90%',
+              backgroundColor: COLORS.support1,
+              padding: SIZES.padding,
+              borderRadius: SIZES.radius,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row-reverse',
+                justifyContent: 'space-between',
+                marginBottom: 20,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  alignSelf: 'flex-end',
+                  backgroundColor: COLORS.light20,
+                  borderRadius: 50,
+                  padding: 5,
+                  elevation: 1,
+                }}
+                onPress={() => setForgetModal(false)}
+              >
+                <Text>
+                  <AntDesign name="close" size={30} color={COLORS.dark} />
+                </Text>
+              </TouchableOpacity>
+
+              <Text style={{fontSize: SIZES.h2, padding: 10}}>
+                reset password
+              </Text>
+            </View>
+            <FormInput
+              containerStyle={{
+                borderRadius: SIZES.radius,
+                backgroundColor: COLORS.error,
+              }}
+              placeholder="ENTER YOUR EMAIL"
+              value={forgetPassword}
+              onChange={f => setForgetPassword(f)}
+            />
+            <TextButton
+              label={'Reset Password'}
+              contentContainerStyle={{
+                height: 55,
+                borderRadius: SIZES.radius,
+                marginVertical: 10,
+              }}
+              labelStyle={{
+                color: COLORS.light,
+                ...FONTS.h4,
+              }}
+              onPress={() => resetPassword()}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

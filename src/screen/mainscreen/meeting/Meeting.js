@@ -1,4 +1,11 @@
-import {StyleSheet, Text, View, Alert, FlatList} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
 import {COLORS, constants, SIZES} from '../../../constants';
@@ -12,15 +19,20 @@ const Meeting = ({navigation}) => {
   console.log('token', token);
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
 
   const handleMeetingList = async () => {
     const url = constants.endPoint.meetingList;
-    const params = {};
-
+    const params = {
+      //   page: 1,
+      //   per_page_record: '10',
+    };
+    setIsRefreshing(true);
     try {
       const result = await ApiMethod.postData(url, params, token);
       console.log('result', result?.data?.data, 'url', url);
       setListState(result?.data?.data);
+      setIsRefreshing(false);
       return;
     } catch (error) {
       console.log('error', error);
@@ -29,7 +41,7 @@ const Meeting = ({navigation}) => {
 
   useEffect(() => {
     handleMeetingList();
-  }, []);
+  }, [page]);
   return (
     <>
       <Header
@@ -74,6 +86,15 @@ const Meeting = ({navigation}) => {
             </>
           );
         }}
+        onEndReached={() => {
+          //   console.log('load more');
+          //   setPage(page + 1);
+          handleMeetingList(page + 1);
+        }}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={() => (
+          <ActivityIndicator size={'large'} color={'rosybrown'} />
+        )}
       />
       <FAB
         icon="plus"

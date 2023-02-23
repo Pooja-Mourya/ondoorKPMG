@@ -37,5 +37,7 @@ export default {
     meetingList: 'meetings',
     addMeeting: 'meeting',
     logout: 'logout',
+    register: 'register',
+    forgetPassword: 'forgot-password',
   },
 };

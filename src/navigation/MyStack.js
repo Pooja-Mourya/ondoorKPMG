@@ -8,6 +8,7 @@ import {
   MyTab,
   Forgot,
   AddMeeting,
+  Resetpassword,
 } from '../screen/index';
 
 const Stack = createStackNavigator();
@@ -27,6 +28,7 @@ const MyStack = () => {
         <Stack.Screen name="MyTab" component={MyTab} />
         <Stack.Screen name="Forgot" component={Forgot} />
         <Stack.Screen name="AddMeeting" component={AddMeeting} />
+        <Stack.Screen name="Resetpassword" component={Resetpassword} />
       </Stack.Navigator>
     </NavigationContainer>
   );
