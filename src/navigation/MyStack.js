@@ -9,6 +9,7 @@ import {
   Forgot,
   AddMeeting,
   Resetpassword,
+  ViewMeeting,
 } from '../screen/index';
 
 const Stack = createStackNavigator();
@@ -29,6 +30,7 @@ const MyStack = () => {
         <Stack.Screen name="Forgot" component={Forgot} />
         <Stack.Screen name="AddMeeting" component={AddMeeting} />
         <Stack.Screen name="Resetpassword" component={Resetpassword} />
+        <Stack.Screen name="ViewMeeting" component={ViewMeeting} />
       </Stack.Navigator>
     </NavigationContainer>
   );

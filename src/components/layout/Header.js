@@ -142,7 +142,7 @@ const Header = ({
           <Text
             style={{
               backgroundColor: COLORS.light20,
-              width: '70%',
+              width: rightIcon == true ? '75%' : '95%',
               paddingHorizontal: 10,
               marginHorizontal: 10,
               borderRadius: SIZES.radius,

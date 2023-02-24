@@ -79,7 +79,7 @@ export default function MyTab() {
           },
         })}
         // h={false}
-        name="Role"
+        name="More"
         component={MyDrawer}
       />
     </Tab.Navigator>

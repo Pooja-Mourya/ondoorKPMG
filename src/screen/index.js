@@ -5,6 +5,7 @@ import MyTab from '../navigation/MyTab';
 import Forgot from './Authentication/Forgot';
 import AddMeeting from './mainscreen/meeting/AddMeeting';
 import Resetpassword from './Authentication/Resetpassword';
+import ViewMeeting from './mainscreen/meeting/ViewMeeting';
 
 export {
   Welcome,
@@ -14,4 +15,5 @@ export {
   Forgot,
   AddMeeting,
   Resetpassword,
+  ViewMeeting,
 };

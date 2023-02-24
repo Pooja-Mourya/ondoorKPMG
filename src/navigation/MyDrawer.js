@@ -22,6 +22,7 @@ import {useSelector} from 'react-redux';
 import ApiMethod from '../Services/APIService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ActivityIndicator} from 'react-native';
+import UserList from '../screen/user/UserList';
 
 function HomeScreen({navigation}) {
   return (
@@ -122,11 +123,11 @@ const MyDrawer = () => {
   return (
     <Drawer.Navigator
       initialRouteName="Home"
-      drawerContentOptions={{
+      //   drawerContentOptions={{
+      // }}
+      screenOptions={{
         activeTintColor: 'red',
         itemStyle: {marginVertical: 5},
-      }}
-      screenOptions={{
         drawerActiveBackgroundColor: COLORS.primary,
         drawerActiveTintColor: 'white',
         drawerInactiveTintColor: 'black',
@@ -145,11 +146,21 @@ const MyDrawer = () => {
         }}
       />
       <Drawer.Screen
+        name="User"
+        component={UserList}
+        options={{
+          drawerIcon: () => (
+            <AntDesign name="user" size={20} color={COLORS.dark} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
         name="Notifications"
         component={NotificationsScreen}
         options={{
           drawerIcon: () => (
-            <AntDesign name="home" size={20} color={COLORS.dark} />
+            <AntDesign name="contacts" size={20} color={COLORS.dark} />
           ),
           //   headerShown: false,
         }}
@@ -159,7 +170,7 @@ const MyDrawer = () => {
         component={Logout}
         options={{
           drawerIcon: () => (
-            <AntDesign name="home" size={20} color={COLORS.dark} />
+            <AntDesign name="logout" size={20} color={COLORS.dark} />
           ),
           headerShown: false,
         }}

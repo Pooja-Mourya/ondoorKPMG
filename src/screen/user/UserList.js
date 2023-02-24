@@ -5,20 +5,19 @@ import {
   Alert,
   FlatList,
   ActivityIndicator,
-  TouchableOpacity,
+  Modal,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import Header from '../../../components/layout/Header';
-import {COLORS, constants, SIZES} from '../../../constants';
+import Header from '../../components/layout/Header';
+import {COLORS, constants, SIZES} from '../../constants';
 import {FAB} from 'react-native-paper';
-import ApiMethod from '../../../Services/APIService';
+import ApiMethod from '../../Services/APIService';
 import {useSelector} from 'react-redux';
 import {RefreshControl} from 'react-native';
-import {Modal} from 'react-native';
-import MeetingFilter from './MeetingFilter';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import UserFilter from './UserFilter';
 
-const Meeting = ({navigation}) => {
+const UserList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user);
   console.log('token', token);
   const [listState, setListState] = useState([]);
@@ -27,8 +26,8 @@ const Meeting = ({navigation}) => {
   const [filterData, setFilterData] = useState({}); //filter data
   const [filterModal, setFilterModal] = useState(false);
 
-  const handleMeetingList = async () => {
-    const url = constants.endPoint.meetingList;
+  const userListApi = async () => {
+    const url = constants.endPoint.userList;
     const params = {
       //   page: 1,
       //   per_page_record: '10',
@@ -46,7 +45,7 @@ const Meeting = ({navigation}) => {
   };
 
   useEffect(() => {
-    handleMeetingList();
+    userListApi();
   }, [page]);
   return (
     <>
@@ -68,12 +67,11 @@ const Meeting = ({navigation}) => {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={() => {
-              handleMeetingList(null, true);
+              userListApi(null, true);
             }}
           />
         }
         renderItem={({item}) => {
-          //   console.log('item', item?.documents[0]?.uploading_file_name);
           return (
             <>
               <View
@@ -85,20 +83,11 @@ const Meeting = ({navigation}) => {
                 }}
               >
                 <View>
-                  <TouchableOpacity onPress={() => {}}>
-                    <AntDesign name="delete" size={20} color={COLORS.error} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('ViewMeeting', item)}
-                  >
-                    <AntDesign name="eyeo" size={20} color={COLORS.support3} />
-                  </TouchableOpacity>
+                  <AntDesign name="delete" size={20} color={COLORS.error} />
+                  <AntDesign name="delete" size={20} color={COLORS.error} />
                 </View>
-
-                <Text>{item.meetRandomId}</Text>
-                {/* <Text>{item.meeting_title}</Text> */}
-                <Text>{item.attendees[0].user_id}</Text>
-                {/* <Text>{item?.documents[0]?.file_extension}</Text> */}
+                <Text>{item.name}</Text>
+                <Text>{item.email}</Text>
               </View>
             </>
           );
@@ -106,7 +95,7 @@ const Meeting = ({navigation}) => {
         onEndReached={() => {
           //   console.log('load more');
           //   setPage(page + 1);
-          handleMeetingList(page + 1);
+          userListApi(page + 1);
         }}
         onEndReachedThreshold={0.1}
         ListFooterComponent={() => (
@@ -145,7 +134,7 @@ const Meeting = ({navigation}) => {
               borderRadius: SIZES.radius,
             }}
           >
-            <MeetingFilter
+            <UserFilter
               filterData={filterData}
               setFilterModal={setFilterModal}
               filterModal={filterModal}
@@ -157,7 +146,7 @@ const Meeting = ({navigation}) => {
   );
 };
 
-export default Meeting;
+export default UserList;
 
 const styles = StyleSheet.create({
   fab: {

@@ -2,7 +2,7 @@ import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS, SIZES} from '../constants';
 
-const CheckBox = ({containerStyle, isSelected, onPress}) => {
+const CheckBox = ({containerStyle, isSelected, onPress, CheckBoxText}) => {
   return (
     <TouchableOpacity
       style={{flexDirection: 'row', ...containerStyle}}
@@ -16,6 +16,7 @@ const CheckBox = ({containerStyle, isSelected, onPress}) => {
           justifyContent: 'center',
           borderColor: isSelected ? COLORS.primary : COLORS.light,
           backgroundColor: isSelected ? COLORS.primary : COLORS.dark,
+          marginTop: 10,
         }}
       >
         {isSelected ? (
@@ -36,9 +37,11 @@ const CheckBox = ({containerStyle, isSelected, onPress}) => {
           marginLeft: SIZES.base,
           ...FONTS.body5,
           lineHeight: 20,
+          fontSize: SIZES.h3,
+          marginTop: 12,
         }}
       >
-        By registering , you agree to our terms
+        {CheckBoxText}
       </Text>
     </TouchableOpacity>
   );

@@ -341,10 +341,7 @@ const AuthMain = ({navigation}) => {
       setLoginUser(result?.data);
 
       if (result?.data?.data?.access_token) {
-        AsyncStorage.setItem(
-          '@user',
-          JSON.stringify(result?.data?.data?.access_token),
-        );
+        AsyncStorage.setItem('@user', result?.data?.data?.access_token);
         dispatch(userLoginFun(result?.data?.data?.access_token));
         setLoad(false);
         navigation.navigate('MyTab');
@@ -395,7 +392,7 @@ const AuthMain = ({navigation}) => {
     try {
       const variable = await AsyncStorage.getItem('@user');
       if (variable !== null) {
-        console.log('variable', variable);
+        console.log('"variable"', variable);
         dispatch(userLoginFun(variable));
         navigation.navigate('MyTab');
       }

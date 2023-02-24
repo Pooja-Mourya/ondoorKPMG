@@ -35,9 +35,11 @@ export default {
   endPoint: {
     login: 'login',
     meetingList: 'meetings',
-    addMeeting: 'meeting',
+    meeting: 'meeting',
     logout: 'logout',
     register: 'register',
     forgetPassword: 'forgot-password',
+    userList: 'users',
+    uploadFile: 'file-upload',
   },
 };

@@ -2,11 +2,15 @@ import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Header from '../../../components/layout/Header';
 
-const Notes = () => {
+const Notes = ({navigation}) => {
   return (
     <View>
-      <Header text="Notes Common" />
-      <Text>Notes</Text>
+      <Header
+        textHeader="Notes"
+        leftIcon={true}
+        onPressArrow={() => navigation.goBack()}
+      />
+      <Text></Text>
     </View>
   );
 };
