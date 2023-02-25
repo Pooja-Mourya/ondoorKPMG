@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../components/layout/Header';
-import {COLORS, constants, SIZES} from '../../constants';
+import {COLORS, constants, FONTS, SIZES} from '../../constants';
 import {FAB} from 'react-native-paper';
 import ApiMethod from '../../Services/APIService';
 import {useSelector} from 'react-redux';
@@ -60,6 +60,17 @@ const UserList = ({navigation}) => {
         userProfile={true}
       />
 
+      <Text
+        style={{
+          ...FONTS.base,
+          color: COLORS.primary,
+          textAlign: 'center',
+          fontSize: SIZES.h2,
+          margin: 5,
+        }}
+      >
+        Roles List
+      </Text>
       <FlatList
         data={listState}
         keyExtractor={item => item.id}

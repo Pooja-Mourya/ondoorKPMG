@@ -97,7 +97,7 @@ const Meeting = ({navigation}) => {
 
                 <Text>{item.meetRandomId}</Text>
                 {/* <Text>{item.meeting_title}</Text> */}
-                <Text>{item.attendees[0].user_id}</Text>
+                <Text>{item.attendees[0].meeting_id}</Text>
                 {/* <Text>{item?.documents[0]?.file_extension}</Text> */}
               </View>
             </>

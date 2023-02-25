@@ -6,6 +6,8 @@ import {
   FlatList,
   Button,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
@@ -13,14 +15,15 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FormInput from '../../../components/FormInput';
 import {SIZES, COLORS, FONTS, constants} from '../../../constants';
 import TextButton from '../../../components/TextButton';
-import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {useSelector} from 'react-redux';
 import ApiMethod from '../../../Services/APIService';
 import CheckBox from '../../../components/CheckBox';
 import {Dropdown, MultiSelect} from 'react-native-element-dropdown';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
+import DocumentPicker from 'react-native-document-picker';
 
 const data = [
   {id: '1', duration: 'Every day'},
@@ -31,22 +34,26 @@ const data = [
 const AddMeeting = () => {
   const token = useSelector(state => state?.user?.user);
 
-  const [images, setImages] = useState([]);
+  const [selectImage, setSelectImage] = useState([]);
   const [enableCheck, setEnableCheck] = useState(false);
+  const [singleFile, setSingleFile] = useState(null);
+  const [uploadFiles, setUploadFiles] = useState([]);
   const [user, setUser] = useState([]);
   const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
-  const [text, setText] = useState('');
+  const [open, setOpen] = useState(false);
+  const [openTime, setOpenTime] = useState(false);
+  const [isUploadLoading, setIsUploading] = useState(false);
   const [state, setState] = useState({
     meeting_title: '',
     meeting_date: '',
     meeting_time: '',
     meeting_ref_no: '',
     agenda_of_meeting: '',
-    is_repeat: '',
-    attendees: '',
-    documents: '',
+    is_repeat: data.id,
+    eventNumber: 0,
+    attendees: [user.email],
+    documents: [selectImage.uri],
+    inviteEmail: '',
   });
 
   const onChange = (event, selectedData) => {
@@ -72,29 +79,63 @@ const AddMeeting = () => {
     setMode(currentMode);
   };
 
-  const uploadFile = async () => {
-    try {
-      let url = constants.endPoint.uploadFile;
-      let params = {};
-      const result = await ApiMethod.postImageData(url, params, token);
-      console.log('result', result);
-    } catch (error) {
-      console.log('error', error);
+  //   const uploadFile = async () => {
+  //     try {
+  //       let url = constants.endPoint.uploadFile;
+  //       let params = {};
+  //       const result = await ApiMethod.uploadFileServices(url, params, token);
+  //       console.log('result', result);
+  //     } catch (error) {
+  //       console.log('error', error);
+  //     }
+  //   };
+
+  const uploadFile = async singleFile => {
+    // if (singleFile != null) {
+    //   console.log('singleFile', singleFile);
+
+    setIsUploading(true);
+    let url = constants.endPoint.uploadFile;
+    let res = await ApiMethod.uploadFileServices(
+      url,
+      singleFile,
+      token,
+      'CSV_',
+      'no_multiple',
+      'csv Attachment',
+    );
+
+    console.log('response', res);
+
+    if (res.errorMsg) {
+      Alert.alert('Constants.danger, res.errorMsg');
+      setIsUploading(false);
+      return null;
+    } else {
+      Alert.alert(' Constants.labels.message_uploaded_successfully,');
+      if (res?.data?.file) setUploadFiles(res?.data?.file);
+      setIsUploading(false);
     }
+    // }
   };
 
   const submitHandle = async () => {
     const url = constants.endPoint.meeting;
+    console.log('submit');
+
+    return;
     const params = {
-      meeting_title: 'no subject',
-      metting_date: '21/02/2023',
-      metting_time: '05:28',
+      meeting_title: state.meeting_title,
+      meeting_date: state.meeting_date,
+      meeting_time: '05:28',
       meeting_ref_no: '0000',
       agenda_of_meeting: 'null',
       is_repeat: 'fdfd',
       attendees: 'ff',
       documents: 'gg',
     };
+
+    console.log('params', params);
 
     try {
       const result = await ApiMethod.postData(url, params, token);
@@ -107,32 +148,13 @@ const AddMeeting = () => {
     }
   };
 
-  const openPicker = async () => {
-    try {
-      const response = await MultipleImagePicker.openPicker({
-        selectedAssets: images,
-        isExportThumbnail: true,
-        maxVideo: 1,
-        usedCameraButton: false,
-        isCrop: true,
-        isCropCircle: true,
-        mediaType: 'All',
-        usedCameraButton: true,
-      });
-      console.log('response: ', response);
-      setImages(response);
-    } catch (e) {
-      console.log(e.code, e.message);
-    }
-  };
-
   const onDelete = value => {
-    const data = images.filter(
+    const data = selectImage.filter(
       item =>
         item?.localIdentifier &&
         item?.localIdentifier !== value?.localIdentifier,
     );
-    setImages(data);
+    setSelectImage(data);
   };
 
   const ListUser = async () => {
@@ -148,9 +170,11 @@ const AddMeeting = () => {
       console.log('error', error);
     }
   };
+
   useEffect(() => {
     ListUser();
   }, []);
+
   const onchangeState = (name, value) => {
     setState({
       ...state,
@@ -158,7 +182,32 @@ const AddMeeting = () => {
     });
   };
 
+  const onlyDate = moment(date).format('L');
+  const onlyTime = moment(date).format('LT');
+
+  const selectFile = async options => {
+    try {
+      const res = await DocumentPicker.pickMultiple(options);
+      setSelectImage(res);
+      //   return;
+      if (singleFile <= 10000) {
+        uploadFile(res);
+      }
+    } catch (err) {
+      setSingleFile(null);
+      if (DocumentPicker.isCancel(err)) {
+        alert('Canceled');
+      } else {
+        alert('Unknown Error: ' + JSON.stringify(err));
+      }
+    }
+  };
+
   //   console.log('state', state);
+  //   console.log('date', onlyDate);
+  //   console.log('time', onlyTime);
+
+  if (isUploadLoading) return <ActivityIndicator />;
   return (
     <>
       <Header textHeader={'Create Meeting'} leftIcon={true} rightIcon={true} />
@@ -193,10 +242,13 @@ const AddMeeting = () => {
                 width: '48%',
               }}
               placeholder="Meeting Date"
-              value={state.meeting_date}
-              onChange={d => onchangeState('meeting_date', d)}
+              value={onlyDate}
+              onChange={d => {
+                console.log('25/02/2023', d);
+                onchangeState('meeting_date', d);
+              }}
               appendComponent={
-                <TouchableOpacity onPress={() => showMode('date')}>
+                <TouchableOpacity onPress={() => setOpen(true)}>
                   <Fontisto name={'date'} size={25} color={COLORS.primary} />
                 </TouchableOpacity>
               }
@@ -209,10 +261,13 @@ const AddMeeting = () => {
                 width: '48%',
               }}
               placeholder="Meeting Time"
-              value={state.metting_time}
-              onChange={d => onchangeState('metting_time', d)}
+              value={onlyTime}
+              onChange={t => {
+                console.log('meeting_time', t);
+                onchangeState('meeting_time', t);
+              }}
               appendComponent={
-                <TouchableOpacity onPress={() => showMode('time')}>
+                <TouchableOpacity onPress={() => setOpenTime(true)}>
                   <AntDesign
                     name={'clockcircleo'}
                     size={25}
@@ -287,9 +342,19 @@ const AddMeeting = () => {
                   marginTop: 10,
                 }}
                 placeholder="Event Number"
-                value={state.is_repeat}
-                onChange={a => onchangeState('is_repeat', a)}
+                value={state.eventNumber}
+                onChange={a => onchangeState('eventNumber', a)}
+                keyboardType="number"
               />
+              {state.eventNumber === Number ? null : (
+                <Text
+                  style={{
+                    color: state.eventNumber === Number ? COLORS.error : 'grey',
+                  }}
+                >
+                  this field is required
+                </Text>
+              )}
               <Text
                 style={{
                   ...FONTS.body3,
@@ -300,7 +365,7 @@ const AddMeeting = () => {
                   color: COLORS.primary,
                 }}
               >
-                The meeting will be repeated for Days
+                The meeting will be repeated for {state.eventNumber} Days
               </Text>
             </View>
           ) : null}
@@ -314,12 +379,23 @@ const AddMeeting = () => {
             data={user}
             labelField="email"
             valueField="id"
-            placeholder="Select item"
+            placeholder="Select attendees"
             searchPlaceholder="Search..."
             value={state.attendees}
             onChange={item => {
               onchangeState('attendees', item);
             }}
+          />
+
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            placeholder="Add Invitational Email"
+            value={state.inviteEmail}
+            onChange={invitation => onchangeState('inviteEmail', invitation)}
           />
           <FormInput
             containerStyle={{
@@ -335,34 +411,34 @@ const AddMeeting = () => {
                 name={'upload'}
                 size={30}
                 color={COLORS.primary}
-                onPress={() => openPicker()}
+                onPress={() => selectFile()}
               />
             }
           />
           <View>
             <FlatList
-              data={images}
+              data={selectImage}
               keyExtractor={(item, index) =>
                 (item?.filename ?? item?.path) + index
               }
               renderItem={({item}) => {
-                console.log('item', item.path);
+                // console.log('item', item);
                 return (
                   <View style={{}}>
-                    {/* <Image
+                    <Image
                       width={250}
-                      source={require(item.realPath)}
+                      source={{uri: item.uri}}
                       style={{
                         width: 100,
                         height: 100,
-                        backgroundColor: 'red',
                         flex: 1,
+                        borderRadius: SIZES.radius,
                       }}
-                    /> */}
+                    />
                     <TouchableOpacity
                       onPress={() => onDelete(item)}
                       activeOpacity={0.9}
-                      style={{}}
+                      style={{position: 'absolute', padding: 5}}
                     >
                       <Text style={{}}>
                         <AntDesign name="delete" color={'red'} size={20} />
@@ -373,13 +449,13 @@ const AddMeeting = () => {
               }}
               numColumns={3}
               style={{
-                height: images != '' ? 200 : 1,
+                height: selectImage != '' ? 200 : 1,
                 borderWidth: 1,
                 backgroundColor: COLORS.light,
                 marginVertical: 10,
                 borderRadius: SIZES.radius,
                 padding: 10,
-                display: !images ? 'none' : 'flex',
+                display: !selectImage ? 'none' : 'flex',
               }}
             />
             <TextButton
@@ -389,10 +465,11 @@ const AddMeeting = () => {
                 margin: 10,
               }}
               labelStyle={{
-                color: images.length > 0 ? COLORS.primary : COLORS.primary60,
+                color:
+                  selectImage.length > 0 ? COLORS.primary : COLORS.primary60,
                 ...FONTS.h4,
               }}
-              onPress={images.length > 0 ? () => uploadFile() : () => {}}
+              onPress={selectImage.length > 0 ? () => uploadFile() : () => {}}
             />
           </View>
           <TextButton
@@ -406,21 +483,44 @@ const AddMeeting = () => {
               color: COLORS.light,
               ...FONTS.h4,
             }}
-            onPress={() => submitHandle()}
+            onPress={() =>
+              (state.eventNumber = state.eventNumber
+                ? submitHandle()
+                : Alert.alert('event number'))
+            }
           />
         </KeyboardAwareScrollView>
       </View>
-
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={mode}
-          display={'default'}
-          is24Hour={true}
-          onChange={() => onChange()}
+      {open && (
+        <DatePicker
+          modal
+          open={open}
+          date={date}
+          mode={'date'}
+          onConfirm={date => {
+            setOpen(false);
+            setDate(date);
+          }}
+          onCancel={() => {
+            setOpen(false);
+          }}
         />
       )}
+      {openTime ? (
+        <DatePicker
+          modal
+          open={openTime}
+          date={date}
+          mode={'time'}
+          onConfirm={date => {
+            setOpenTime(false);
+            setDate(date);
+          }}
+          onCancel={() => {
+            setOpenTime(false);
+          }}
+        />
+      ) : null}
     </>
   );
 };

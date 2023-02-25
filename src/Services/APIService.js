@@ -131,21 +131,18 @@ const ApiMethod = {
     }
   },
 
-  ApiService: async (endpoint, singleFile, debugMsg, extraParamsObj, token) => {
+  uploadFileServices: async (
+    endpoint,
+    token,
+    title,
+    type,
+    debugMsg,
+    param_key = 'file',
+  ) => {
+    console.log('-----uploadFile?-----');
     let formDataRes = new FormData();
-    if (!singleFile.size) singleFile['size'] = singleFile.fileSize;
-    if (!singleFile.name) singleFile['name'] = singleFile.fileName;
-
-    formDataRes.append('image', singleFile);
-    if (extraParamsObj) {
-      for (const [key, value] of Object.entries(extraParamsObj)) {
-        console.log(`key = `, key, ` value = `, value);
-        formDataRes.append(key, value);
-      }
-    }
-
+    console.log('formDataRes', formDataRes);
     let debugMessage = debugMsg ?? '';
-    // let url = 'http://192.168.1.34:8000' + endpoint;
     let url = constants.base_url + endpoint;
     let headers = {};
     if (token) {
@@ -164,12 +161,18 @@ const ApiMethod = {
       headers: headers,
     };
     let response = {};
-    extraParamsObj
-      ? console.log('extraParamsObj', JSON.stringify(extraParamsObj))
-      : null;
+
+    console.log(
+      ' API reference -- url',
+      url,
+      'formDataRes',
+      JSON.stringify(formDataRes),
+    );
+
     try {
       response = await axios.post(url, formDataRes, configObject);
-      if (response) {
+
+      if (!response?.data?.error) {
         console.log(
           debugMessage + ' SuccessResponse',
           JSON.stringify(response),
@@ -185,9 +188,16 @@ const ApiMethod = {
         return response;
       }
     } catch (error) {
-      console.log(debugMessage + ' FailureResponse...inside catch', error);
+      console.log(
+        debugMessage + ' FailureResponse...inside catch',
+        error?.response?.data,
+      );
+      console.log(debugMessage + ' FailureResponse...msg', error);
+
       response['data'] = error?.response?.data;
-      response['errorMsg'] = 'Something went wrong !!';
+      response['errorMsg'] =
+        error?.response?.data?.message ?? 'something_went_wrong';
+
       return response;
     }
   },

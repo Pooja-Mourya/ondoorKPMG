@@ -23,6 +23,8 @@ import ApiMethod from '../Services/APIService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ActivityIndicator} from 'react-native';
 import UserList from '../screen/user/UserList';
+import Roles from '../screen/mainscreen/role/Roles';
+import Feather from 'react-native-vector-icons/Feather';
 
 function HomeScreen({navigation}) {
   return (
@@ -156,13 +158,23 @@ const MyDrawer = () => {
         }}
       />
       <Drawer.Screen
+        name="Roles"
+        component={Roles}
+        options={{
+          drawerIcon: () => (
+            <Feather name="command" size={20} color={COLORS.dark} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
         name="Notifications"
         component={NotificationsScreen}
         options={{
           drawerIcon: () => (
             <AntDesign name="contacts" size={20} color={COLORS.dark} />
           ),
-          //   headerShown: false,
+          headerShown: false,
         }}
       />
       <Drawer.Screen

@@ -6,6 +6,7 @@ import Forgot from './Authentication/Forgot';
 import AddMeeting from './mainscreen/meeting/AddMeeting';
 import Resetpassword from './Authentication/Resetpassword';
 import ViewMeeting from './mainscreen/meeting/ViewMeeting';
+import AddNotes from './mainscreen/notes/AddNotes';
 
 export {
   Welcome,
@@ -16,4 +17,5 @@ export {
   AddMeeting,
   Resetpassword,
   ViewMeeting,
+  AddNotes,
 };

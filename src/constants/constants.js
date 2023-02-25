@@ -41,5 +41,8 @@ export default {
     forgetPassword: 'forgot-password',
     userList: 'users',
     uploadFile: 'file-upload',
+    notes: 'notes',
+    roles: 'roles',
+    note: 'note',
   },
 };
