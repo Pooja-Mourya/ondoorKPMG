@@ -168,7 +168,6 @@ const ApiMethod = {
       'formDataRes',
       JSON.stringify(formDataRes),
     );
-
     try {
       response = await axios.post(url, formDataRes, configObject);
 

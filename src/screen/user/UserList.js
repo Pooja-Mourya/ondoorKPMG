@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   Modal,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../components/layout/Header';
@@ -19,7 +20,8 @@ import UserFilter from './UserFilter';
 
 const UserList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user);
-  console.log('token', token);
+
+  //   console.log('token', token);
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -44,9 +46,30 @@ const UserList = ({navigation}) => {
     }
   };
 
+  const handleDelete = async id => {
+    setIsRefreshing(true);
+
+    try {
+      let url = constants.endPoint.user + '/' + id;
+      //   console.log('deleteUrl', url);
+      //   return;
+      const deleteResult = ApiMethod.deleteData(url, null, token);
+      console.log('deleteResult', deleteResult);
+      userListApi();
+      setIsRefreshing(false);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
   useEffect(() => {
     userListApi();
   }, [page]);
+
+  //   useEffect(() => {
+  //     if (mode) {
+  //       navigation.navigate('AuthMain');
+  //     }
+  //   }, []);
   return (
     <>
       <Header
@@ -91,14 +114,31 @@ const UserList = ({navigation}) => {
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
+                  elevation: 2,
                 }}
               >
-                <View>
-                  <AntDesign name="delete" size={20} color={COLORS.error} />
-                  <AntDesign name="delete" size={20} color={COLORS.error} />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignSelf: 'flex-end',
+                    width: '25%',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <TouchableOpacity>
+                    <AntDesign name="delete" size={20} color={COLORS.error} />
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+                    <AntDesign name="eyeo" size={20} color={COLORS.primary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+                    <AntDesign name="edit" size={20} color={COLORS.primary} />
+                  </TouchableOpacity>
                 </View>
                 <Text>{item.name}</Text>
                 <Text>{item.email}</Text>
+                <Text>{item.designation}</Text>
+                <Text>{item.mobile_number}</Text>
               </View>
             </>
           );
@@ -116,7 +156,7 @@ const UserList = ({navigation}) => {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => navigation.navigate('AddMeeting')}
+        onPress={() => navigation.navigate('AuthMain')}
       />
 
       <Modal

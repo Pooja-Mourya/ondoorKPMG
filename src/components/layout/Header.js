@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import {COLORS, SIZES} from '../../constants';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Header = ({
   userName,
@@ -157,17 +158,17 @@ const Header = ({
           </Text>
         )}
         {rightIcon ? (
-          <TouchableOpacity onPress={leftIcon ? onPressSort : null}>
-            <Image
-              source={require('../../assets/icons/sort.png')}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.light20,
-                padding: 24,
-              }}
-            />
+          <TouchableOpacity
+            onPress={leftIcon ? onPressSort : null}
+            style={{
+              //   width: 30,
+              //   height: 30,
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.light20,
+              padding: 10,
+            }}
+          >
+            <Ionicons name="filter-sharp" size={27} color={COLORS.primary} />
           </TouchableOpacity>
         ) : null}
       </View>

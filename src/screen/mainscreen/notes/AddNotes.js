@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Keyboard,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
@@ -21,37 +22,90 @@ import {useSelector} from 'react-redux';
 import ApiMethod from '../../../Services/APIService';
 import {Dropdown} from 'react-native-element-dropdown';
 
-const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
+const AddMeeting = props => {
   const token = useSelector(state => state?.user?.user);
+
+  const {navigation} = props;
+
+  //   const routeData = props?.route.params?.action_items;
+
+  //   console.log('routeData', routeData);
 
   const [isLoading, setIsLoading] = useState(false);
   const [listState, setListState] = useState([]);
   const [state, setState] = useState({
-    meeting_id: forMeetingID,
+    meeting_id: '',
     duration: '',
     notes: '',
     decision: '',
   });
+  const [errors, setErrors] = useState('');
+  const [editData, setEditData] = useState({});
+
+  const validate = () => {
+    let valid = true;
+    Keyboard.dismiss();
+    if (state.notes) {
+      handleError('this field is required');
+      valid = false;
+    }
+    // else if(state.email.match('this string')){
+    //     handleError('invalid email formate')
+    // }
+    if (valid) {
+      AddMeeting();
+    }
+  };
+
+  const handleError = (errorMessage, input) => {
+    setErrors({...errors, [errorMessage]: input});
+  };
 
   const submitHandle = async () => {
     setIsLoading(true);
     let url = constants.endPoint.note;
     let params = {
-      meeting_id: '29',
-      duration: '16',
-      notes:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
-      decision:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
+      meeting_id: listState.meeting_title,
+      duration: state.duration,
+      notes: state.notes,
+      decision: state.decision,
     };
 
     // console.log('params', params);
     // return;
-    const response = await ApiMethod.postData(url, params, token);
-    console.log('response', response);
-    // navigation.navigate('Notes');
-    setIsLoading(false);
-    console.log('submit');
+
+    try {
+      const response = await ApiMethod.postData(url, params, token);
+
+      //   navigation.navigate('Notes');
+      Alert.alert(' note register successfully');
+      setIsLoading(false);
+      console.log('response', response);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  const EditHandle = async () => {
+    setIsLoading(true);
+    let url = constants.endPoint.note + '/' + id;
+    let params = {
+      meeting_id: listState.meeting_title,
+      duration: state.duration,
+      notes: state.notes,
+      decision: state.decision,
+    };
+
+    try {
+      const response = await ApiMethod.postData(url, params, token);
+
+      //   navigation.navigate('Notes');
+      Alert.alert(' note register successfully');
+      setIsLoading(false);
+      console.log('response', response);
+    } catch (error) {
+      console.log('error', error);
+    }
   };
 
   const onchangeState = (name, value) => {
@@ -69,25 +123,50 @@ const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
       setListState(result?.data?.data);
       return;
     } catch (error) {
-      console.log('error', error);
+      console.log('error', error.message);
     }
   };
+
+  //   useEffect(() => {
+  //     if (routeData) {
+  //       setState({
+  //         ...state,
+  //         // [state.meeting_id]: routeData.meeting_id,
+  //         [state.duration]: routeData.duration,
+  //         [state.notes]: routeData.notes,
+  //         [state.decision]: routeData.decision,
+  //       });
+  //     } else {
+  //       setState({
+  //         ...state,
+  //         [state.meeting_id]: token.meeting_id,
+  //         [state.duration]: token.duration,
+  //         [state.notes]: token.notes,
+  //         [state.decision]: token.decision,
+  //       });
+  //     }
+  //   }, []);
 
   useEffect(() => {
     handleMeetingList();
   }, []);
 
-  //   console.log(
-  //     'meeting_id',
-  //     listState.map(item => console.log(item.attendees[0])),
-  //   );
+  console.log('state', state);
 
-  const forMeetingID = listState.map(item => console.log(item.attendees[0]));
+  //   const forMeetingID = listState.map(item => item.attendees[0].meeting_id);
+  //   const forMeetingID = listState.map(item => console.log('item', item));
+
+  //   console.log('forMeetingID0', ...forMeetingID);
+  //   console.log('routeData', routeData);
 
   if (isLoading) return <ActivityIndicator />;
   return (
     <>
-      <Header textHeader={'Add Notes'} leftIcon={true} />
+      <Header
+        textHeader={editData ? 'Edit Notes' : 'Add Notes'}
+        // leftIcon={true}
+        // onPressArrow={() => !false)}
+      />
       <View
         style={{
           backgroundColor: COLORS.support3_08,
@@ -106,12 +185,12 @@ const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
             selectedTextStyle={styles.selectedTextStyle}
             inputSearchStyle={styles.inputSearchStyle}
             iconStyle={styles.iconStyle}
-            data={forMeetingID}
+            data={listState}
             search
             maxHeight={300}
-            labelField="meeting_id"
+            labelField="meeting_title"
             valueField="id"
-            placeholder="Select meeting_id"
+            placeholder="Select meeting id"
             searchPlaceholder="Search..."
             value={state.meeting_id}
             onChange={item => {
@@ -126,6 +205,19 @@ const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
               />
             )}
           />
+          {/* <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            placeholder="meeting_id"
+            value={state.meeting_id}
+            onChange={d => onchangeState('meeting_id', d)}
+            error={errors.duration}
+            onFocus={() => handleError(null, 'duration')}
+            keyboardType="numeric"
+          /> */}
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -135,6 +227,9 @@ const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
             placeholder="Duration"
             value={state.duration}
             onChange={d => onchangeState('duration', d)}
+            error={errors.duration}
+            onFocus={() => handleError(null, 'duration')}
+            keyboardType="numeric"
           />
           <FormInput
             containerStyle={{
@@ -145,6 +240,8 @@ const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
             placeholder="Notes"
             value={state.notes}
             onChange={n => onchangeState('notes', n)}
+            multiline={true}
+            numberOfLines={4}
           />
           <FormInput
             containerStyle={{
@@ -154,10 +251,12 @@ const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
             }}
             placeholder="Decision"
             value={state.decision}
-            onChange={n => onchangeState('notes', n)}
+            onChange={n => onchangeState('decision', n)}
+            multiline={true}
+            numberOfLines={4}
           />
           <TextButton
-            label={'Save'}
+            label={editData ? 'Edit' : 'Save'}
             contentContainerStyle={{
               height: 55,
               borderRadius: SIZES.radius,
@@ -167,7 +266,14 @@ const AddMeeting = ({addNotesModal, setNotesModal, navigation}) => {
               color: COLORS.light,
               ...FONTS.h4,
             }}
-            onPress={() => submitHandle()}
+            onPress={() => {
+              submitHandle();
+              //   if (validate()) {
+              //     submitHandle();
+              //   } else {
+              //     Alert.alert('invalid input');
+              //   }
+            }}
           />
         </KeyboardAwareScrollView>
       </View>

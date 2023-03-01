@@ -76,7 +76,7 @@ const Meeting = ({navigation}) => {
         </Text>
       </View>
 
-      {/* <FlatList
+      <FlatList
         data={listState}
         keyExtractor={item => item.id}
         refreshControl={
@@ -122,7 +122,7 @@ const Meeting = ({navigation}) => {
         ListFooterComponent={() => (
           <ActivityIndicator size={'large'} color={'rosybrown'} />
         )}
-      /> */}
+      />
       <FAB
         icon="plus"
         style={styles.fab}

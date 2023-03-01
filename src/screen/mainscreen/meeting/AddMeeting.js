@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Keyboard,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
@@ -23,7 +24,9 @@ import CheckBox from '../../../components/CheckBox';
 import {Dropdown, MultiSelect} from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
-import DocumentPicker from 'react-native-document-picker';
+import DocumentPicker, {types} from 'react-native-document-picker';
+import axios from 'axios';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 const data = [
   {id: '1', duration: 'Every day'},
@@ -31,11 +34,11 @@ const data = [
   {id: '3', duration: 'Every month'},
 ];
 
-const AddMeeting = () => {
+const AddMeeting = ({navigation}) => {
   const token = useSelector(state => state?.user?.user);
 
-  const [selectImage, setSelectImage] = useState([]);
   const [enableCheck, setEnableCheck] = useState(false);
+  const [selectImage, setSelectImage] = useState(null);
   const [singleFile, setSingleFile] = useState(null);
   const [uploadFiles, setUploadFiles] = useState([]);
   const [user, setUser] = useState([]);
@@ -52,90 +55,75 @@ const AddMeeting = () => {
     is_repeat: data.id,
     eventNumber: 0,
     attendees: [user.email],
-    documents: [selectImage.uri],
+    documents: selectImage,
     inviteEmail: '',
+    is_multiple: 1,
   });
+  const [stateError, setStateError] = useState('');
 
-  const onChange = (event, selectedData) => {
-    const currentDate = selectedData || date;
-    setShow(false);
-    setDate(currentDate);
-
-    let tempDate = new Date(currentDate);
-    let fDate =
-      tempDate.getDate() +
-      '/' +
-      (tempDate.getMonth() + 1) +
-      '/' +
-      tempDate.getFullYear();
-    let fTime =
-      'Hours:' + tempDate.getHours() + '| Minutes:' + tempDate.getMinutes();
-    setText(fDate + '\n' + fTime);
-    // console.log('first', fDate + '\n' + fTime);
-  };
-
-  const showMode = currentMode => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
-  //   const uploadFile = async () => {
-  //     try {
-  //       let url = constants.endPoint.uploadFile;
-  //       let params = {};
-  //       const result = await ApiMethod.uploadFileServices(url, params, token);
-  //       console.log('result', result);
-  //     } catch (error) {
-  //       console.log('error', error);
-  //     }
-  //   };
-
-  const uploadFile = async singleFile => {
-    // if (singleFile != null) {
-    //   console.log('singleFile', singleFile);
-
-    setIsUploading(true);
-    let url = constants.endPoint.uploadFile;
-    let res = await ApiMethod.uploadFileServices(
-      url,
-      singleFile,
-      token,
-      'CSV_',
-      'no_multiple',
-      'csv Attachment',
-    );
-
-    console.log('response', res);
-
-    if (res.errorMsg) {
-      Alert.alert('Constants.danger, res.errorMsg');
-      setIsUploading(false);
-      return null;
-    } else {
-      Alert.alert(' Constants.labels.message_uploaded_successfully,');
-      if (res?.data?.file) setUploadFiles(res?.data?.file);
-      setIsUploading(false);
+  const validate = () => {
+    Keyboard.dismiss();
+    if (state.email) {
+      handleError('please input email');
     }
-    // }
+  };
+
+  const handleError = (errorMessage, input) => {
+    setStateError({...stateError, [errorMessage]: input});
+  };
+
+  const [emailValidError, setEmailValidError] = useState('');
+
+  const handleValidEmail = () => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+
+    if (state.inviteEmail === 0) {
+      setEmailValidError('email address must be enter');
+    } else if (reg.test(state.inviteEmail) === false) {
+      setEmailValidError('enter valid email address');
+    } else if (reg.test(state.inviteEmail) === true) {
+      setEmailValidError('');
+    }
+  };
+
+  const AddEmailFunction = () => {
+    const invitation = state.inviteEmail;
+    onchangeState('attendees', [...state.attendees, invitation]);
+    const u = user;
+
+    u.push({
+      id: invitation,
+      email: invitation,
+    });
+    setUser([...u]);
+    console.log('added');
+  };
+
+  const onDelete = val => {
+    console.log('value', val);
+    // const data = selectImage.filter(
+    //   item => console.log('localIdentifier', item),
+    //   item?.localIdentifier && item?.localIdentifier !== value?.localIdentifier,
+    // );
+    setSelectImage(data);
   };
 
   const submitHandle = async () => {
     const url = constants.endPoint.meeting;
-    console.log('submit');
-
-    return;
     const params = {
       meeting_title: state.meeting_title,
-      meeting_date: state.meeting_date,
-      meeting_time: '05:28',
-      meeting_ref_no: '0000',
-      agenda_of_meeting: 'null',
-      is_repeat: 'fdfd',
-      attendees: 'ff',
-      documents: 'gg',
+      meeting_date: onlyDate,
+      meeting_time: onlyTime,
+      meeting_ref_no: state.meeting_ref_no,
+      agenda_of_meeting: state.agenda_of_meeting,
+      is_repeat: data.id,
+      attendees: [user.email].concat(state.inviteEmail),
+      documents: [selectImage.uri],
     };
 
     console.log('params', params);
+
+    return;
 
     try {
       const result = await ApiMethod.postData(url, params, token);
@@ -146,15 +134,6 @@ const AddMeeting = () => {
     } catch (error) {
       console.log('error', error);
     }
-  };
-
-  const onDelete = value => {
-    const data = selectImage.filter(
-      item =>
-        item?.localIdentifier &&
-        item?.localIdentifier !== value?.localIdentifier,
-    );
-    setSelectImage(data);
   };
 
   const ListUser = async () => {
@@ -185,32 +164,80 @@ const AddMeeting = () => {
   const onlyDate = moment(date).format('L');
   const onlyTime = moment(date).format('LT');
 
-  const selectFile = async options => {
-    try {
-      const res = await DocumentPicker.pickMultiple(options);
-      setSelectImage(res);
-      //   return;
-      if (singleFile <= 10000) {
-        uploadFile(res);
+  const uploadFile = async imagePath => {
+    let url = constants.base_url + constants.endPoint.uploadFile;
+    let formDataRes = new FormData();
+    formDataRes.append('is_multiple', 1);
+    imagePath?.map((e, i) => {
+      let obj = e;
+      if (!obj.size) {
+        obj['size'] = e.fileSize;
       }
+      if (!e?.name) {
+        obj['name'] =
+          e.fileName ?? e.uri.substr(e.uri.lastIndexOf('/'), e.uri.length);
+      }
+      //   if (!e?.value) {
+      //     obj['value'] = e?.uri;
+      //   }
+      formDataRes.append(`file[${i}]`, obj);
+    });
+
+    let headers = {
+      Accept: '*/*',
+      'content-type': 'multipart/form-data',
+    };
+
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    let config = {
+      headers: headers,
+    };
+
+    console.log('url', url);
+    console.log('formDataRes', formDataRes);
+    console.log('headers', headers);
+    let imageResponse = '';
+    try {
+      imageResponse = await axios.post(url, formDataRes, config);
+      //   console.log('imageResponse', imageResponse);
+      //   setUploadFiles(imageResponse);
+    } catch (error) {
+      console.log('error', error);
+      console.log('imageResponse', imageResponse);
+    }
+  };
+
+  const selectFile = async () => {
+    try {
+      const res = await DocumentPicker.pickMultiple({
+        allowMultiSelection: true,
+        type: [types.doc, types.docx],
+      });
+      console.log('res', res);
+      setSelectImage(res);
     } catch (err) {
-      setSingleFile(null);
       if (DocumentPicker.isCancel(err)) {
-        alert('Canceled');
+        alert('cancelled');
+      } else if (isInProgress(err)) {
+        console.warn(
+          'multiple pickers were opened, only the last will be considered',
+        );
       } else {
-        alert('Unknown Error: ' + JSON.stringify(err));
+        throw err;
       }
     }
   };
 
-  //   console.log('state', state);
-  //   console.log('date', onlyDate);
-  //   console.log('time', onlyTime);
-
   if (isUploadLoading) return <ActivityIndicator />;
   return (
     <>
-      <Header textHeader={'Create Meeting'} leftIcon={true} rightIcon={true} />
+      <Header
+        textHeader={'Create Meeting'}
+        leftIcon={true}
+        rightIcon={true}
+        onPressArrow={() => navigation.navigate('Meeting')}
+      />
       <View
         style={{
           backgroundColor: COLORS.support3_08,
@@ -244,7 +271,7 @@ const AddMeeting = () => {
               placeholder="Meeting Date"
               value={onlyDate}
               onChange={d => {
-                console.log('25/02/2023', d);
+                // console.log('25/02/2023', d);
                 onchangeState('meeting_date', d);
               }}
               appendComponent={
@@ -341,20 +368,21 @@ const AddMeeting = () => {
                   backgroundColor: COLORS.error,
                   marginTop: 10,
                 }}
+                inputMode="numeric"
+                keyboardType="numeric"
                 placeholder="Event Number"
                 value={state.eventNumber}
                 onChange={a => onchangeState('eventNumber', a)}
-                keyboardType="number"
               />
-              {state.eventNumber === Number ? null : (
-                <Text
-                  style={{
-                    color: state.eventNumber === Number ? COLORS.error : 'grey',
-                  }}
-                >
-                  this field is required
-                </Text>
-              )}
+              {/* {state.eventNumber === Number ? null : (
+                  <Text
+                    style={{
+                      color: state.eventNumber === Number ? COLORS.error : 'grey',
+                    }}
+                  >
+                    this field is required
+                  </Text>
+                )} */}
               <Text
                 style={{
                   ...FONTS.body3,
@@ -383,19 +411,54 @@ const AddMeeting = () => {
             searchPlaceholder="Search..."
             value={state.attendees}
             onChange={item => {
+              //   console.log('asasasas', item);
               onchangeState('attendees', item);
             }}
           />
-
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
+            // error={stateError.email}
+            inputMode="email"
             placeholder="Add Invitational Email"
+            keyboardType="email-address"
             value={state.inviteEmail}
-            onChange={invitation => onchangeState('inviteEmail', invitation)}
+            onChange={invitation => {
+              onchangeState('inviteEmail', invitation);
+              // handleValidEmail(invitation);
+            }}
+            appendComponent={
+              !state.inviteEmail ? (
+                <TouchableOpacity
+                  onPress={() =>
+                    Alert.alert(
+                      'if you want to add new attendees, enter his email',
+                    )
+                  }
+                >
+                  <Entypo name="email" size={25} color={COLORS.primary} />
+                </TouchableOpacity>
+              ) : (
+                <TextButton
+                  label={'add email'}
+                  contentContainerStyle={{
+                    ...FONTS.base,
+                    padding: 5,
+                    borderRadius: SIZES.radius,
+                  }}
+                  onPress={() => {
+                    if (handleValidEmail()) {
+                      AddEmailFunction();
+                    } else {
+                      Alert.alert('invalid email address');
+                    }
+                  }}
+                />
+              )
+            }
           />
           <FormInput
             containerStyle={{
@@ -404,8 +467,8 @@ const AddMeeting = () => {
               marginTop: 10,
             }}
             placeholder="Upload Document"
-            value={state.documents}
-            onChange={d => onchangeState('document', d)}
+            value={selectImage?.[0]?.name}
+            onChange={d => onchangeState('documents', console.log('d', d))}
             appendComponent={
               <AntDesign
                 name={'upload'}
@@ -425,6 +488,7 @@ const AddMeeting = () => {
                 // console.log('item', item);
                 return (
                   <View style={{}}>
+                    {/* {} */}
                     <Image
                       width={250}
                       source={{uri: item.uri}}
@@ -435,6 +499,7 @@ const AddMeeting = () => {
                         borderRadius: SIZES.radius,
                       }}
                     />
+                    {/* <Text>{item.name}</Text> */}
                     <TouchableOpacity
                       onPress={() => onDelete(item)}
                       activeOpacity={0.9}
@@ -458,19 +523,19 @@ const AddMeeting = () => {
                 display: !selectImage ? 'none' : 'flex',
               }}
             />
-            <TextButton
-              label={'upload Image'}
-              contentContainerStyle={{
-                backgroundColor: 'none',
-                margin: 10,
-              }}
-              labelStyle={{
-                color:
-                  selectImage.length > 0 ? COLORS.primary : COLORS.primary60,
-                ...FONTS.h4,
-              }}
-              onPress={selectImage.length > 0 ? () => uploadFile() : () => {}}
-            />
+            {selectImage ? (
+              <TextButton
+                label={'upload Image'}
+                contentContainerStyle={{
+                  backgroundColor: 'none',
+                  margin: 10,
+                }}
+                labelStyle={{
+                  color: COLORS.primary,
+                }}
+                onPress={() => uploadFile()}
+              />
+            ) : null}
           </View>
           <TextButton
             label={'Save'}
@@ -483,11 +548,7 @@ const AddMeeting = () => {
               color: COLORS.light,
               ...FONTS.h4,
             }}
-            onPress={() =>
-              (state.eventNumber = state.eventNumber
-                ? submitHandle()
-                : Alert.alert('event number'))
-            }
+            onPress={() => {}}
           />
         </KeyboardAwareScrollView>
       </View>

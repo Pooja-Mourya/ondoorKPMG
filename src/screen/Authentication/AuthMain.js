@@ -354,11 +354,21 @@ const AuthMain = ({navigation}) => {
   const HandleSignUp = async () => {
     const url = constants.endPoint.register;
     const params = {
-      name,
-      email,
-      number,
-      password,
-      designation,
+      role_id: '2',
+      name: name,
+      email: email,
+      password: password,
+      'confirm-password': confirmPassword,
+      mobile_number: number,
+      designation: designation,
+
+      //   role_id: '2',
+      //   name: 'user8',
+      //   email: 'user8@gmail.com',
+      //   password: '12345678',
+      //   'confirm-password': '12345678',
+      //   mobile_number: '8103099592',
+      //   designation: 'project Manager',
     };
     try {
       const result = await ApiMethod.postData(url, params, token);

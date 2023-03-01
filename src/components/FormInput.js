@@ -14,12 +14,18 @@ const FormInput = ({
   onPress,
   editable,
   secureTextEntry,
-  keyboardType = 'default',
   autoCompleteType = 'off',
   autoCapitalize = 'none',
   maxLength,
   placeholderTextColor,
+  keyboardType,
+  inputMode,
+  error,
+  multiline,
+  numberOfLines,
+  onFocus = () => {},
 }) => {
+  const [isFocused, setIsFocused] = React.useState(false);
   return (
     <View style={{...containerStyle}}>
       <View
@@ -31,6 +37,12 @@ const FormInput = ({
           alignItems: 'center',
           backgroundColor: COLORS.lightGrey,
           ...inputContainerStyle,
+          borderColor: COLORS.error
+            ? COLORS.error
+            : isFocused
+            ? COLORS.primary
+            : COLORS.light,
+          alignItems: 'center',
         }}
       >
         {prependComponent}
@@ -44,13 +56,21 @@ const FormInput = ({
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           secureTextEntry={secureTextEntry}
-          keyboardAppearance={keyboardType}
           autoCapitalize={autoCapitalize}
           autoCompleteType={autoCompleteType}
           maxLength={maxLength}
           onChangeText={text => onChange(text)}
           onPressIn={onPress}
           editable={editable}
+          keyboardType={keyboardType}
+          inputMode={inputMode}
+          error={error}
+          onFocus={() => {
+            onFocus();
+            setIsFocused(true);
+          }}
+          multiline={multiline}
+          numberOfLines={numberOfLines}
         />
         {appendComponent}
       </View>

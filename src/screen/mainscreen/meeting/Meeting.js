@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
-import {COLORS, constants, SIZES} from '../../../constants';
+import {COLORS, constants, FONTS, SIZES} from '../../../constants';
 import {FAB} from 'react-native-paper';
 import ApiMethod from '../../../Services/APIService';
 import {useSelector} from 'react-redux';
@@ -17,27 +17,31 @@ import {RefreshControl} from 'react-native';
 import {Modal} from 'react-native';
 import MeetingFilter from './MeetingFilter';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import moment from 'moment';
 
-const Meeting = ({navigation}) => {
+const Meeting = props => {
   const token = useSelector(state => state?.user?.user);
-  console.log('token', token);
+  //   console.log('token', token);
+
+  const {navigation} = props;
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [filterData, setFilterData] = useState({}); //filter data
   const [filterModal, setFilterModal] = useState(false);
+  const [iconModal, setIconModal] = useState('');
 
   const handleMeetingList = async () => {
     const url = constants.endPoint.meetingList;
     const params = {
-      //   page: 1,
-      //   per_page_record: '10',
+      page: 1,
+      per_page_record: '10',
     };
     setIsRefreshing(true);
     try {
       const result = await ApiMethod.postData(url, params, token);
       console.log('result', result?.data?.data, 'url', url);
-      setListState(result?.data?.data);
+      setListState(result?.data?.data?.data);
       setIsRefreshing(false);
       return;
     } catch (error) {
@@ -48,6 +52,8 @@ const Meeting = ({navigation}) => {
   useEffect(() => {
     handleMeetingList();
   }, [page]);
+
+  console.log('listState', listState);
   return (
     <>
       <Header
@@ -62,7 +68,8 @@ const Meeting = ({navigation}) => {
       />
 
       <FlatList
-        data={listState}
+        // data={listState}
+        data={Array.isArray(listState) ? listState : []}
         keyExtractor={item => item.id}
         refreshControl={
           <RefreshControl
@@ -72,8 +79,11 @@ const Meeting = ({navigation}) => {
             }}
           />
         }
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
           //   console.log('item', item?.documents[0]?.uploading_file_name);
+          const createdDateFormate = moment(item.created_at).format('L');
+          const meetingDateFormate = moment(item.meeting_date).format('L');
+          const meetingTimeFormate = moment(item.meeting_time).format('LT');
           return (
             <>
               <View
@@ -82,23 +92,110 @@ const Meeting = ({navigation}) => {
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
+                  elevation: 1,
                 }}
               >
-                <View>
-                  <TouchableOpacity onPress={() => {}}>
-                    <AntDesign name="delete" size={20} color={COLORS.error} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('ViewMeeting', item)}
+                {/* {iconModal === index ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      zIndex: 2,
+                      width: '100%',
+                      height: '100%',
+                      margin: 40,
+                      position: 'absolute',
+                      backgroundColor: COLORS.support5,
+                      borderBottomRightRadius: SIZES.radius,
+                      borderTopLeftRadius: SIZES.radius,
+                    }}
                   >
-                    <AntDesign name="eyeo" size={20} color={COLORS.support3} />
-                  </TouchableOpacity>
-                </View>
+                    <View
+                      style={{
+                        justifyContent: 'space-around',
+                        flexDirection: 'row',
+                      }}
+                    >
+                      <AntDesign
+                        onPress={() => setIconModal('')}
+                        name="close"
+                        size={25}
+                        color={COLORS.light}
+                      />
+                      <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                        <AntDesign
+                          name="delete"
+                          size={20}
+                          color={COLORS.error}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate('ViewMeeting', item)}
+                      >
+                        <AntDesign
+                          name="eyeo"
+                          size={20}
+                          color={COLORS.support3}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : null} */}
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('ViewMeeting', item)}
+                  style={{
+                    position: 'absolute',
+                    alignSelf: 'flex-end',
+                    // marginRight: 25,
+                    padding: 20,
+                    backgroundColor: COLORS.light,
+                    borderBottomLeftRadius: 40,
+                    elevation: 2,
+                  }}
+                >
+                  <AntDesign name="eyeo" size={30} color={COLORS.dark} />
+                </TouchableOpacity>
 
-                <Text>{item.meetRandomId}</Text>
-                {/* <Text>{item.meeting_title}</Text> */}
-                <Text>{item.attendees[0].meeting_id}</Text>
-                {/* <Text>{item?.documents[0]?.file_extension}</Text> */}
+                <View style={{flexDirection: 'row'}}>
+                  <Text
+                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                  >
+                    Title:{' '}
+                  </Text>
+                  <Text style={{width: '50%'}}>{item.meeting_title}</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text
+                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                  >
+                    Reference:{' '}
+                  </Text>
+                  <Text style={{width: '50%'}}>{item.meeting_ref_no}</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text
+                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                  >
+                    Meeting Date:{' '}
+                  </Text>
+                  <Text>{meetingDateFormate}</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text
+                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                  >
+                    Meeting Time:{' '}
+                  </Text>
+                  <Text>{meetingTimeFormate}</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text
+                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                  >
+                    Created At:{' '}
+                  </Text>
+                  <Text>{createdDateFormate}</Text>
+                </View>
               </View>
             </>
           );

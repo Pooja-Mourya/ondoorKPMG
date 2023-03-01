@@ -11,6 +11,7 @@ import {
   Resetpassword,
   ViewMeeting,
   AddNotes,
+  ViewNotes,
 } from '../screen/index';
 
 const Stack = createStackNavigator();
@@ -33,6 +34,7 @@ const MyStack = () => {
         <Stack.Screen name="Resetpassword" component={Resetpassword} />
         <Stack.Screen name="ViewMeeting" component={ViewMeeting} />
         <Stack.Screen name="AddNotes" component={AddNotes} />
+        <Stack.Screen name="ViewNotes" component={ViewNotes} />
       </Stack.Navigator>
     </NavigationContainer>
   );
