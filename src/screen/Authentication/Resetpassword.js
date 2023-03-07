@@ -3,14 +3,21 @@ import React, {useState} from 'react';
 import Header from '../../components/layout/Header';
 import FormInput from '../../components/FormInput';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {COLORS, FONTS, SIZES} from '../../constants';
+import {COLORS, constants, FONTS, SIZES} from '../../constants';
 import TextButton from '../../components/TextButton';
 import {TextInput} from 'react-native';
 import {Button} from 'react-native';
+import ApiMethod from '../../Services/APIService';
+import {useSelector} from 'react-redux';
+import {ActivityIndicator} from 'react-native';
 
-const Resetpassword = () => {
+const Resetpassword = ({navigation}) => {
+  const oldPassword = useSelector(state => state?.user?.user);
+
+  console.log('oldPassword', oldPassword);
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [load, setLoad] = useState(false);
   const [otpState, setOtpState] = useState({
     one: '',
     two: '',
@@ -19,12 +26,31 @@ const Resetpassword = () => {
   });
   const [verifyState, setVerifyState] = useState(false);
 
+  const MakeNewPassword = async () => {
+    const url = constants.endPoint.changePassword;
+    const params = {
+      old_password: password.token,
+      password: newPassword,
+    };
+    try {
+      setLoad(true);
+      const result = await ApiMethod.postData(url, params, token);
+      if (result) {
+        Alert.alert('user added successfully');
+        navigation.navigate('User');
+      }
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
   const onChangeOtp = (name, value) => {
     setOtpState({
       ...otpState,
       [name]: value,
     });
   };
+
+  if (load === true) return <ActivityIndicator />;
   return (
     <>
       <Header leftIcon={true} rightIcon={true} textHeader={'Reset Password'} />
@@ -161,7 +187,7 @@ const Resetpassword = () => {
                 color: COLORS.light,
                 ...FONTS.h4,
               }}
-              // onPress={() => HandleSignUp()}
+              onPress={() => MakeNewPassword()}
             />
           </View>
         ) : null}

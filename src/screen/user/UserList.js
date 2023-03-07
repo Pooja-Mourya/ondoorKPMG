@@ -16,7 +16,10 @@ import ApiMethod from '../../Services/APIService';
 import {useSelector} from 'react-redux';
 import {RefreshControl} from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import UserFilter from './UserFilter';
+import RadioButton from 'react-native-paper';
+import TextButton from '../../components/TextButton';
 
 const UserList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user);
@@ -27,6 +30,8 @@ const UserList = ({navigation}) => {
   const [page, setPage] = useState(1);
   const [filterData, setFilterData] = useState({}); //filter data
   const [filterModal, setFilterModal] = useState(false);
+  const [actionModal, setActionModal] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   const userListApi = async () => {
     const url = constants.endPoint.userList;
@@ -48,7 +53,6 @@ const UserList = ({navigation}) => {
 
   const handleDelete = async id => {
     setIsRefreshing(true);
-
     try {
       let url = constants.endPoint.user + '/' + id;
       //   console.log('deleteUrl', url);
@@ -61,6 +65,7 @@ const UserList = ({navigation}) => {
       console.log('error', error);
     }
   };
+
   useEffect(() => {
     userListApi();
   }, [page]);
@@ -70,6 +75,7 @@ const UserList = ({navigation}) => {
   //       navigation.navigate('AuthMain');
   //     }
   //   }, []);
+  if (isRefreshing === true) return <ActivityIndicator />;
   return (
     <>
       <Header
@@ -105,7 +111,7 @@ const UserList = ({navigation}) => {
             }}
           />
         }
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
           return (
             <>
               <View
@@ -121,24 +127,84 @@ const UserList = ({navigation}) => {
                   style={{
                     flexDirection: 'row',
                     alignSelf: 'flex-end',
-                    width: '25%',
+                    width: '40%',
                     justifyContent: 'space-between',
                   }}
                 >
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDelete(item.id)}>
                     <AntDesign name="delete" size={20} color={COLORS.error} />
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ViewUser', item)}
+                  >
                     <AntDesign name="eyeo" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('AddUser', item)}
+                  >
                     <AntDesign name="edit" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setActionModal(true)}>
+                    <MaterialCommunityIcons
+                      name="list-status"
+                      size={25}
+                      color={COLORS.error}
+                    />
+                  </TouchableOpacity>
                 </View>
-                <Text>{item.name}</Text>
-                <Text>{item.email}</Text>
-                <Text>{item.designation}</Text>
-                <Text>{item.mobile_number}</Text>
+
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={actionModal}
+                  onRequestClose={() => {
+                    setActionModal(!actionModal);
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      backgroundColor: COLORS.light20,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <View
+                      style={{backgroundColor: COLORS.success, width: '80%'}}
+                    >
+                      <Text> id : {item.id}</Text>
+                      {/* <View style={{flexDirection: 'row'}}>
+                        <RadioButton
+                          value={item.status != null ?? ''}
+                          status={
+                            checked === item.status ? 'checked' : 'unchecked'
+                          }
+                          onPress={() => setChecked(!checked)}
+                        />
+                        <Text style={{marginTop: 8}}>
+                          {!checked ? 'Active' : 'inactive'}
+                        </Text>
+                      </View> */}
+                      <Text>
+                        status : {item.status == 1 ? 'active' : 'inactive'}
+                      </Text>
+                      <TextButton
+                        label={'submit'}
+                        contentContainerStyle={{
+                          padding: 10,
+                          borderRadius: SIZES.radius,
+                        }}
+                        onPress={() => {}}
+                      />
+                    </View>
+                  </View>
+                </Modal>
+                <Text>Id: {item.id}</Text>
+                <Text>Name: {item.name}</Text>
+                <Text>Email: {item.email}</Text>
+                <Text>Designation: {item.designation}</Text>
+                <Text>Number: {item.mobile_number}</Text>
+                <Text>Status: {item.status == 1 ? 'active' : 'inactive'}</Text>
               </View>
             </>
           );
@@ -156,7 +222,7 @@ const UserList = ({navigation}) => {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => navigation.navigate('AuthMain')}
+        onPress={() => navigation.navigate('AddUser')}
       />
 
       <Modal

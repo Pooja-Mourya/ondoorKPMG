@@ -56,14 +56,6 @@ const ViewNotes = props => {
               'https://graphicsfamily.com/wp-content/uploads/edd/2021/08/Free-Creative-Abstract-Logo-Design-Template-scaled.jpg',
           }}
         /> */}
-        <TouchableOpacity>
-          <TextButton
-            label={'edit'}
-            onPress={() => {
-              navigation.navigate('AddNotes', routeParm);
-            }}
-          />
-        </TouchableOpacity>
       </View>
     </>
   );

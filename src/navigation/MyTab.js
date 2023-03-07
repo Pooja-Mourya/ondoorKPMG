@@ -6,6 +6,7 @@ import {SIZES, COLORS} from '../constants';
 import MyDrawer from './MyDrawer';
 import Meeting from '../screen/mainscreen/meeting/Meeting';
 import Notes from '../screen/mainscreen/notes/Notes';
+import {ImageUpload} from '../screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -60,6 +61,26 @@ export default function MyTab() {
         })}
         name="Notes"
         component={Notes}
+      />
+      <Tab.Screen
+        options={() => ({
+          tabBarIcon: () => {
+            return (
+              <View>
+                <Image
+                  source={require('../assets/icons/add.png')}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    marginRight: SIZES.base,
+                  }}
+                />
+              </View>
+            );
+          },
+        })}
+        name="Upload"
+        component={ImageUpload}
       />
       <Tab.Screen
         options={() => ({

@@ -1,4 +1,4 @@
-let domain = 'meeting-api.gofactz.com/public';
+let domain = 'meeting-api.gofactz.com';
 
 const base_url = `https://${domain}/api/`;
 const base_url2 = `https://${domain}/`;
@@ -45,5 +45,15 @@ export default {
     roles: 'roles',
     note: 'note',
     user: 'user',
+    actionList: 'action-items',
+    action: 'action-item',
+    meetingAction: 'meeting-action',
+    noteAction: 'note-action',
+    actionItemAction: 'action-item-action',
+    appSetting: 'app-setting',
+    role: 'role',
+    dashboard: 'dashboard',
+    changePassword: 'change-password',
+    updatePassword: 'update-password',
   },
 };

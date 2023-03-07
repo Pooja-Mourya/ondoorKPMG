@@ -34,7 +34,13 @@ const data = [
   {id: '3', duration: 'Every month'},
 ];
 
-const AddMeeting = ({navigation}) => {
+const AddMeeting = props => {
+  const {navigation} = props;
+
+  const editMeeting = props.route.params;
+
+  //   console.log('editMeeting', editMeeting);
+
   const token = useSelector(state => state?.user?.user);
 
   const [enableCheck, setEnableCheck] = useState(false);
@@ -45,6 +51,7 @@ const AddMeeting = ({navigation}) => {
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
   const [openTime, setOpenTime] = useState(false);
+  const [openStart, setOpenStart] = useState(false);
   const [isUploadLoading, setIsUploading] = useState(false);
   const [state, setState] = useState({
     meeting_title: '',
@@ -52,12 +59,14 @@ const AddMeeting = ({navigation}) => {
     meeting_time: '',
     meeting_ref_no: '',
     agenda_of_meeting: '',
-    is_repeat: data.id,
-    eventNumber: 0,
-    attendees: [user.email],
-    documents: selectImage,
+    is_repeat: '',
+    eventNumber: '',
+    attendees: '',
+    documents: '',
     inviteEmail: '',
-    is_multiple: 1,
+    is_multiple: '',
+    meeting_time_end: '',
+    meeting_time_start: '',
   });
   const [stateError, setStateError] = useState('');
 
@@ -112,18 +121,24 @@ const AddMeeting = ({navigation}) => {
     const url = constants.endPoint.meeting;
     const params = {
       meeting_title: state.meeting_title,
-      meeting_date: onlyDate,
-      meeting_time: onlyTime,
+      meeting_date: state.meeting_date,
+      meeting_time_end: state.meeting_time_end,
+      meeting_time_start: state.meeting_time_start,
       meeting_ref_no: state.meeting_ref_no,
       agenda_of_meeting: state.agenda_of_meeting,
-      is_repeat: data.id,
-      attendees: [user.email].concat(state.inviteEmail),
-      documents: [selectImage.uri],
+      is_repeat: state.is_repeat,
+      attendees: state.attendees?.map(e => ({
+        email: e,
+      })),
+      documents: [
+        {
+          file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+          file_extension: '',
+          file_name: '',
+          uploading_file_name: '',
+        },
+      ],
     };
-
-    console.log('params', params);
-
-    return;
 
     try {
       const result = await ApiMethod.postData(url, params, token);
@@ -150,6 +165,17 @@ const AddMeeting = ({navigation}) => {
     }
   };
 
+  const updateMeeting = async () => {
+    let url = constants.endPoint.meeting + '/' + editMeeting.id;
+    let params = {};
+
+    try {
+      const updateRes = await ApiMethod.putData(url, params, token);
+      if (updateRes) {
+        navigation.navigate('Meeting');
+      }
+    } catch (error) {}
+  };
   useEffect(() => {
     ListUser();
   }, []);
@@ -161,13 +187,11 @@ const AddMeeting = ({navigation}) => {
     });
   };
 
-  const onlyDate = moment(date).format('L');
-  const onlyTime = moment(date).format('LT');
-
   const uploadFile = async imagePath => {
     let url = constants.base_url + constants.endPoint.uploadFile;
     let formDataRes = new FormData();
     formDataRes.append('is_multiple', 1);
+    console.log('sadsadsadsa', imagePath);
     imagePath?.map((e, i) => {
       let obj = e;
       if (!obj.size) {
@@ -211,6 +235,7 @@ const AddMeeting = ({navigation}) => {
   const selectFile = async () => {
     try {
       const res = await DocumentPicker.pickMultiple({
+        presentationStyle: 'fullScreen',
         allowMultiSelection: true,
         type: [types.doc, types.docx],
       });
@@ -229,11 +254,39 @@ const AddMeeting = ({navigation}) => {
     }
   };
 
+  useEffect(() => {
+    if (editMeeting) {
+      setState({
+        ...state,
+        meeting_title: editMeeting.meeting_title,
+        meeting_date: editMeeting.meeting_date,
+        meeting_time_end: editMeeting.meeting_time_end,
+        meeting_time_start: editMeeting.meeting_time_start,
+        meeting_ref_no: editMeeting.meeting_ref_no,
+        agenda_of_meeting: editMeeting.agenda_of_meeting,
+        is_repeat: editMeeting.is_repeat,
+        // attendees: editMeeting.attendees[0].email,
+        attendees: editMeeting.attendees?.map(e => ({
+          email: e,
+        })),
+        documents: [
+          {
+            file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+            file_extension: '',
+            file_name: '',
+            uploading_file_name: '',
+          },
+        ],
+      });
+    }
+  }, []);
+
+  //   console.log('state', state);
   if (isUploadLoading) return <ActivityIndicator />;
   return (
     <>
       <Header
-        textHeader={'Create Meeting'}
+        textHeader={editMeeting ? 'Edit Meeting' : 'Create Meeting'}
         leftIcon={true}
         rightIcon={true}
         onPressArrow={() => navigation.navigate('Meeting')}
@@ -260,6 +313,23 @@ const AddMeeting = ({navigation}) => {
             value={state.meeting_title}
             onChange={m => onchangeState('meeting_title', m)}
           />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            placeholder="Meeting Date"
+            value={state.meeting_date}
+            onChange={d => {
+              onchangeState('meeting_date', d);
+            }}
+            appendComponent={
+              <TouchableOpacity onPress={() => setOpen(true)}>
+                <Fontisto name={'date'} size={25} color={COLORS.primary} />
+              </TouchableOpacity>
+            }
+          />
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <FormInput
               containerStyle={{
@@ -268,15 +338,18 @@ const AddMeeting = ({navigation}) => {
                 marginTop: 10,
                 width: '48%',
               }}
-              placeholder="Meeting Date"
-              value={onlyDate}
+              placeholder="time start"
+              value={state.meeting_time_start}
               onChange={d => {
-                // console.log('25/02/2023', d);
-                onchangeState('meeting_date', d);
+                onchangeState('meeting_time_start', d);
               }}
               appendComponent={
-                <TouchableOpacity onPress={() => setOpen(true)}>
-                  <Fontisto name={'date'} size={25} color={COLORS.primary} />
+                <TouchableOpacity onPress={() => setOpenStart(true)}>
+                  <AntDesign
+                    name={'clockcircleo'}
+                    size={25}
+                    color={COLORS.primary}
+                  />
                 </TouchableOpacity>
               }
             />
@@ -287,19 +360,14 @@ const AddMeeting = ({navigation}) => {
                 marginTop: 10,
                 width: '48%',
               }}
-              placeholder="Meeting Time"
-              value={onlyTime}
+              placeholder="time end"
+              value={state.meeting_time_end}
               onChange={t => {
-                console.log('meeting_time', t);
-                onchangeState('meeting_time', t);
+                onchangeState('meeting_time_end', t);
               }}
               appendComponent={
                 <TouchableOpacity onPress={() => setOpenTime(true)}>
-                  <AntDesign
-                    name={'clockcircleo'}
-                    size={25}
-                    color={COLORS.primary}
-                  />
+                  <Entypo name={'clock'} size={28} color={COLORS.primary} />
                 </TouchableOpacity>
               }
             />
@@ -361,7 +429,6 @@ const AddMeeting = ({navigation}) => {
                   />
                 )}
               />
-
               <FormInput
                 containerStyle={{
                   borderRadius: SIZES.radius,
@@ -406,7 +473,7 @@ const AddMeeting = ({navigation}) => {
             search
             data={user}
             labelField="email"
-            valueField="id"
+            valueField="email"
             placeholder="Select attendees"
             searchPlaceholder="Search..."
             value={state.attendees}
@@ -450,11 +517,7 @@ const AddMeeting = ({navigation}) => {
                     borderRadius: SIZES.radius,
                   }}
                   onPress={() => {
-                    if (handleValidEmail()) {
-                      AddEmailFunction();
-                    } else {
-                      Alert.alert('invalid email address');
-                    }
+                    AddEmailFunction();
                   }}
                 />
               )
@@ -533,12 +596,12 @@ const AddMeeting = ({navigation}) => {
                 labelStyle={{
                   color: COLORS.primary,
                 }}
-                onPress={() => uploadFile()}
+                onPress={() => uploadFile(selectImage)}
               />
             ) : null}
           </View>
           <TextButton
-            label={'Save'}
+            label={editMeeting ? 'Edit' : 'Save'}
             contentContainerStyle={{
               height: 55,
               borderRadius: SIZES.radius,
@@ -548,7 +611,7 @@ const AddMeeting = ({navigation}) => {
               color: COLORS.light,
               ...FONTS.h4,
             }}
-            onPress={() => {}}
+            onPress={() => (editMeeting ? updateMeeting() : submitHandle())}
           />
         </KeyboardAwareScrollView>
       </View>
@@ -561,12 +624,29 @@ const AddMeeting = ({navigation}) => {
           onConfirm={date => {
             setOpen(false);
             setDate(date);
+            onchangeState('meeting_date', moment(date).format('L'));
           }}
           onCancel={() => {
             setOpen(false);
           }}
         />
       )}
+      {openStart ? (
+        <DatePicker
+          modal
+          open={openStart}
+          date={date}
+          mode={'time'}
+          onConfirm={date => {
+            setOpenStart(false);
+            setDate(date);
+            onchangeState('meeting_time_start', moment(date).format('LTS'));
+          }}
+          onCancel={() => {
+            setOpenStart(false);
+          }}
+        />
+      ) : null}
       {openTime ? (
         <DatePicker
           modal
@@ -576,6 +656,7 @@ const AddMeeting = ({navigation}) => {
           onConfirm={date => {
             setOpenTime(false);
             setDate(date);
+            onchangeState('meeting_time_end', moment(date).format('LTS'));
           }}
           onCancel={() => {
             setOpenTime(false);

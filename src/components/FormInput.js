@@ -23,6 +23,7 @@ const FormInput = ({
   error,
   multiline,
   numberOfLines,
+  autoFocus,
   onFocus = () => {},
 }) => {
   const [isFocused, setIsFocused] = React.useState(false);
@@ -65,6 +66,7 @@ const FormInput = ({
           keyboardType={keyboardType}
           inputMode={inputMode}
           error={error}
+          autoFocus={autoFocus}
           onFocus={() => {
             onFocus();
             setIsFocused(true);

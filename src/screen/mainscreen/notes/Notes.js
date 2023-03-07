@@ -10,7 +10,7 @@ import {
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
 import {COLORS, constants, FONTS, SIZES} from '../../../constants';
-import {FAB} from 'react-native-paper';
+import {FAB, RadioButton} from 'react-native-paper';
 import ApiMethod from '../../../Services/APIService';
 import {useSelector} from 'react-redux';
 import {RefreshControl} from 'react-native';
@@ -20,8 +20,10 @@ import MeetingFilter from '../meeting/MeetingFilter';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {AddNotes} from '../..';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useCallback} from 'react';
 import ViewNotes from './ViewNotes';
+import TextButton from '../../../components/TextButton';
 
 const Notes = ({navigation}) => {
   const token = useSelector(state => state?.user?.user);
@@ -36,6 +38,9 @@ const Notes = ({navigation}) => {
   const [iconModal, setIconModal] = useState('');
   const [lengthMore, setLengthMore] = useState('');
   const [textShown, setTextShown] = useState(false);
+  const [editable, setEditable] = useState([]);
+  const [actionModal, setActionModal] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   const [agendaText, setAgendaText] = useState(false);
 
@@ -66,7 +71,25 @@ const Notes = ({navigation}) => {
       //   setListState(result?.data?.data);
       handelNotesList();
       setIsRefreshing(false);
-      return;
+      Alert.alert('Data Deleted Successfully');
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  const NoteAction = async id => {
+    const url = constants.endPoint.noteAction;
+    const params = {
+      ids: [id],
+      action: checked,
+    };
+    try {
+      const ActionRes = await ApiMethod.postData(url, params, token);
+      if (ActionRes) {
+        Alert.alert('Note Action Update Successfully');
+        setActionModal(false);
+        handelNotesList();
+      }
     } catch (error) {
       console.log('error', error);
     }
@@ -146,7 +169,7 @@ const Notes = ({navigation}) => {
                       />
                       <TouchableOpacity
                         onPress={() => {
-                          handleDelete(id);
+                          handleDelete(item.id);
                           navigation.navigate('Notes');
                         }}
                       >
@@ -161,8 +184,27 @@ const Notes = ({navigation}) => {
                       >
                         <AntDesign
                           name="eyeo"
+                          size={25}
+                          color={COLORS.support3}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setAddNotesModal(true, item);
+                          setEditable(item);
+                        }}
+                      >
+                        <AntDesign
+                          name="edit"
                           size={20}
                           color={COLORS.support3}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => setActionModal(true)}>
+                        <MaterialCommunityIcons
+                          name="list-status"
+                          size={20}
+                          color={COLORS.error}
                         />
                       </TouchableOpacity>
                     </View>
@@ -231,6 +273,58 @@ const Notes = ({navigation}) => {
                   {item.decision}
                 </Text>
 
+                <View style={{flexDirection: 'row'}}>
+                  <Text
+                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                  >
+                    {' '}
+                    Status :{' '}
+                  </Text>
+                  <Text>{item.status == 1 ? 'active' : 'inactive'}</Text>
+                  <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={actionModal}
+                    onRequestClose={() => {
+                      setActionModal(!actionModal);
+                    }}
+                  >
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: COLORS.light20,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <View
+                        style={{backgroundColor: COLORS.success, width: '80%'}}
+                      >
+                        <Text> id : {item.id} </Text>
+                        <View style={{flexDirection: 'row'}}>
+                          <RadioButton
+                            value={item.status}
+                            status={
+                              checked === item.status ? 'checked' : 'unchecked'
+                            }
+                            onPress={() => setChecked(!checked)}
+                          />
+                          <Text style={{marginTop: 8}}>
+                            {!checked ? 'Active' : 'inactive'}
+                          </Text>
+                        </View>
+                        <TextButton
+                          label={'submit'}
+                          contentContainerStyle={{
+                            padding: 10,
+                            borderRadius: SIZES.radius,
+                          }}
+                          onPress={() => NoteAction(item.id)}
+                        />
+                      </View>
+                    </View>
+                  </Modal>
+                </View>
                 {/* {!lengthMore ? (
                   <Text
                     onPress={() => setAgendaText(agendaText)}
@@ -326,6 +420,8 @@ const Notes = ({navigation}) => {
             <AddNotes
               addNotesModal={addNotesModal}
               setAddNotesModal={setAddNotesModal}
+              editable={editable}
+              setEditable={setEditable}
             />
           </View>
         </View>

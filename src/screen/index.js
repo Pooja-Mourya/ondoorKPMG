@@ -8,6 +8,14 @@ import Resetpassword from './Authentication/Resetpassword';
 import ViewMeeting from './mainscreen/meeting/ViewMeeting';
 import AddNotes from './mainscreen/notes/AddNotes';
 import ViewNotes from './mainscreen/notes/ViewNotes';
+import ActionList from './mainscreen/action/ActionList';
+import AddActionItem from './mainscreen/action/AddActionItem';
+import ImageUpload from './ImageUpload';
+import ViewActionItem from './mainscreen/action/ViewActionItem';
+import AddRole from './mainscreen/role/AddRole';
+import ViewRoles from './mainscreen/role/ViewRoles';
+import AddUser from './user/AddUser';
+import ViewUser from './user/ViewUser';
 
 export {
   Welcome,
@@ -20,4 +28,12 @@ export {
   ViewMeeting,
   AddNotes,
   ViewNotes,
+  ActionList,
+  AddActionItem,
+  ImageUpload,
+  ViewActionItem,
+  AddRole,
+  ViewRoles,
+  AddUser,
+  ViewUser,
 };

@@ -12,6 +12,13 @@ import {
   ViewMeeting,
   AddNotes,
   ViewNotes,
+  ActionList,
+  AddActionItem,
+  ViewActionItem,
+  AddRole,
+  ViewRoles,
+  AddUser,
+  ViewUser,
 } from '../screen/index';
 
 const Stack = createStackNavigator();
@@ -35,6 +42,13 @@ const MyStack = () => {
         <Stack.Screen name="ViewMeeting" component={ViewMeeting} />
         <Stack.Screen name="AddNotes" component={AddNotes} />
         <Stack.Screen name="ViewNotes" component={ViewNotes} />
+        <Stack.Screen name="ActionList" component={ActionList} />
+        <Stack.Screen name="AddActionItem" component={AddActionItem} />
+        <Stack.Screen name="ViewActionItem" component={ViewActionItem} />
+        <Stack.Screen name="AddRole" component={AddRole} />
+        <Stack.Screen name="ViewRoles" component={ViewRoles} />
+        <Stack.Screen name="AddUser" component={AddUser} />
+        <Stack.Screen name="ViewUser" component={ViewUser} />
       </Stack.Navigator>
     </NavigationContainer>
   );

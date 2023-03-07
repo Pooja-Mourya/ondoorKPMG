@@ -21,15 +21,19 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import {useSelector} from 'react-redux';
 import ApiMethod from '../../../Services/APIService';
 import {Dropdown} from 'react-native-element-dropdown';
+import axios from 'axios';
+import DocumentPicker, {types} from 'react-native-document-picker';
 
 const AddMeeting = props => {
   const token = useSelector(state => state?.user?.user);
 
-  const {navigation} = props;
-
-  //   const routeData = props?.route.params?.action_items;
-
-  //   console.log('routeData', routeData);
+  const {
+    navigation,
+    addNotesModal,
+    setAddNotesModal,
+    setEditable,
+    editable,
+  } = props;
 
   const [isLoading, setIsLoading] = useState(false);
   const [listState, setListState] = useState([]);
@@ -39,8 +43,8 @@ const AddMeeting = props => {
     notes: '',
     decision: '',
   });
+  const [selectImage, setSelectImage] = useState([]);
   const [errors, setErrors] = useState('');
-  const [editData, setEditData] = useState({});
 
   const validate = () => {
     let valid = true;
@@ -61,48 +65,112 @@ const AddMeeting = props => {
     setErrors({...errors, [errorMessage]: input});
   };
 
-  const submitHandle = async () => {
-    setIsLoading(true);
-    let url = constants.endPoint.note;
-    let params = {
-      meeting_id: listState.meeting_title,
-      duration: state.duration,
-      notes: state.notes,
-      decision: state.decision,
-    };
-
-    // console.log('params', params);
-    // return;
-
+  const handleImagePiker = async () => {
     try {
-      const response = await ApiMethod.postData(url, params, token);
+      const res = await DocumentPicker.pickMultiple({
+        presentationStyle: 'fullScreen',
+        allowMultiSelection: true,
+        type: [types.doc, types.docx],
+      });
+      console.log('res', res);
+      setSelectImage(res);
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        alert('cancelled');
+      } else if (isInProgress(err)) {
+        console.warn(
+          'multiple pickers were opened, only the last will be considered',
+        );
+      } else {
+        throw err;
+      }
+    }
+  };
 
-      //   navigation.navigate('Notes');
-      Alert.alert(' note register successfully');
-      setIsLoading(false);
-      console.log('response', response);
+  const handleUploadImage = async () => {
+    const formData = new FormData();
+    formData.append('file[0]', selectImage?.[0]);
+    formData.append('is_multiple', '1');
+
+    console.log('formData', JSON.stringify(formData));
+
+    // return;
+    try {
+      const res = await axios.post(
+        'https://meeting-api.gofactz.com/api/file-upload',
+        formData,
+        {
+          headers: {
+            accept: '*/*',
+            'content-type': 'multipart/form-data',
+            authorization: 'Bearer ' + token,
+          },
+        },
+      );
+      console.log('imageRes', res);
     } catch (error) {
       console.log('error', error);
     }
   };
 
-  const EditHandle = async () => {
+  const submitHandle = async () => {
     setIsLoading(true);
-    let url = constants.endPoint.note + '/' + id;
+    const res = await axios({
+      method: 'post',
+      url: 'https://meeting-api.gofactz.com/api/note',
+      headers: {
+        authorization: 'Bearer ' + token,
+      },
+      data: {
+        meeting_id: '29',
+        duration: state.duration,
+        // notes:
+        //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
+        // decision:
+        //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
+        //
+        notes: state.notes,
+        decision: state.decision,
+        documents: [
+          {
+            file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+            file_extension: '',
+            file_name: '',
+            uploading_file_name: '',
+          },
+        ],
+      },
+    });
+    Alert.alert('Record successfully created');
+    console.log('create api response ...', res);
+    setIsLoading(false);
+    setAddNotesModal(false);
+  };
+
+  const handleUpdate = async () => {
+    setIsLoading(true);
+    let url = constants.endPoint.note + '/' + editable.id;
     let params = {
-      meeting_id: listState.meeting_title,
+      meeting_id: state.meeting_id.id,
       duration: state.duration,
       notes: state.notes,
       decision: state.decision,
+      documents: [
+        {
+          file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+          file_extension: '',
+          file_name: '',
+          uploading_file_name: '',
+        },
+      ],
     };
 
     try {
-      const response = await ApiMethod.postData(url, params, token);
-
-      //   navigation.navigate('Notes');
-      Alert.alert(' note register successfully');
+      const response = await ApiMethod.putData(url, params, token);
+      Alert.alert(' note update successfully');
       setIsLoading(false);
       console.log('response', response);
+      setAddNotesModal(false);
     } catch (error) {
       console.log('error', error);
     }
@@ -127,43 +195,29 @@ const AddMeeting = props => {
     }
   };
 
-  //   useEffect(() => {
-  //     if (routeData) {
-  //       setState({
-  //         ...state,
-  //         // [state.meeting_id]: routeData.meeting_id,
-  //         [state.duration]: routeData.duration,
-  //         [state.notes]: routeData.notes,
-  //         [state.decision]: routeData.decision,
-  //       });
-  //     } else {
-  //       setState({
-  //         ...state,
-  //         [state.meeting_id]: token.meeting_id,
-  //         [state.duration]: token.duration,
-  //         [state.notes]: token.notes,
-  //         [state.decision]: token.decision,
-  //       });
-  //     }
-  //   }, []);
-
   useEffect(() => {
     handleMeetingList();
   }, []);
 
-  console.log('state', state);
+  useEffect(() => {
+    if (editable) {
+      setState({
+        ...state,
+        meeting_id: editable.meeting_id,
+        duration: editable.duration,
+        notes: editable.notes,
+        decision: editable.decision,
+        documents: editable.documents,
+      });
+    }
+  }, []);
 
-  //   const forMeetingID = listState.map(item => item.attendees[0].meeting_id);
-  //   const forMeetingID = listState.map(item => console.log('item', item));
-
-  //   console.log('forMeetingID0', ...forMeetingID);
-  //   console.log('routeData', routeData);
-
+  console.log('editable', editable);
   if (isLoading) return <ActivityIndicator />;
   return (
     <>
       <Header
-        textHeader={editData ? 'Edit Notes' : 'Add Notes'}
+        textHeader={!editable ? 'Add Notes' : 'Edit Notes'}
         // leftIcon={true}
         // onPressArrow={() => !false)}
       />
@@ -176,8 +230,30 @@ const AddMeeting = props => {
           borderRadius: SIZES.radius,
         }}
       >
-        {/* <Text style={{...FONTS.body2, fontSize: SIZES.h2}}>Basic Details</Text>
-        <Text>Enter basic details of the meeting</Text> */}
+        <TouchableOpacity
+          onPress={() => {
+            if (editable) {
+              setEditable(false);
+            } else {
+              setAddNotesModal(false);
+            }
+          }}
+          style={{alignItems: 'flex-end'}}
+        >
+          <AntDesign
+            style={{
+              backgroundColor: COLORS.light,
+              borderRadius: 50,
+              padding: 5,
+              elevation: 1,
+            }}
+            name="close"
+            size={25}
+            color={COLORS.dark}
+          />
+        </TouchableOpacity>
+        <Text style={{...FONTS.body2, fontSize: SIZES.h2}}>Basic Details</Text>
+        <Text>Enter basic details of the meeting</Text>
         <KeyboardAwareScrollView>
           <Dropdown
             style={styles.dropdown}
@@ -189,7 +265,7 @@ const AddMeeting = props => {
             search
             maxHeight={300}
             labelField="meeting_title"
-            valueField="id"
+            valueField="meeting_id"
             placeholder="Select meeting id"
             searchPlaceholder="Search..."
             value={state.meeting_id}
@@ -205,19 +281,7 @@ const AddMeeting = props => {
               />
             )}
           />
-          {/* <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-              marginTop: 10,
-            }}
-            placeholder="meeting_id"
-            value={state.meeting_id}
-            onChange={d => onchangeState('meeting_id', d)}
-            error={errors.duration}
-            onFocus={() => handleError(null, 'duration')}
-            keyboardType="numeric"
-          /> */}
+
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -255,19 +319,86 @@ const AddMeeting = props => {
             multiline={true}
             numberOfLines={4}
           />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            placeholder="Documents"
+            value={state.documents}
+            onChange={n => onchangeState('documents', n)}
+            appendComponent={
+              <TouchableOpacity onPress={() => handleImagePiker()}>
+                <AntDesign name="upload" size={25} color={COLORS.primary} />
+              </TouchableOpacity>
+            }
+          />
+          {/* <Text>{editable.documents[0].document}</Text>
+          {editable ? <Text>{editable.duration}</Text> : null} */}
+
+          <View>
+            <FlatList
+              data={selectImage}
+              keyExtractor={(item, index) =>
+                (item?.filename ?? item?.path) + index
+              }
+              renderItem={({item}) => {
+                // console.log('item', item);
+                return (
+                  <View style={{flexDirection: 'column', width: '100%'}}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        paddingVertical: 10,
+                      }}
+                    >
+                      <View>
+                        <Text>{item.name}</Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => setSelectImage(selectImage.splice(0, 1))}
+                      >
+                        <AntDesign name="delete" size={20} color={'red'} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              }}
+              numColumns={3}
+            />
+          </View>
+          {selectImage.length > 0 ? (
+            <TextButton
+              label={'Upload Image'}
+              onPress={() => handleUploadImage()}
+              contentContainerStyle={{
+                height: 55,
+                borderRadius: SIZES.radius,
+                marginVertical: 15,
+                width: '100%',
+              }}
+              labelStyle={{
+                color: COLORS.light,
+                ...FONTS.h4,
+              }}
+            />
+          ) : null}
           <TextButton
-            label={editData ? 'Edit' : 'Save'}
+            label={editable ? 'Update' : 'Save'}
             contentContainerStyle={{
               height: 55,
               borderRadius: SIZES.radius,
-              margin: 10,
+              marginVertical: 15,
+              width: '100%',
             }}
             labelStyle={{
               color: COLORS.light,
               ...FONTS.h4,
             }}
             onPress={() => {
-              submitHandle();
+              editable ? handleUpdate() : submitHandle();
               //   if (validate()) {
               //     submitHandle();
               //   } else {

@@ -22,6 +22,7 @@ import {ActivityIndicator} from 'react-native';
 import {useSelector} from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import CheckBox from '../../components/CheckBox';
+import {Alert} from 'react-native';
 
 const AuthMain = ({navigation}) => {
   const token = useSelector(state => state?.user?.user);
@@ -293,11 +294,11 @@ const AuthMain = ({navigation}) => {
               />
             }
           />
-          <CheckBox
+          {/* <CheckBox
             containerStyle={{backgroundColor: '', lineHeight: 20}}
             isSelected={termChecked}
             onPress={() => setTermChecked(!termChecked)}
-          />
+          /> */}
           <TextButton
             label={'Sign Up'}
             contentContainerStyle={{
@@ -380,17 +381,20 @@ const AuthMain = ({navigation}) => {
 
   const resetPassword = async () => {
     try {
-      const url = await constants.endPoint.forgetPassword;
+      const url = constants.endPoint.forgetPassword;
       const params = {
-        // email: forgetPassword,
-        email: 'admin@gmail.com',
+        email: forgetPassword,
+        // email: 'admin@gmail.com',
       };
 
       // return
-      const result = ApiMethod.postData(url, params, token);
+      const result = await ApiMethod.postData(url, params, token);
       console.log('result', result);
       if (result) {
-        result.message;
+        // result.message;
+        Alert.alert(
+          'Password reset link send to your email address, please check your mail',
+        );
         navigation.navigate('Resetpassword');
       }
     } catch (error) {

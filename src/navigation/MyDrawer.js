@@ -25,25 +25,10 @@ import {ActivityIndicator} from 'react-native';
 import UserList from '../screen/user/UserList';
 import Roles from '../screen/mainscreen/role/Roles';
 import Feather from 'react-native-vector-icons/Feather';
+import {ActionList} from '../screen';
+import AppSetting from '../screen/mainscreen/appSetting/AppSetting';
+import Dashboard from '../screen/Dashboard';
 
-function HomeScreen({navigation}) {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Button
-        onPress={() => navigation.navigate('Notifications')}
-        title="Go to notifications"
-      />
-    </View>
-  );
-}
-
-function NotificationsScreen({navigation}) {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Button onPress={() => navigation.goBack()} title="Go back home" />
-    </View>
-  );
-}
 function Logout({navigation}) {
   const token = useSelector(state => state?.user?.user);
   console.log('logout token', token);
@@ -124,7 +109,7 @@ const Drawer = createDrawerNavigator();
 const MyDrawer = () => {
   return (
     <Drawer.Navigator
-      initialRouteName="Home"
+      initialRouteName="DASHBOARD"
       //   drawerContentOptions={{
       // }}
       screenOptions={{
@@ -138,11 +123,21 @@ const MyDrawer = () => {
       drawerContent={props => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen
-        name="Home"
-        component={HomeScreen}
+        name="DASHBOARD"
+        component={Dashboard}
         options={{
           drawerIcon: () => (
             <AntDesign name="home" size={20} color={COLORS.dark} />
+          ),
+          //   headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Setting"
+        component={AppSetting}
+        options={{
+          drawerIcon: () => (
+            <AntDesign name="setting" size={20} color={COLORS.dark} />
           ),
           //   headerShown: false,
         }}
@@ -168,8 +163,8 @@ const MyDrawer = () => {
         }}
       />
       <Drawer.Screen
-        name="Notifications"
-        component={NotificationsScreen}
+        name="Action"
+        component={ActionList}
         options={{
           drawerIcon: () => (
             <AntDesign name="contacts" size={20} color={COLORS.dark} />

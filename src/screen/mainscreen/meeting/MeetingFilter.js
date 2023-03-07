@@ -1,24 +1,32 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, Modal} from 'react-native';
 import React, {useState} from 'react';
 import Header from '../../../components/layout/Header';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {COLORS, FONTS, SIZES} from '../../../constants';
+import Fontisto from 'react-native-vector-icons/Fontisto';
+import Entypo from 'react-native-vector-icons/Entypo';
+import {COLORS, constants, FONTS, SIZES} from '../../../constants';
 import TextButton from '../../../components/TextButton';
 import FormInput from '../../../components/FormInput';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
+import ApiMethod from '../../../Services/APIService';
+import {useSelector} from 'react-redux';
 
-const MeetingFilter = ({
-  navigation,
-  filterModal,
-  setFilterModal,
-  filterData,
-}) => {
+const MeetingFilter = ({setFilterModal}) => {
+  const token = useSelector(state => state?.user?.user);
+
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+  const [openTime, setOpenTime] = useState(false);
+  const [openStart, setOpenStart] = useState(false);
   const [state, setState] = useState({
-    name: '',
-    email: '',
-    designation: '',
-    number: '',
-    status: 'active',
+    meeting_date: '',
+    meeting_ref_no: '',
+    meeting_time_end: '',
+    meeting_time_start: '',
+    meeting_title: '',
+    status: '',
   });
   const onChangeTextHandle = (name, value) => {
     setState({
@@ -27,8 +35,27 @@ const MeetingFilter = ({
     });
   };
 
-  const onSubmitFilterHandler = () => {
-    console.log('pressed');
+  const onSubmitFilterHandler = async () => {
+    let url = constants.endPoint.meetingList;
+    let params = {
+      meeting_date: state.meeting_date,
+      meeting_ref_no: state.meeting_ref_no,
+      meeting_time_end: state.meeting_time_end,
+      meeting_time_start: state.meeting_time_start,
+      meeting_title: state.meeting_title,
+      status: state.status == 1 ? 'active' : 'inactive',
+    };
+
+    try {
+      const filterRes = await ApiMethod.postData(url, params, token);
+      console.log('filterRes', filterRes);
+      if (filterRes) {
+        // navigation.navigate('Meeting');
+        setFilterModal(false);
+      }
+    } catch (error) {
+      console.log('error', error);
+    }
   };
   return (
     <View>
@@ -61,9 +88,9 @@ const MeetingFilter = ({
           borderRadius: SIZES.radius,
           backgroundColor: COLORS.error,
         }}
-        placeholder="ENTER YOUR NAME"
-        value={state.name}
-        onChange={N => onChangeTextHandle('name', N)}
+        placeholder="MEETING TITLE"
+        value={state.meeting_title}
+        onChange={N => onChangeTextHandle('meeting_title', N)}
       />
       <FormInput
         containerStyle={{
@@ -71,9 +98,9 @@ const MeetingFilter = ({
           backgroundColor: COLORS.error,
           marginTop: 10,
         }}
-        placeholder="ENTER YOUR EMAIL"
-        value={state.email}
-        onChange={E => onChangeTextHandle('email', E)}
+        placeholder="MEETING REF NO."
+        value={state.meeting_ref_no}
+        onChange={M => onChangeTextHandle('meeting_ref_no', M)}
       />
       <FormInput
         containerStyle={{
@@ -81,20 +108,59 @@ const MeetingFilter = ({
           backgroundColor: COLORS.error,
           marginTop: 10,
         }}
-        placeholder="ENTER YOUR DESIGNATION"
-        value={state.designation}
-        onChange={D => onChangeTextHandle('designation', D)}
-      />
-      <FormInput
-        containerStyle={{
-          borderRadius: SIZES.radius,
-          backgroundColor: COLORS.error,
-          marginTop: 10,
+        placeholder="Meeting Date"
+        value={state.meeting_date}
+        onChange={d => {
+          onChangeTextHandle('meeting_date', d);
         }}
-        placeholder="ENTER YOUR MOBILE NUMBER"
-        value={state.number}
-        onChange={M => onChangeTextHandle('number', M)}
+        appendComponent={
+          <TouchableOpacity onPress={() => setOpen(true)}>
+            <Fontisto name={'date'} size={25} color={COLORS.primary} />
+          </TouchableOpacity>
+        }
       />
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+            marginTop: 10,
+            width: '48%',
+          }}
+          placeholder="time start"
+          value={state.meeting_time_start}
+          onChange={d => {
+            onChangeTextHandle('meeting_time_start', d);
+          }}
+          appendComponent={
+            <TouchableOpacity onPress={() => setOpenStart(true)}>
+              <AntDesign
+                name={'clockcircleo'}
+                size={25}
+                color={COLORS.primary}
+              />
+            </TouchableOpacity>
+          }
+        />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+            marginTop: 10,
+            width: '48%',
+          }}
+          placeholder="time end"
+          value={state.meeting_time_end}
+          onChange={t => {
+            onChangeTextHandle('meeting_time_end', t);
+          }}
+          appendComponent={
+            <TouchableOpacity onPress={() => setOpenTime(true)}>
+              <Entypo name={'clock'} size={28} color={COLORS.primary} />
+            </TouchableOpacity>
+          }
+        />
+      </View>
       <View style={{marginTop: 10}}>
         <BouncyCheckbox
           size={25}
@@ -121,6 +187,57 @@ const MeetingFilter = ({
         }}
         onPress={() => onSubmitFilterHandler()}
       />
+      {open && (
+        <DatePicker
+          modal
+          open={open}
+          date={date}
+          mode={'date'}
+          onConfirm={date => {
+            setOpen(false);
+            setDate(date);
+            onChangeTextHandle('meeting_date', moment(date).format('L'));
+          }}
+          onCancel={() => {
+            setOpen(false);
+          }}
+        />
+      )}
+      {openStart ? (
+        <DatePicker
+          modal
+          open={openStart}
+          date={date}
+          mode={'time'}
+          onConfirm={date => {
+            setOpenStart(false);
+            setDate(date);
+            onChangeTextHandle(
+              'meeting_time_start',
+              moment(date).format('LTS'),
+            );
+          }}
+          onCancel={() => {
+            setOpenStart(false);
+          }}
+        />
+      ) : null}
+      {openTime ? (
+        <DatePicker
+          modal
+          open={openTime}
+          date={date}
+          mode={'time'}
+          onConfirm={date => {
+            setOpenTime(false);
+            setDate(date);
+            onChangeTextHandle('meeting_time_end', moment(date).format('LTS'));
+          }}
+          onCancel={() => {
+            setOpenTime(false);
+          }}
+        />
+      ) : null}
     </View>
   );
 };

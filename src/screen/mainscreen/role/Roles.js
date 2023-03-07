@@ -28,6 +28,7 @@ const Meeting = ({navigation}) => {
   const [page, setPage] = useState(1);
   const [filterData, setFilterData] = useState({}); //filter data
   const [filterModal, setFilterModal] = useState(false);
+  //   const [addRoleModal, setAddRoleModal] = useState(false);
 
   const handleRoles = async () => {
     const url = constants.endPoint.roles;
@@ -42,6 +43,16 @@ const Meeting = ({navigation}) => {
       setListState(result?.data?.data);
       setIsRefreshing(false);
       return;
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  const handleDelete = async id => {
+    let url = constants.endPoint.role + '/' + id;
+    let params = {};
+    try {
+      await ApiMethod.deleteData(url, params, token);
     } catch (error) {
       console.log('error', error);
     }
@@ -79,6 +90,7 @@ const Meeting = ({navigation}) => {
       <FlatList
         data={listState}
         keyExtractor={item => item.id}
+        horizontal={true}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -87,7 +99,7 @@ const Meeting = ({navigation}) => {
             }}
           />
         }
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
           return (
             <>
               <View
@@ -98,19 +110,55 @@ const Meeting = ({navigation}) => {
                   padding: SIZES.padding,
                 }}
               >
-                <View>
-                  <TouchableOpacity onPress={() => {}}>
+                <View
+                  style={{
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                    backgroundColor: COLORS.light,
+                    padding: 10,
+                    elevation: 2,
+                  }}
+                >
+                  <TouchableOpacity onPress={() => handleDelete(item.id)}>
                     <AntDesign name="delete" size={20} color={COLORS.error} />
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('ViewMeeting', item)}
+                    onPress={() => navigation.navigate('AddRole', item)}
                   >
-                    <AntDesign name="eyeo" size={20} color={COLORS.support3} />
+                    <AntDesign name="edit" size={20} color={COLORS.primary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ViewRoles', item)}
+                  >
+                    <AntDesign name="eyeo" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
                 </View>
 
-                <Text>{item.name}</Text>
-                <Text>{item.se_name}</Text>
+                <Text
+                  style={{
+                    padding: 8,
+                    textAlign: 'center',
+                    fontFamily: FONTS.base,
+                    fontWeight: '700',
+                    color: COLORS.grey,
+                  }}
+                >
+                  {item.name}
+                </Text>
+                <FlatList
+                  data={item.permissions}
+                  keyExtractor={item => item.id}
+                  renderItem={({item, index}) => {
+                    console.log('permission', item);
+                    return (
+                      <View>
+                        <Text>
+                          {index} {item.name}
+                        </Text>
+                      </View>
+                    );
+                  }}
+                />
               </View>
             </>
           );
@@ -126,7 +174,7 @@ const Meeting = ({navigation}) => {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => navigation.navigate('AddMeeting')}
+        onPress={() => navigation.navigate('AddRole')}
       />
 
       <Modal
@@ -160,6 +208,40 @@ const Meeting = ({navigation}) => {
               setFilterModal={setFilterModal}
               filterModal={filterModal}
             />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={filterModal}
+        onRequestClose={() => {
+          //   Alert.alert('Modal has been closed.');
+          setFilterModal(!filterModal);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            width: '100%',
+            padding: SIZES.padding,
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.gray,
+          }}
+        >
+          <View
+            style={{
+              marginBottom: 20,
+              backgroundColor: COLORS.support1,
+              padding: SIZES.padding,
+              borderRadius: SIZES.radius,
+            }}
+          >
+            {/* <AddRole
+              addRoleModal={addRoleModal}
+              setAddRoleModal={setAddRoleModal}
+            /> */}
           </View>
         </View>
       </Modal>
