@@ -55,5 +55,7 @@ export default {
     dashboard: 'dashboard',
     changePassword: 'change-password',
     updatePassword: 'update-password',
+    notifications: 'notifications',
+    readAllNotification: 'user-notification-read-all',
   },
 };

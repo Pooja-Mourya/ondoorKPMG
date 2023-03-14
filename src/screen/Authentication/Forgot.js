@@ -6,8 +6,11 @@ import {constants} from '../../constants';
 import ApiMethod from '../../Services/APIService';
 import {ActivityIndicator} from 'react-native';
 import TextButton from '../../components/TextButton';
+import {useSelector} from 'react-redux';
 
 const Forgot = ({navigation}) => {
+  const token = useSelectorr(state => state?.user?.user?.access_token);
+
   const [load, setLoad] = useState(false);
   const [email, setEmail] = useState('');
 

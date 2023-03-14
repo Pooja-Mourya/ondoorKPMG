@@ -36,9 +36,7 @@ const AddUser = props => {
 
   const userEdit = props.route.params;
 
-  const token = useSelector(state => state?.user?.user);
-
-  //   console.log('userEdit', userEdit);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   const [click, setClick] = useState(false);
   const [load, setLoad] = useState(false);

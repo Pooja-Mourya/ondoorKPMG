@@ -14,7 +14,7 @@ import ApiMethod from '../../../Services/APIService';
 import {useSelector} from 'react-redux';
 
 const MeetingFilter = ({setFilterModal}) => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);

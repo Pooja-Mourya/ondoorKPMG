@@ -26,8 +26,8 @@ import ViewNotes from './ViewNotes';
 import TextButton from '../../../components/TextButton';
 
 const Notes = ({navigation}) => {
-  const token = useSelector(state => state?.user?.user);
-  console.log('token', token);
+  const token = useSelector(state => state?.user?.user?.access_token);
+
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -137,7 +137,7 @@ const Notes = ({navigation}) => {
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
-                  elevation: 2,
+                  //   elevation: 2,
                 }}
               >
                 {iconModal === index ? (

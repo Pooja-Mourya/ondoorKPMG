@@ -12,9 +12,8 @@ import {useSelector} from 'react-redux';
 import {ActivityIndicator} from 'react-native';
 
 const Resetpassword = ({navigation}) => {
-  const oldPassword = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
-  console.log('oldPassword', oldPassword);
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [load, setLoad] = useState(false);

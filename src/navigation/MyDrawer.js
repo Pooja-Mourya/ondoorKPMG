@@ -28,9 +28,11 @@ import Feather from 'react-native-vector-icons/Feather';
 import {ActionList} from '../screen';
 import AppSetting from '../screen/mainscreen/appSetting/AppSetting';
 import Dashboard from '../screen/Dashboard';
+import NotificationApp from '../screen/mainscreen/notification/NotificationApp';
 
 function Logout({navigation}) {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
+
   console.log('logout token', token);
 
   const [logout, setLogout] = useState(true);
@@ -45,9 +47,9 @@ function Logout({navigation}) {
       const result = await ApiMethod.postData(url, params, token);
       console.log('result', result);
 
-      AsyncStorage.removeItem('@user');
+      AsyncStorage.removeItem('@user', token);
       setLoader(false);
-      navigation.navigate('Walkthrough');
+      navigation.navigate('AuthMain');
     } catch (error) {
       console.log('error', error);
     }
@@ -104,6 +106,32 @@ function Logout({navigation}) {
   );
 }
 
+// function showNotification() {
+//   const [visible, setVisible] = useState(false);
+//   return (
+//     <Modal
+//       animationType="slide"
+//       transparent={true}
+//       visible={visible}
+//       onRequestClose={() => {
+//         setVisible(!visible);
+//       }}
+//     >
+//       <View
+//         style={{
+//           flex: 1,
+//           alignItems: 'center',
+//           justifyContent: 'center',
+//           flexDirection: 'row',
+//           backgroundColor: COLORS.support1,
+//         }}
+//       >
+//         <NotificationApp visible={visible} setVisible={setVisible} />
+//       </View>
+//     </Modal>
+//   );
+// }
+
 const Drawer = createDrawerNavigator();
 
 const MyDrawer = () => {
@@ -138,6 +166,16 @@ const MyDrawer = () => {
         options={{
           drawerIcon: () => (
             <AntDesign name="setting" size={20} color={COLORS.dark} />
+          ),
+          //   headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Notification"
+        component={NotificationApp}
+        options={{
+          drawerIcon: () => (
+            <AntDesign name="notification" size={20} color={COLORS.dark} />
           ),
           //   headerShown: false,
         }}

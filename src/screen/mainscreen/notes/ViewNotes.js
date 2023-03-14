@@ -8,7 +8,7 @@ import {TouchableOpacity} from 'react-native';
 import TextButton from '../../../components/TextButton';
 
 const ViewNotes = props => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   const {navigation, setViewModal, viewModal} = props;
   const [editData, setEditData] = useState({});

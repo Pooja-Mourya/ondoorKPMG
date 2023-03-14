@@ -24,6 +24,7 @@ const FormInput = ({
   multiline,
   numberOfLines,
   autoFocus,
+  disabled,
   onFocus = () => {},
 }) => {
   const [isFocused, setIsFocused] = React.useState(false);
@@ -73,6 +74,7 @@ const FormInput = ({
           }}
           multiline={multiline}
           numberOfLines={numberOfLines}
+          disabled={disabled}
         />
         {appendComponent}
       </View>

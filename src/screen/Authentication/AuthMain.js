@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   Animated,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 // import {Shadow} from 'react-native-shadow-2';
@@ -18,14 +19,17 @@ import ApiMethod from '../../Services/APIService';
 import {useDispatch} from 'react-redux';
 import {userLoginFun} from '../../redux/slice/UserSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ActivityIndicator} from 'react-native';
 import {useSelector} from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import CheckBox from '../../components/CheckBox';
 import {Alert} from 'react-native';
+import LoaderFile from '../LoaderFile';
+import {CommonActions} from '@react-navigation/native';
 
 const AuthMain = ({navigation}) => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
+
+  console.log('authToken', token);
   const [mode, setMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -39,11 +43,22 @@ const AuthMain = ({navigation}) => {
   const [forgetModal, setForgetModal] = useState(false);
   const [forgetPassword, setForgetPassword] = useState('');
   const [termChecked, setTermChecked] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   const dispatch = useDispatch();
 
   function SignInFunction() {
-    if (load) return <ActivityIndicator />;
+    if (load)
+      return (
+        <ActivityIndicator
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 50,
+          }}
+        />
+      );
     return (
       <Animated.View
         style={{marginTop: SIZES.padding, height: SIZES.height * 0.55}}
@@ -341,9 +356,10 @@ const AuthMain = ({navigation}) => {
       //   return;
       setLoginUser(result?.data);
 
-      if (result?.data?.data?.access_token) {
-        AsyncStorage.setItem('@user', result?.data?.data?.access_token);
-        dispatch(userLoginFun(result?.data?.data?.access_token));
+      if (result?.data?.data) {
+        AsyncStorage.setItem('@user', token);
+        console.log('asyncUserToken', token);
+        dispatch(userLoginFun(result?.data?.data));
         setLoad(false);
         navigation.navigate('MyTab');
       }
@@ -403,12 +419,21 @@ const AuthMain = ({navigation}) => {
   };
 
   async function myFunction() {
+    setLoader(true);
     try {
       const variable = await AsyncStorage.getItem('@user');
+
       if (variable !== null) {
-        console.log('"variable"', variable);
-        dispatch(userLoginFun(variable));
-        navigation.navigate('MyTab');
+        console.log('variable', variable);
+        // navigation.navigate('MyTab');
+
+        navigation.dispatch({
+          ...CommonActions.reset({
+            index: 0,
+            routes: [{name: 'MyTab'}],
+          }),
+        });
+        setLoader(false);
       }
     } catch (error) {
       console.log('AppError', error);
@@ -417,7 +442,17 @@ const AuthMain = ({navigation}) => {
 
   useEffect(() => {
     myFunction();
+    // async () => {
+    //   if (componentMounted.current) {
+    //     myFunction();
+    //     return () => {
+    //       componentMounted.current = false;
+    //     };
+    //   }
+    // };
   }, []);
+
+  //   if (loader || token) return <LoaderFile />;
   return (
     <View
       style={{

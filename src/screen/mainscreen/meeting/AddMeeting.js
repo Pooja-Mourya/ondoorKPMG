@@ -39,9 +39,7 @@ const AddMeeting = props => {
 
   const editMeeting = props.route.params;
 
-  //   console.log('editMeeting', editMeeting);
-
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   const [enableCheck, setEnableCheck] = useState(false);
   const [selectImage, setSelectImage] = useState(null);
@@ -64,48 +62,38 @@ const AddMeeting = props => {
     attendees: '',
     documents: '',
     inviteEmail: '',
+    checkValidEmail: false,
     is_multiple: '',
     meeting_time_end: '',
     meeting_time_start: '',
   });
-  const [stateError, setStateError] = useState('');
 
-  const validate = () => {
-    Keyboard.dismiss();
-    if (state.email) {
-      handleError('please input email');
-    }
-  };
-
-  const handleError = (errorMessage, input) => {
-    setStateError({...stateError, [errorMessage]: input});
-  };
-
-  const [emailValidError, setEmailValidError] = useState('');
-
-  const handleValidEmail = () => {
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-
-    if (state.inviteEmail === 0) {
-      setEmailValidError('email address must be enter');
-    } else if (reg.test(state.inviteEmail) === false) {
-      setEmailValidError('enter valid email address');
-    } else if (reg.test(state.inviteEmail) === true) {
-      setEmailValidError('');
-    }
+  const uniEmail = invitation => {
+    const flag = user.find(i => i.email === invitation);
+    console.log('flag', flag);
+    return flag;
   };
 
   const AddEmailFunction = () => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+
     const invitation = state.inviteEmail;
     onchangeState('attendees', [...state.attendees, invitation]);
     const u = user;
-
-    u.push({
-      id: invitation,
-      email: invitation,
-    });
-    setUser([...u]);
-    console.log('added');
+    if (invitation.match(reg)) {
+      if (!uniEmail(invitation)) {
+        u.push({
+          id: invitation,
+          email: invitation,
+        });
+        setUser([...u]);
+      } else {
+        Alert.alert('email already exist');
+      }
+      console.log('added');
+    } else {
+      Alert.alert('invalid');
+    }
   };
 
   const onDelete = val => {
@@ -176,6 +164,7 @@ const AddMeeting = props => {
       }
     } catch (error) {}
   };
+
   useEffect(() => {
     ListUser();
   }, []);
@@ -281,7 +270,6 @@ const AddMeeting = props => {
     }
   }, []);
 
-  //   console.log('state', state);
   if (isUploadLoading) return <ActivityIndicator />;
   return (
     <>
@@ -324,6 +312,7 @@ const AddMeeting = props => {
             onChange={d => {
               onchangeState('meeting_date', d);
             }}
+            editable={false}
             appendComponent={
               <TouchableOpacity onPress={() => setOpen(true)}>
                 <Fontisto name={'date'} size={25} color={COLORS.primary} />
@@ -339,6 +328,7 @@ const AddMeeting = props => {
                 width: '48%',
               }}
               placeholder="time start"
+              editable={false}
               value={state.meeting_time_start}
               onChange={d => {
                 onchangeState('meeting_time_start', d);
@@ -362,6 +352,7 @@ const AddMeeting = props => {
               }}
               placeholder="time end"
               value={state.meeting_time_end}
+              editable={false}
               onChange={t => {
                 onchangeState('meeting_time_end', t);
               }}
@@ -495,7 +486,6 @@ const AddMeeting = props => {
             value={state.inviteEmail}
             onChange={invitation => {
               onchangeState('inviteEmail', invitation);
-              // handleValidEmail(invitation);
             }}
             appendComponent={
               !state.inviteEmail ? (

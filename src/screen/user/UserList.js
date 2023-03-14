@@ -22,9 +22,8 @@ import RadioButton from 'react-native-paper';
 import TextButton from '../../components/TextButton';
 
 const UserList = ({navigation}) => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
-  //   console.log('token', token);
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -120,7 +119,6 @@ const UserList = ({navigation}) => {
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
-                  elevation: 2,
                 }}
               >
                 <View

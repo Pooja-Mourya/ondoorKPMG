@@ -20,7 +20,8 @@ const AddRole = props => {
 
   const editRole = props.route.params;
 
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
+
   const [selected, setSelected] = useState([]);
   const [se_name, setSe_name] = useState([]);
   const [listState, setListState] = useState();

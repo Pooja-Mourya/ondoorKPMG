@@ -20,9 +20,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from 'moment';
 import ActionFilter from './ActionFilter';
 import TextButton from '../../../components/TextButton';
+import {Dropdown} from 'react-native-element-dropdown';
 
 const ActionList = props => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
+
   const {navigation} = props;
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -30,6 +32,7 @@ const ActionList = props => {
   const [filterModal, setFilterModal] = useState(false);
   const [checked, setChecked] = useState(false);
   const [actionModal, setActionModal] = useState(false);
+  const [viewStatus, setViewStatus] = useState(false);
 
   const handleActionList = async () => {
     const url = constants.endPoint.actionList;
@@ -117,11 +120,18 @@ const ActionList = props => {
                     padding: 10,
                     flexDirection: 'row',
                     alignSelf: 'flex-end',
-                    width: '40%',
+                    width: '50%',
                     justifyContent: 'space-between',
                     paddingHorizontal: 20,
                   }}
                 >
+                  {/* <TouchableOpacity onPress={() => setViewStatus(!viewStatus)}>
+                    <MaterialCommunityIcons
+                      name="gesture-tap-hold"
+                      size={25}
+                      color={COLORS.dark}
+                    />
+                  </TouchableOpacity> */}
                   <TouchableOpacity
                     onPress={() => navigation.navigate('ViewActionItem', item)}
                   >
@@ -146,7 +156,7 @@ const ActionList = props => {
                     <Text
                       style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
                     >
-                      Title:{' '}
+                      Task:{' '}
                     </Text>
                     <Text style={{width: '50%'}}>{item.task}</Text>
                   </View>
@@ -154,9 +164,35 @@ const ActionList = props => {
                     <Text
                       style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
                     >
-                      Title:{' '}
+                      Comment:{' '}
                     </Text>
                     <Text style={{width: '50%'}}>{item.comment}</Text>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text
+                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                    >
+                      Date:{' '}
+                    </Text>
+                    <Text style={{width: '50%'}}>{item.date_opened}</Text>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text
+                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                    >
+                      Percentage:{' '}
+                    </Text>
+                    <Text style={{width: '50%'}}>
+                      {item.complete_percentage} %
+                    </Text>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text
+                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                    >
+                      Status:{' '}
+                    </Text>
+                    <Text style={{width: '50%'}}>{item.status}</Text>
                   </View>
                 </View>
               </View>

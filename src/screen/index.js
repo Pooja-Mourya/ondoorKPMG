@@ -16,7 +16,7 @@ import AddRole from './mainscreen/role/AddRole';
 import ViewRoles from './mainscreen/role/ViewRoles';
 import AddUser from './user/AddUser';
 import ViewUser from './user/ViewUser';
-
+import LoaderFile from './LoaderFile';
 export {
   Welcome,
   Walkthrough,
@@ -36,4 +36,5 @@ export {
   ViewRoles,
   AddUser,
   ViewUser,
+  LoaderFile,
 };

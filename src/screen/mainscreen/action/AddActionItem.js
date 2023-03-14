@@ -37,14 +37,13 @@ const PRIORITY = [
 const STATUS = [
   {id: '1', status: 'In Progress'},
   {id: '2', status: 'Complete'},
-  {id: '3', status: 'Pending'},
-  {id: '4', status: 'On Hold'},
-  {id: '5', status: 'Not Started'},
-  {id: '6', status: 'Cancelled'},
+  {id: '3', status: 'On Hold'},
+  {id: '4', status: 'Not Started'},
+  {id: '5', status: 'Cancelled'},
 ];
 
 const AddActionItem = props => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   const {navigation} = props;
 

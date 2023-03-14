@@ -20,8 +20,9 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import moment from 'moment';
 
 const Meeting = props => {
-  const token = useSelector(state => state?.user?.user);
-  //   console.log('token', token);
+  const token = useSelector(state => state?.user?.user?.access_token);
+
+  console.log('token', token);
 
   const {navigation} = props;
   const [listState, setListState] = useState([]);
@@ -92,55 +93,10 @@ const Meeting = props => {
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
-                  elevation: 1,
+                  //   elevation: 1,
+                  borderWidth: 1,
                 }}
               >
-                {/* {iconModal === index ? (
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      zIndex: 2,
-                      width: '100%',
-                      height: '100%',
-                      margin: 40,
-                      position: 'absolute',
-                      backgroundColor: COLORS.support5,
-                      borderBottomRightRadius: SIZES.radius,
-                      borderTopLeftRadius: SIZES.radius,
-                    }}
-                  >
-                    <View
-                      style={{
-                        justifyContent: 'space-around',
-                        flexDirection: 'row',
-                      }}
-                    >
-                      <AntDesign
-                        onPress={() => setIconModal('')}
-                        name="close"
-                        size={25}
-                        color={COLORS.light}
-                      />
-                      <TouchableOpacity onPress={() => handleDelete(item.id)}>
-                        <AntDesign
-                          name="delete"
-                          size={20}
-                          color={COLORS.error}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('ViewMeeting', item)}
-                      >
-                        <AntDesign
-                          name="eyeo"
-                          size={20}
-                          color={COLORS.support3}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ) : null} */}
                 <TouchableOpacity
                   onPress={() => navigation.navigate('ViewMeeting', item)}
                   style={{

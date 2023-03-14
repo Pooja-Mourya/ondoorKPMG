@@ -3,9 +3,10 @@ import React from 'react';
 // import { launchImageLibrary } from 'react-native-image-picker'
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
+import ValidationForm from './ValidationForm';
 
 let access_token =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiODIyYmU0ZDE5ZjM2NzYxOTRlYWI2NjAxMzU5YjZiM2QyNTJkY2Q3OTEzNzYzNGY1ZDc3NDUzOTJiODg2MjYwY2ExOGVlYWVlN2FlMTNhNzIiLCJpYXQiOjE2Nzc4NDE0MzcuNzMwMzk1MDc4NjU5MDU3NjE3MTg3NSwibmJmIjoxNjc3ODQxNDM3LjczMDM5NzkzOTY4MjAwNjgzNTkzNzUsImV4cCI6MTcwOTQ2MzgzNy43MjgzMjEwNzU0Mzk0NTMxMjUsInN1YiI6IjEiLCJzY29wZXMiOltdfQ.fMKCKgQEQko87EJgM_IoGd2pmhytWUn1qMCF_uvlMjMics1LqRz9FFmEHplAEKLaW8OV-Sq-Gk0gedACoy-1ORGufiXbapTcyRNv3EtoN2OVW_VGvcdGWd53BXdnjqQngBlCtAJkPYw8Zr33ggzfPu2sxrvttQTm_JUQnuwQIwSyXQbes7x1otvD6km65bLBXy5yp7sxL3l6ZDj_hNThO8R6xin1gWHqhdJhsPfcn2zOwKwLB4pjzCx2Asb98Eyc3V7JoYtnpnPsswN785dU9dcgFyqvv5AAxnRluUtqVV7xkCAE8wanv47m61oyRu5VObF7wEz16YL9f3P5ckjoPKIFeeZWh0NSGVLVVyk07S38TEQLEKJmPCaTJ_DX-JrX4i91g3XIq1-9zDp3dJm_EA3E59CHr-1kp3779iKymf7SV7yT7wEG2zRqcSLskEB61FHrc_didFUaMShU4jxL2OJgybLsCIGTdzTKOc2IGwzZJR77q0NKKgis7P_7iEKgJUm2BLDZPrXW0WyOjXNr5YBZhZS2MMeDlZ-UXox2bX9EQ9XDhjCbF5U2tYt1h-0An_CLv3XxfOrKXCTHzpLQ7x4oB64WuzTwneW80qLm08HarCDNvoPFfsyGH5EECI4iatkrb_qn515XJm1kL3NO9s4-flMhzCg_LqCKirRPGJs';
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiNDQyOGU2OTdiZjRlZDUwMDdkNzEyNTFlM2U0YWI0NGM4OTQwMmU1MGRmNmVjM2EwYjY5ZDRkZmJiM2M4ZWYwNjk0NmMyNmM1Yzc3ZTI1YjgiLCJpYXQiOjE2Nzg0MjYwOTYuMjc3OTE5MDU0MDMxMzcyMDcwMzEyNSwibmJmIjoxNjc4NDI2MDk2LjI3NzkyMTkxNTA1NDMyMTI4OTA2MjUsImV4cCI6MTcxMDA0ODQ5Ni4yNzYxMjQwMDA1NDkzMTY0MDYyNSwic3ViIjoiMSIsInNjb3BlcyI6W119.b67yoflbxf9f1U2pBvn0PzyY4Fttz0_rFELl69-idEaz5IKnDsc62d3827gbHjx8-93KP3X6ZCAmnHWRJ2OGmZK3FvMHNWmhbmO_zXnt1JNGAEFmb3cNkIlMgnH1pkAOln19JmHfxJb0W6bw8sp0jn4a-JjiKeoIXMy7FNgNkSeAcja9ehZg4Nba4RXKh9oT4bsEnV_D_QIkckp3V1VjJdJVOcH1Qa8WSRiIv5O8SHqfP7PKKzkQYJggKVUCcN92uUlx77N2vXgv5K4uyWRIycYYMG-sCZadY8YI1rD-6aVdcy2T5YyJOJCcZWshvPr31VQA_jJoco6gWUwbrDYjAvZZvuosFJ4L3Nr668eKpo4GibLrHWPwhqb7E6F03ouh7z2GhAVZf9zyXqJAMIqelkVyPPZ9oRetFvhLIXsM2hMkc-87cR-GSYo5ocPq3xrH-wTtoeiiWL54W5hOJBS5B95xKcR4WRGHTMbfCshE34QwnPGuCaSFOC1bhoMEaq_U2TIU0dL-53SCOI7tDlNRidKRh6B974PIMZXbv5IbpSLwkFLHlTALp8eWSfv5294Ihxp4TbIIUWQiSiz_O1TQHh9OUYrvdSdCgGOeYD57t7trhuN7Y28qyevg1hXFFcKSTBE13Zcv5vkqtTAFVmFW3Qe3MhAa9gdoWo3sNdYIeKg';
 const ImageUpload = () => {
   const APIServiceUploadFile = async (
     endpoint,
@@ -91,7 +92,7 @@ const ImageUpload = () => {
       'multiple',
       'KPMG Attachment',
     );
-    if (res?.errorMsg) {
+    if (!res?.errorMsg) {
       Alert.alert('danger', 'res.errorMsg');
       return null;
     } else {
@@ -112,6 +113,7 @@ const ImageUpload = () => {
       }
     }
   };
+
   const openImagePicker = async () => {
     let chooseMultiple = true;
     let res = null;
@@ -155,6 +157,8 @@ const ImageUpload = () => {
       >
         <Text style={{color: '#fff', fontWeight: '700'}}>Upload</Text>
       </TouchableOpacity>
+
+      <ValidationForm />
     </View>
   );
 };

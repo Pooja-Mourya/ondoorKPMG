@@ -21,8 +21,8 @@ import MeetingFilter from '../meeting/MeetingFilter';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const Meeting = ({navigation}) => {
-  const token = useSelector(state => state?.user?.user);
-  console.log('token', token);
+  const token = useSelector(state => state?.user?.user?.access_token);
+
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);

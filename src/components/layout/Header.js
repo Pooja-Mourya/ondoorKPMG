@@ -128,7 +128,8 @@ const Header = ({
 
             <TextInput
               placeholder="search"
-              value={searchBar ? value : ''}
+              //   value={searchBar ? value : ''}
+              value={value}
               onChangeText={searchBar ? onChangeText : null}
               style={{
                 borderRadius: SIZES.radius,

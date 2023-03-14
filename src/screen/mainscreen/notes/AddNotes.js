@@ -25,7 +25,7 @@ import axios from 'axios';
 import DocumentPicker, {types} from 'react-native-document-picker';
 
 const AddMeeting = props => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   const {
     navigation,

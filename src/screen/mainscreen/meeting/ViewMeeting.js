@@ -26,7 +26,7 @@ const data = [
   },
 ];
 const ViewMeeting = props => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   const {navigation} = props;
   let routeParm = props?.route?.params;

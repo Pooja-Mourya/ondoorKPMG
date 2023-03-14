@@ -15,7 +15,7 @@ import ApiMethod from '../Services/APIService';
 import {useSelector} from 'react-redux';
 
 const UserList = ({navigation}) => {
-  const token = useSelector(state => state?.user?.user);
+  const token = useSelector(state => state?.user?.user?.access_token);
 
   //   console.log('token', token);
   const [listState, setListState] = useState([]);
