@@ -9,6 +9,7 @@ import {
 import React from 'react';
 import {COLORS, SIZES} from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useSelector} from 'react-redux';
 
 const Header = ({
   userName,
@@ -25,32 +26,49 @@ const Header = ({
   textHeader,
   userProfile,
 }) => {
+  const userToken = useSelector(state => state?.user?.user);
+
   return (
     <View
       style={{
         backgroundColor: COLORS.support1,
-        padding: 10,
-        // height: (SIZES.height * 1) / 5.8,
+        padding: 5,
+        // height: (SIZES.height * 1) / 12,
       }}
     >
       <View style={{flexDirection: 'row'}}>
         {userProfile ? (
-          <Image
-            source={require('../../assets/images/banner-01.png')}
+          <View
             style={{
-              width: 45,
-              height: 45,
+              width: 50,
+              height: 50,
               borderRadius: 50,
               top: 5,
               left: 10,
               backgroundColor: COLORS.dark,
             }}
-          />
+          >
+            <Text
+              style={{
+                zIndex: 1,
+                color: COLORS.light,
+                fontSize: 25,
+                textAlign: 'center',
+                marginTop: 5,
+              }}
+            >
+              {/* {userToken.name} */}
+              {userToken?.name ? userToken?.name?.slice(0, 1) : null}
+              {userToken?.email ? userToken?.email?.slice(0, 1) : null}
+            </Text>
+          </View>
         ) : null}
         {userTitle ? (
           <View style={{margin: 10, paddingHorizontal: 10, width: '60%'}}>
-            <Text style={{fontSize: 16, color: COLORS.dark}}>{userName}</Text>
-            <Text>{userTitle}</Text>
+            <Text style={{fontSize: 16, color: COLORS.dark}}>
+              {userToken.name}
+            </Text>
+            <Text>{userToken.email}</Text>
           </View>
         ) : null}
 
@@ -91,18 +109,16 @@ const Header = ({
         }}
       >
         {leftIcon ? (
-          <TouchableOpacity onPress={leftIcon ? onPressArrow : null}>
-            <Image
-              source={require('../../assets/icons/arrow-left.png')}
-              style={{
-                width: 30,
-                height: 30,
-                backgroundColor: COLORS.light20,
-                borderRadius: SIZES.radius,
-                padding: 25,
-                marginHorizontal: 5,
-              }}
-            />
+          <TouchableOpacity
+            style={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.light20,
+              padding: 10,
+              marginLeft: 10,
+            }}
+            onPress={leftIcon ? onPressArrow : null}
+          >
+            <Ionicons name="arrow-back" size={30} color={COLORS.dark} />
           </TouchableOpacity>
         ) : null}
         {searchBar ? (

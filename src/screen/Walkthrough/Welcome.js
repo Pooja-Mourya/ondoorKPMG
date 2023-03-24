@@ -54,6 +54,7 @@ const Welcome = ({navigation}) => {
               ? navigation.navigate('MyTab')
               : navigation.navigate('Walkthrough')
           }
+          //   onPress={() => navigation.navigate('MyTab')}
         />
 
         {/* <TextButton

@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
@@ -14,6 +15,8 @@ import {useSelector} from 'react-redux';
 import ApiMethod from '../../../Services/APIService';
 import {COLORS, constants, FONTS, SIZES} from '../../../constants';
 import TextButton from '../../../components/TextButton';
+import {Button} from 'react-native';
+import CheckBox from '../../../components/CheckBox';
 
 const AddRole = props => {
   const {navigation} = props;
@@ -25,13 +28,21 @@ const AddRole = props => {
   const [selected, setSelected] = useState([]);
   const [se_name, setSe_name] = useState([]);
   const [listState, setListState] = useState();
+  const [checkUser, setCheckUser] = useState([]);
   const handleRoles = async () => {
-    const url = constants.endPoint.roles;
+    const url = constants.endPoint.permissions;
     const params = {};
     try {
       const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result?.data?.data, 'url', url);
-      setListState(result?.data?.data);
+      let obj = {};
+      result?.data?.data.map(item => {
+        if (obj[item.group_name]) {
+          obj[item.group_name].push(item);
+        } else {
+          obj[item.group_name] = [item];
+        }
+      });
+      setListState(obj.user);
       return;
     } catch (error) {
       console.log('error', error);
@@ -74,18 +85,24 @@ const AddRole = props => {
     }
   };
 
+  const handleCheck = selectCheck => {
+    console.log('selectCheck', selectCheck);
+    if (checkUser.includes(selectCheck)) {
+      setCheckUser(checkUser.filter(checkValue => checkValue !== selectCheck));
+      return;
+    }
+    setCheckUser(d => d.concat(selectCheck));
+  };
+
   useEffect(() => {
     handleRoles();
   }, []);
-
   useEffect(() => {
     if (editRole) {
       setSelected(editRole.selected);
       setSe_name(editRole.se_name);
     }
   }, []);
-
-  console.log('listState');
   return (
     <>
       <Header textHeader={editRole ? 'EDIT ROLE' : 'ADD ROLE'} />
@@ -94,85 +111,60 @@ const AddRole = props => {
           margin: 10,
           padding: SIZES.padding,
           borderRadius: SIZES.radius,
-          backgroundColor: COLORS.secondary,
         }}
       >
-        <FlatList
-          data={listState}
-          keyExtractor={item => item.id}
-          renderItem={({item, index}) => {
-            console.log('listState', item.permissions[0].group_name);
+        <View>
+          <Text
+            style={{fontSize: 20, color: COLORS.primary, fontWeight: '500'}}
+          >
+            User
+          </Text>
+          <FlatList
+            data={listState}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => {
+              console.log('first***', checkUser.includes(item));
+              return (
+                <View>
+                  <View style={{flexDirection: 'row'}}>
+                    <TouchableOpacity
+                      onPress={() => handleCheck(item)}
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderWidth: 1,
+                        marginTop: 10,
+                      }}
+                    >
+                      {checkUser.includes(item) && (
+                        <Text style={{textAlign: 'center'}}>✔️</Text>
+                      )}
+                    </TouchableOpacity>
+                    <Text
+                      style={{
+                        marginTop: 10,
+                        marginHorizontal: 10,
+                        ...FONTS.font1,
+                        fontWeight: '500',
+                      }}
+                    >{`${item.name.replace('user-', '').toUpperCase()}`}</Text>
+                  </View>
+                </View>
+              );
+            }}
+          />
+        </View>
 
-            // if(item.name === 'Admin' || item.name === 'User' || item.name === 'manager' )
-            return (
-              <>
-                <Text>{item.name}</Text>
-                {/* <Text>{item.permissions[0].name.length}</Text>
-                <Text>{item.permissions.length}</Text> */}
-
-                <MultiSelect
-                  style={[styles.dropdown, {marginVertical: 10}]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  inputSearchStyle={styles.inputSearchStyle}
-                  iconStyle={styles.iconStyle}
-                  search
-                  data={item.permissions}
-                  labelField="name"
-                  valueField="id"
-                  placeholder={'select item'}
-                  searchPlaceholder="Search..."
-                  value={selected}
-                  onChange={item => {
-                    setSelected(item);
-                  }}
-                  renderLeftIcon={() => (
-                    <AntDesign
-                      style={styles.icon}
-                      color="black"
-                      name="Safety"
-                      size={20}
-                    />
-                  )}
-                  selectedStyle={styles.selectedStyle}
-                />
-              </>
-            );
-          }}
-        />
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={listState}
-          search
-          maxHeight={300}
-          labelField="se_name"
-          valueField="id"
-          placeholder="Select name"
-          searchPlaceholder="Search..."
-          value={se_name}
-          onChange={item => {
-            setSe_name(item);
-          }}
-          renderLeftIcon={() => (
-            <AntDesign
-              style={styles.icon}
-              color="black"
-              name="Safety"
-              size={20}
-            />
-          )}
-        />
         <TextButton
           label={'ADD ROLE'}
           contentContainerStyle={{
             ...FONTS.base,
             padding: 5,
             borderRadius: SIZES.radius,
-            marginBottom: 50,
+            marginVertical: 50,
+          }}
+          labelStyle={{
+            paddingVertical: 10,
           }}
           onPress={() => {
             editRole ? EditRole() : SubmitRole();

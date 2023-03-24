@@ -1,4 +1,4 @@
-let domain = 'meeting-api.gofactz.com';
+let domain = 'meeting-api.gofactz.com/public';
 
 const base_url = `https://${domain}/api/`;
 const base_url2 = `https://${domain}/`;
@@ -57,5 +57,9 @@ export default {
     updatePassword: 'update-password',
     notifications: 'notifications',
     readAllNotification: 'user-notification-read-all',
+    // readAllNotificationId: 'notification/1/read',
+    permissions: 'permissions',
+    permission: 'permission',
+    verifyOtp: 'verify-otp',
   },
 };

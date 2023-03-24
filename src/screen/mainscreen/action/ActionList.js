@@ -21,6 +21,7 @@ import moment from 'moment';
 import ActionFilter from './ActionFilter';
 import TextButton from '../../../components/TextButton';
 import {Dropdown} from 'react-native-element-dropdown';
+import ActionItemAction from './ActionItemAction';
 
 const ActionList = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -30,9 +31,8 @@ const ActionList = props => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [filterModal, setFilterModal] = useState(false);
-  const [checked, setChecked] = useState(false);
   const [actionModal, setActionModal] = useState(false);
-  const [viewStatus, setViewStatus] = useState(false);
+  const [actionItem, setActionItem] = useState({});
 
   const handleActionList = async () => {
     const url = constants.endPoint.actionList;
@@ -52,24 +52,24 @@ const ActionList = props => {
     }
   };
 
-  const ActionHandler = async id => {
-    const url = constants.endPoint.actionItemAction;
-    const params = {
-      ids: [id],
-      action: checked,
-    };
-    try {
-      const ActionRes = await ApiMethod.postData(url, params, token);
-      if (ActionRes) {
-        Alert.alert('Action item Action Update Successfully');
-      }
-      setChecked(false);
-      setActionModal(false);
-      handleActionList();
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
+  //   const ActionHandler = async id => {
+  //     const url = constants.endPoint.actionItemAction + '/' + id;
+  //     const params = {
+  //       ids: [id],
+  //       action: checked,
+  //     };
+  //     try {
+  //       const ActionRes = await ApiMethod.postData(url, params, token);
+  //       if (ActionRes) {
+  //         Alert.alert('Action item Action Update Successfully');
+  //       }
+  //       setChecked(false);
+  //       setActionModal(false);
+  //       handleActionList();
+  //     } catch (error) {
+  //       console.log('error', error);
+  //     }
+  //   };
 
   useEffect(() => {
     handleActionList();
@@ -78,9 +78,9 @@ const ActionList = props => {
   return (
     <>
       <Header
-        userName={'Niharika'}
-        userTitle={'manager'}
-        searchBar={true}
+        userName={true}
+        userTitle={true}
+        textHeader={'Action List '}
         rightIcon={true}
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
@@ -101,17 +101,12 @@ const ActionList = props => {
           />
         }
         renderItem={({item, index}) => {
-          //   console.log('item', item?.documents[0]?.uploading_file_name);
-          //   const createdDateFormate = moment(item.created_at).format('L');
-          //   const meetingDateFormate = moment(item.meeting_date).format('L');
-          //   const meetingTimeFormate = moment(item.meeting_time).format('LT');
           return (
             <>
               <View
                 style={{
                   backgroundColor: COLORS.support1_08,
                   margin: 10,
-                  //   borderRadius: SIZES.radius,
                   elevation: 1,
                 }}
               >
@@ -125,13 +120,6 @@ const ActionList = props => {
                     paddingHorizontal: 20,
                   }}
                 >
-                  {/* <TouchableOpacity onPress={() => setViewStatus(!viewStatus)}>
-                    <MaterialCommunityIcons
-                      name="gesture-tap-hold"
-                      size={25}
-                      color={COLORS.dark}
-                    />
-                  </TouchableOpacity> */}
                   <TouchableOpacity
                     onPress={() => navigation.navigate('ViewActionItem', item)}
                   >
@@ -158,7 +146,9 @@ const ActionList = props => {
                     >
                       Task:{' '}
                     </Text>
-                    <Text style={{width: '50%'}}>{item.task}</Text>
+                    <Text numberOfLines={2} style={{width: '50%'}}>
+                      {item.task}
+                    </Text>
                   </View>
                   <View style={{flexDirection: 'row'}}>
                     <Text
@@ -166,7 +156,9 @@ const ActionList = props => {
                     >
                       Comment:{' '}
                     </Text>
-                    <Text style={{width: '50%'}}>{item.comment}</Text>
+                    <Text numberOfLines={2} style={{width: '50%'}}>
+                      {item.comment}
+                    </Text>
                   </View>
                   <View style={{flexDirection: 'row'}}>
                     <Text
@@ -196,48 +188,6 @@ const ActionList = props => {
                   </View>
                 </View>
               </View>
-
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={actionModal}
-                onRequestClose={() => {
-                  setActionModal(!actionModal);
-                }}
-              >
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: COLORS.light20,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <View style={{backgroundColor: COLORS.success, width: '80%'}}>
-                    <Text> id : {item.id}</Text>
-                    <View style={{flexDirection: 'row'}}>
-                      <RadioButton
-                        value={item.status}
-                        status={
-                          checked === item.status ? 'checked' : 'unchecked'
-                        }
-                        onPress={() => setChecked(!checked)}
-                      />
-                      <Text style={{marginTop: 8}}>
-                        {!checked ? 'Active' : 'inactive'}
-                      </Text>
-                    </View>
-                    <TextButton
-                      label={'submit'}
-                      contentContainerStyle={{
-                        padding: 10,
-                        borderRadius: SIZES.radius,
-                      }}
-                      onPress={() => ActionHandler()}
-                    />
-                  </View>
-                </View>
-              </Modal>
             </>
           );
         }}
@@ -288,6 +238,30 @@ const ActionList = props => {
               setFilterModal={setFilterModal}
             />
           </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={actionModal}
+        onRequestClose={() => {
+          setActionModal(!actionModal);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: COLORS.light80,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <ActionItemAction
+            setActionModal={setActionModal}
+            actionModal={actionModal}
+            actionItem={actionItem}
+          />
         </View>
       </Modal>
     </>

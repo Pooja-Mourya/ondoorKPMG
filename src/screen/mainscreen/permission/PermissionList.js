@@ -2,40 +2,35 @@ import {
   StyleSheet,
   Text,
   View,
-  Alert,
   FlatList,
-  ActivityIndicator,
   TouchableOpacity,
+  RefreshControl,
+  Modal,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import Header from '../../../components/layout/Header';
-import {COLORS, constants, FONTS, SIZES} from '../../../constants';
-import {FAB} from 'react-native-paper';
-import ApiMethod from '../../../Services/APIService';
 import {useSelector} from 'react-redux';
-import {RefreshControl} from 'react-native';
-import {Modal} from 'react-native';
-import MeetingFilter from './MeetingFilter';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {COLORS, constants, FONTS, SIZES} from '../../../constants';
+import ApiMethod from '../../../Services/APIService';
 import moment from 'moment';
-import TextButton from '../../../components/TextButton';
+import {FAB} from 'react-native-paper';
+import AddPermission from './AddPermission';
 
-const Meeting = props => {
+const PermissionList = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
-  console.log('token', token);
+  //   console.log('token', token);
 
   const {navigation} = props;
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
-  const [filterData, setFilterData] = useState({}); //filter data
-  const [filterModal, setFilterModal] = useState(false);
+  const [addPreModal, setAddPreModal] = useState(false);
+  const [editModalData, setEditModalData] = useState({});
   const [activeStatus, setActiveStatus] = useState('1');
 
-  const handleMeetingList = async () => {
-    const url = constants.endPoint.meetingList;
+  console.log('listState', listState);
+  const PermissionListFunction = async () => {
+    const url = constants.endPoint.permissions;
     const params = {
       page: 1,
       per_page_record: '10',
@@ -53,113 +48,30 @@ const Meeting = props => {
   };
 
   useEffect(() => {
-    handleMeetingList();
+    PermissionListFunction();
   }, [page]);
-
   return (
-    <>
-      <Header
-        userName={true}
-        userTitle={true}
-        // textHeader={
-        //   <TextButton
-        //     label={'active'}
-        //     contentContainerStyle={{
-        //       padding: SIZES.padding,
-        //       borderRadius: SIZES.radius,
-        //     }}
-        //   />
-        // }
-        // rightIcon={true}
-        // leftIcon={true}
-        // onPressArrow={() => navigation.goBack()}
-        // onPressSort={() => setFilterModal(!filterModal)}
-        userProfile={true}
-      />
-      <View
-        style={{
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          //   marginHorizontal: 10,
-          padding: 10,
-          marginTop: 65,
-          position: 'absolute',
-          backgroundColor: COLORS.light,
-          width: '100%',
-        }}
-      >
-        <TextButton
-          label={'Active'}
-          contentContainerStyle={{
-            height: 45,
-            backgroundColor:
-              activeStatus == '1' ? COLORS.primary : COLORS.grey80,
-            paddingHorizontal: 50,
-            borderRadius: 50,
-          }}
-          labelStyle={{
-            color: activeStatus == '1' ? COLORS.light : COLORS.primary,
-            ...FONTS.h4,
-            fontWeight: '500',
-            fontSize: 18,
-          }}
-          onPress={() => setActiveStatus('1')}
-        />
-
-        <TextButton
-          label={'Inactive'}
-          contentContainerStyle={{
-            height: 45,
-            backgroundColor:
-              activeStatus == '2' ? COLORS.secondary : COLORS.grey80,
-            paddingHorizontal: 50,
-            borderRadius: 50,
-          }}
-          labelStyle={{
-            color: activeStatus == '2' ? COLORS.light : COLORS.secondary,
-            ...FONTS.h4,
-            fontWeight: '500',
-            fontSize: 20,
-          }}
-          onPress={() => setActiveStatus('2')}
-        />
-        <TouchableOpacity
-          onPress={() => setFilterModal(!filterModal)}
-          style={{
-            height: 45,
-            backgroundColor: COLORS.light20,
-            paddingHorizontal: 15,
-            borderRadius: 25,
-          }}
-        >
-          <Ionicons
-            style={{paddingTop: 8}}
-            name="filter-sharp"
-            size={25}
-            color={'black'}
-          />
-        </TouchableOpacity>
-      </View>
-
+    <View>
       <FlatList
-        style={{backgroundColor: COLORS.light}}
-        data={
-          Array.isArray(listState)
-            ? listState.filter(e => e.status == activeStatus)
-            : []
-        }
+        // data={
+        //   Array.isArray(listState)
+        //     ? listState.filter(e => e.status == activeStatus)
+        //     : []
+        // }
+        style={{marginBottom: 30}}
+        data={listState}
         keyExtractor={item => item.id}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={() => {
-              handleMeetingList(null, true);
+              PermissionListFunction(null, true);
             }}
           />
         }
         renderItem={({item}) => {
-          const meetingDateFormate = moment(item.meeting_date).format('L');
-          const meetingTimeFormate = moment(item.meeting_time).format('LT');
+          const create = moment(item.created_at).format('L');
+          const update = moment(item.updated_at).format('L');
           return (
             <>
               <TouchableOpacity
@@ -172,7 +84,7 @@ const Meeting = props => {
                   borderLeftColor:
                     activeStatus == '1' ? COLORS.primary : COLORS.secondary,
                 }}
-                onPress={() => navigation.navigate('ViewMeeting', item)}
+                onPress={() => navigation.navigate('ViewPermission', item)}
               >
                 <View style={{flexDirection: 'row'}}>
                   <Text
@@ -184,21 +96,39 @@ const Meeting = props => {
                       ...FONTS.font1,
                     }}
                   >
-                    {item.meeting_title}
+                    {item.name}
                   </Text>
                 </View>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={{...FONTS.base, fontWeight: '500'}}>
-                    {item.meeting_ref_no}
+                    {item.guard_name}
+                  </Text>
+                </View>
+
+                <View style={{marginTop: 5}}>
+                  <Text style={{...FONTS.body4, fontWeight: '500'}}>
+                    {item.se_name}
+                  </Text>
+                </View>
+
+                <View style={{marginTop: 5}}>
+                  <Text style={{...FONTS.body4, fontWeight: '500'}}>
+                    {item.group_name}
                   </Text>
                 </View>
 
                 <View style={{marginTop: 5}}>
                   <Text
                     numberOfLines={3}
-                    style={{...FONTS.body4, fontWeight: '500', height: 75}}
+                    style={{...FONTS.body4, fontWeight: '500'}}
                   >
-                    {item.agenda_of_meeting}
+                    {item.description == null ? null : item.description}
+                  </Text>
+                </View>
+
+                <View style={{marginTop: 5}}>
+                  <Text style={{...FONTS.body4, fontWeight: '500'}}>
+                    {item.belongs_to}
                   </Text>
                 </View>
                 <View
@@ -211,12 +141,12 @@ const Meeting = props => {
                   <Text
                     style={{...FONTS.font1, fontWeight: '600', color: 'black'}}
                   >
-                    {meetingDateFormate}
+                    Create: {create}
                   </Text>
                   <Text
                     style={{...FONTS.font1, fontWeight: '600', color: 'black'}}
                   >
-                    {meetingTimeFormate}
+                    Update: {update}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -226,7 +156,7 @@ const Meeting = props => {
         // onEndReached={() => {
         //   //   console.log('load more');
         //   //   setPage(page + 1);
-        //   handleMeetingList(page + 1);
+        //   PermissionListFunction(page + 1);
         // }}
         // onEndReachedThreshold={0.1}
         // ListFooterComponent={() => (
@@ -236,16 +166,16 @@ const Meeting = props => {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => navigation.navigate('AddMeeting')}
+        onPress={() => navigation.navigate('AddPermission')}
       />
 
       <Modal
         animationType="slide"
         transparent={true}
-        visible={filterModal}
+        visible={addPreModal}
         onRequestClose={() => {
           //   Alert.alert('Modal has been closed.');
-          setFilterModal(!filterModal);
+          setAddPreModal(!addPreModal);
         }}
       >
         <View
@@ -265,25 +195,25 @@ const Meeting = props => {
               borderRadius: SIZES.radius,
             }}
           >
-            <MeetingFilter
-              filterData={filterData}
-              setFilterModal={setFilterModal}
-              filterModal={filterModal}
+            <AddPermission
+              addPreModal={addPreModal}
+              setAddPreModal={setAddPreModal}
+              editModalData={editModalData}
             />
           </View>
         </View>
       </Modal>
-    </>
+    </View>
   );
 };
 
-export default Meeting;
+export default PermissionList;
 
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     margin: 16,
     right: 0,
-    bottom: 0,
+    bottom: 30,
   },
 });

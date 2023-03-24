@@ -18,6 +18,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Feather from 'react-native-vector-icons/Feather';
 import ApiMethod from '../../Services/APIService';
 import {useSelector} from 'react-redux';
+import {Keyboard} from 'react-native';
 
 const data = [
   {
@@ -40,6 +41,7 @@ const AddUser = props => {
 
   const [click, setClick] = useState(false);
   const [load, setLoad] = useState(false);
+  const [errors, setErrors] = useState(false);
   const [input, setInput] = useState({
     role_id: '',
     name: '',
@@ -50,6 +52,10 @@ const AddUser = props => {
     confirm_password: '',
   });
 
+  const handleError = (error, name) => {
+    setErrors({...errors, [error]: name});
+  };
+
   const handleOnChangeState = (name, value) => {
     setInput({
       ...input,
@@ -57,10 +63,46 @@ const AddUser = props => {
     });
   };
 
+  const validate = () => {
+    Keyboard.dismiss();
+    let isValid = true;
+    if (!input.role_id.id) {
+      handleError('please select role id', 'role_id');
+      isValid = false;
+    }
+    if (!input.name) {
+      handleError('please enter name', 'name');
+      isValid = false;
+    }
+    if (!input.email) {
+      handleError('please enter email', 'email');
+      isValid = false;
+    }
+    if (!input.password) {
+      handleError('please enter password', 'password');
+      isValid = false;
+    }
+    if (!input.confirm_password) {
+      handleError('please enter confirm Password', 'confirm_password');
+      isValid = false;
+    }
+    if (!input.mobile_number) {
+      handleError('please enter number', 'mobile_number');
+      isValid = false;
+    }
+    if (!input.designation) {
+      handleError('please enter designation', 'designation');
+      isValid = false;
+    }
+    if (isValid) {
+      return;
+    }
+  };
+
   const submitHandle = async () => {
     const url = constants.endPoint.user;
     const params = {
-      role_id: data.id,
+      role_id: data.user,
       name: input.name,
       email: input.email,
       mobile_number: input.mobile_number,
@@ -152,15 +194,23 @@ const AddUser = props => {
             onChange={item => {
               handleOnChangeState('role_id', item);
             }}
+            // onFocus={e => }
             renderLeftIcon={() => (
               <AntDesign
                 style={styles.icon}
-                color="black"
+                color="grey"
                 name="Safety"
                 size={20}
               />
             )}
           />
+          {!errors ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              please select any one option
+            </Text>
+          ) : (
+            <Text></Text>
+          )}
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -168,6 +218,8 @@ const AddUser = props => {
             }}
             placeholder="Name"
             value={input.name}
+            error={errors.name}
+            onFocus={e => handleError(e, 'name')}
             onChange={n => handleOnChangeState('name', n)}
             prependComponent={
               <AntDesign name="user" size={25} color={COLORS.grey} />
@@ -182,8 +234,15 @@ const AddUser = props => {
             placeholder="Email"
             value={input.email}
             onChange={e => handleOnChangeState('email', e)}
+            error={errors.email}
+            onFocus={e => handleError(e, 'email')}
             prependComponent={
-              <Fontisto name="email" size={25} color={COLORS.grey} />
+              <Fontisto
+                style={{marginHorizontal: 5}}
+                name="email"
+                size={22}
+                color={COLORS.grey}
+              />
             }
           />
 
@@ -196,8 +255,15 @@ const AddUser = props => {
             placeholder="mobile number"
             value={input.mobile_number}
             onChange={u => handleOnChangeState('mobile_number', u)}
+            error={errors.mobile_number}
+            onFocus={e => handleError(e, 'mobile_number')}
             prependComponent={
-              <AntDesign name="phone" size={25} color={COLORS.grey} />
+              <AntDesign
+                style={{marginHorizontal: 5}}
+                name="phone"
+                size={22}
+                color={COLORS.grey}
+              />
             }
           />
           <FormInput
@@ -210,8 +276,15 @@ const AddUser = props => {
             secureTextEntry={true}
             value={input.password}
             onChange={p => handleOnChangeState('password', p)}
+            error={errors.password}
+            onFocus={e => handleError(e, 'password')}
             prependComponent={
-              <AntDesign name="eye" size={25} color={COLORS.grey} />
+              <AntDesign
+                style={{marginHorizontal: 5}}
+                name="eye"
+                size={25}
+                color={COLORS.grey}
+              />
             }
           />
           <FormInput
@@ -224,8 +297,15 @@ const AddUser = props => {
             secureTextEntry={click}
             value={input.confirm_password}
             onChange={p => handleOnChangeState('confirm_password', p)}
+            error={errors.confirm_password}
+            onFocus={e => handleError(e, 'confirm_password')}
             prependComponent={
-              <AntDesign name="eyeo" size={25} color={COLORS.grey} />
+              <AntDesign
+                style={{marginHorizontal: 5}}
+                name="eyeo"
+                size={25}
+                color={COLORS.grey}
+              />
             }
             appendComponent={
               <TouchableOpacity onPress={() => setClick(!click)}>
@@ -246,8 +326,15 @@ const AddUser = props => {
             placeholder="Designation"
             value={input.designation}
             onChange={d => handleOnChangeState('designation', d)}
+            error={errors.designation}
+            onFocus={e => handleError(e, 'designation')}
             prependComponent={
-              <Feather name="shopping-bag" size={20} color={COLORS.grey} />
+              <Feather
+                style={{marginHorizontal: 5}}
+                name="shopping-bag"
+                size={20}
+                color={COLORS.grey}
+              />
             }
           />
           {/* <CheckBox
@@ -267,7 +354,19 @@ const AddUser = props => {
               ...FONTS.h4,
             }}
             onPress={() => {
-              userEdit ? EditUserHandler() : submitHandle();
+              //   userEdit ? EditUserHandler() : submitHandle();
+              //   if (userEdit) {
+              //     EditUserHandler();
+              //   } else if (validate()) {
+              //     submitHandle();
+              //   } else {
+              //     Alert.alert('validation failed');
+              //   }
+              if (validate()) {
+                submitHandle();
+              } else {
+                Alert.alert('validation failed');
+              }
             }}
           />
         </View>

@@ -17,6 +17,9 @@ import ViewRoles from './mainscreen/role/ViewRoles';
 import AddUser from './user/AddUser';
 import ViewUser from './user/ViewUser';
 import LoaderFile from './LoaderFile';
+import ActionItemAction from './mainscreen/action/ActionItemAction';
+import ViewPermission from './mainscreen/permission/ViewPermission';
+import AddPermission from './mainscreen/permission/AddPermission';
 export {
   Welcome,
   Walkthrough,
@@ -37,4 +40,7 @@ export {
   AddUser,
   ViewUser,
   LoaderFile,
+  ActionItemAction,
+  ViewPermission,
+  AddPermission,
 };

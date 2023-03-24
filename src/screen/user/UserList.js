@@ -78,27 +78,15 @@ const UserList = ({navigation}) => {
   return (
     <>
       <Header
-        userName={'Niharika'}
-        userTitle={'manager'}
-        searchBar={true}
+        userName={true}
+        userTitle={true}
+        textHeader={'Role List'}
         rightIcon={true}
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
         onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
-
-      <Text
-        style={{
-          ...FONTS.base,
-          color: COLORS.primary,
-          textAlign: 'center',
-          fontSize: SIZES.h2,
-          margin: 5,
-        }}
-      >
-        Roles List
-      </Text>
       <FlatList
         data={listState}
         keyExtractor={item => item.id}

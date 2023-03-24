@@ -64,28 +64,15 @@ const Meeting = ({navigation}) => {
   return (
     <>
       <Header
-        userName={'Niharika'}
-        userTitle={'manager'}
-        searchBar={true}
+        userName={true}
+        userTitle={true}
+        textHeader={'Roles List'}
         rightIcon={true}
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
         onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
-      <View style={{}}>
-        <Text
-          style={{
-            ...FONTS.base,
-            color: COLORS.primary,
-            textAlign: 'center',
-            fontSize: SIZES.h2,
-            margin: 5,
-          }}
-        >
-          Roles List
-        </Text>
-      </View>
 
       <FlatList
         data={listState}
@@ -149,27 +136,28 @@ const Meeting = ({navigation}) => {
                   data={item.permissions}
                   keyExtractor={item => item.id}
                   renderItem={({item, index}) => {
-                    console.log('permission', item);
                     return (
-                      <View>
-                        <Text>
-                          {index} {item.name}
+                      <View style={{flexDirection: 'row'}}>
+                        <Text>{index} : </Text>
+                        <Text style={{...FONTS.base, color: COLORS.primary}}>
+                          {item.name}
                         </Text>
                       </View>
                     );
                   }}
+                  showsHorizontalScrollIndicator={false}
                 />
               </View>
             </>
           );
         }}
-        onEndReached={() => {
-          handleRoles(page + 1);
-        }}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={() => (
-          <ActivityIndicator size={'large'} color={'rosybrown'} />
-        )}
+        // onEndReached={() => {
+        //   handleRoles(page + 1);
+        // }}
+        // onEndReachedThreshold={0.1}
+        // ListFooterComponent={() => (
+        //   <ActivityIndicator size={'large'} color={'rosybrown'} />
+        // )}
       />
       <FAB
         icon="plus"

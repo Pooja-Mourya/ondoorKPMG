@@ -29,7 +29,7 @@ const NotificationApp = props => {
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(0);
-  const [textColor, setTextColor] = useState('rgb(210, 210, 210)');
+  const [changeColor, setChangeColor] = useState('rgba(78, 85, 175, 1)');
 
   const handleNotificationList = async () => {
     const url = constants.endPoint.notifications;
@@ -43,7 +43,25 @@ const NotificationApp = props => {
       console.log('resultNotification', result?.data?.data, 'url', url);
       setListState(result?.data?.data);
       setIsRefreshing(false);
+
       return;
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  const readId = Object.assign({}, listState.shift());
+  console.log('readId', readId);
+  const handleReadById = async () => {
+    try {
+      const readById = await ApiMethod.getData(
+        `notification/${readId.id}/read`,
+        token,
+        null,
+      );
+      if (readById) {
+        setChangeColor('rgba(78, 85, 175, 1)');
+      }
     } catch (error) {
       console.log('error', error);
     }
@@ -56,7 +74,7 @@ const NotificationApp = props => {
       const result = await ApiMethod.getData(url, token, null);
       console.log('resultRead', result?.data?.data, 'url', url);
       setIsRefreshing(false);
-      return;
+      setChangeColor('rgba(78, 85, 175, 1)');
     } catch (error) {
       console.log('error', error);
     }
@@ -66,7 +84,6 @@ const NotificationApp = props => {
     handleNotificationList();
   }, [page]);
 
-  console.log('textColor', textColor);
   return (
     <>
       <TextButton
@@ -79,11 +96,8 @@ const NotificationApp = props => {
         }}
       />
       <FlatList
-        // data={listState.filter(f =>
-        //   f.meeting_title.toLowerCase().includes(search).toLowerCase(),
-        // )}
         style={{
-          backgroundColor: 'pink',
+          backgroundColor: COLORS.light80,
           borderRadius: SIZES.radius,
           marginHorizontal: 10,
           marginBottom: 10,
@@ -98,14 +112,13 @@ const NotificationApp = props => {
             }}
           />
         }
-        renderItem={({item, index}) => {
+        renderItem={({item}) => {
           const createdDateFormate = moment(item.created_at).format('L');
-          //   console.log('type :', item.type);
           return (
             <>
               <View
                 style={{
-                  backgroundColor: COLORS.support3_08,
+                  backgroundColor: !changeColor ? COLORS.support3_08 : 'pink',
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
@@ -117,12 +130,11 @@ const NotificationApp = props => {
                     underlayColor="#DDDDDD"
                     style={{
                       marginRight: 10,
-                      backgroundColor:
-                        textColor === index
-                          ? COLORS.support1
-                          : 'rgb(210, 210, 210)',
+                      backgroundColor: !changeColor
+                        ? COLORS.success
+                        : COLORS.dark,
                     }}
-                    onPress={() => setTextColor(COLORS.primary)}
+                    onPress={() => handleReadById()}
                   >
                     <Text>
                       <Ionicons
@@ -134,11 +146,11 @@ const NotificationApp = props => {
                   </TouchableHighlight>
 
                   <TouchableOpacity
-                    onPress={() =>
+                    onPress={() => {
                       item.type === 'action'
                         ? navigation.navigate('ActionList')
-                        : navigation.navigate('Notes')
-                    }
+                        : navigation.navigate('Notes');
+                    }}
                   >
                     <Text
                       style={{
@@ -150,9 +162,11 @@ const NotificationApp = props => {
                     >
                       {item.title}
                     </Text>
-                    <Text style={{paddingRight: 15}}>{item.message}</Text>
+                    <Text style={{paddingRight: 15}}>
+                      message text{item.message}
+                    </Text>
                     <Text style={{color: COLORS.secondary, fontWeight: '700'}}>
-                      {createdDateFormate}
+                      23-03-2023{createdDateFormate}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -170,6 +184,87 @@ const NotificationApp = props => {
         //   <ActivityIndicator size={'large'} color={'rosybrown'} />
         // )}
       />
+      <View style={{backgroundColor: COLORS.primary, flex: 1}}>
+        <View
+          style={{
+            backgroundColor: COLORS.light20,
+            margin: 10,
+            borderRadius: SIZES.radius,
+            padding: 10,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: COLORS.light20,
+              padding: 10,
+              margin: 10,
+              borderTopLeftRadius: SIZES.radius,
+              borderTopRightRadius: SIZES.radius,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: '500',
+                textAlign: 'center',
+                color: COLORS.primary,
+              }}
+            >
+              Type : Action-Item
+            </Text>
+          </View>
+          <View style={{flexDirection: 'row'}}>
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor="#DDDDDD"
+              style={{
+                marginRight: 10,
+                backgroundColor: !changeColor ? COLORS.success : COLORS.dark,
+              }}
+              onPress={() => handleReadById()}
+            >
+              <Text>
+                <Ionicons
+                  name={'md-alert-outline'}
+                  size={25}
+                  color={COLORS.primary}
+                />
+              </Text>
+            </TouchableHighlight>
+
+            <TouchableOpacity
+              onPress={() => {
+                item.type === 'action'
+                  ? navigation.navigate('ActionList')
+                  : navigation.navigate('Notes');
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: FONTS.base,
+                  fontWeight: '700',
+                  fontSize: SIZES.h3,
+                  paddingRight: 15,
+                }}
+              >
+                title
+              </Text>
+              <Text style={{paddingRight: 15}}>message text</Text>
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                }}
+              >
+                <Text style={{color: COLORS.secondary, fontWeight: '700'}}>
+                  23-03-2023
+                </Text>
+                <Text style={{}}>12:30</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
     </>
   );
 };

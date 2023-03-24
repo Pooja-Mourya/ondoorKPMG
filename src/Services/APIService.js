@@ -1,5 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {constants} from '../constants';
+
 const ApiMethod = {
   getData: async (endPoint, token) => {
     let url = constants.base_url + endPoint;
@@ -57,24 +59,21 @@ const ApiMethod = {
       Content: 'application/json',
       //   'content-type': 'multipart/form-data',
     };
-
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
     let config = {
       headers: headers,
     };
 
+    if (constants.base_url + '/' + 'unauthorized') {
+      AsyncStorage.removeItem('@user');
+    }
     // console.log('config--', config);
     // console.log('url--', url);
     // console.log('body--', body);
-
-    try {
-      let response = await axios.post(url, body, config);
-      //   console.log('response', response);
-      return response;
-    } catch (error) {
-      console.log('error', error);
-    }
+    let response = await axios.post(url, body, config);
+    //   console.log('response', response);
+    return response;
   },
 
   deleteData: async (endPoint, token) => {

@@ -121,8 +121,8 @@ const AddActionItem = props => {
         },
       });
       setIsLoading(false);
-      setAddNotesModal(false);
       Alert.alert('Record successfully created');
+      navigation.navigate('ActionList');
       //   console.log('create api response ...', res);
     } catch (error) {
       console.log('error', error);
@@ -262,15 +262,16 @@ const AddActionItem = props => {
     handleNoteList();
   }, []);
 
+  console.log('editDataAction', editData);
   useEffect(() => {
     if (editData) {
       setState({
         ...state,
-        meeting_id: editData.meeting_id.id,
+        // meeting_id: editData.meeting_id,
         note_id: editData.note_id,
         owner_id: editData?.owner_id?.id,
         date_opened: editData.date_opened,
-        task: editData.task,
+        task: 'editData.task',
         priority: String(editData.priority?.priority).toLowerCase(),
         due_date: editData.due_date,
         complete_percentage: editData.complete_percentage,

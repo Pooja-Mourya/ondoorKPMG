@@ -110,6 +110,14 @@ export const SIZES = {
 };
 
 export const FONTS = {
+  font1: {fontFamily: 'Inter'},
+  // font2:{},
+  // font3:{},
+  // font4:{},
+  // font5:{},
+  // font6:{},
+  // font7:{},
+
   largeTitle: {fontFamily: 'Poppins-Black', fontSize: SIZES.largeTitle},
   h1: {fontFamily: 'Poppins-Bold', fontSize: SIZES.h1, lineHeight: 36},
   h2: {fontFamily: 'Poppins-Bold', fontSize: SIZES.h2, lineHeight: 30},

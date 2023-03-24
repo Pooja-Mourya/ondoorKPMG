@@ -8,9 +8,11 @@ import {
   Modal,
   Animated,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
-import React, {useEffect, useState, useRef} from 'react';
-// import {Shadow} from 'react-native-shadow-2';
+
+import React, {useEffect, useState} from 'react';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FormInput from '../../components/FormInput';
 import {COLORS, SIZES, FONTS, constants} from '../../constants';
@@ -21,15 +23,16 @@ import {userLoginFun} from '../../redux/slice/UserSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector} from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import CheckBox from '../../components/CheckBox';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Alert} from 'react-native';
 import LoaderFile from '../LoaderFile';
 import {CommonActions} from '@react-navigation/native';
+import CheckBox from '../../components/CheckBox';
 
 const AuthMain = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
-
-  console.log('authToken', token);
+  const [enableCheck, setEnableCheck] = useState(false);
   const [mode, setMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -37,335 +40,74 @@ const AuthMain = ({navigation}) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [number, setNumber] = useState('');
   const [designation, setDesignation] = useState('');
+  const [errors, setErrors] = useState(false);
   const [click, setClick] = useState(false);
-  const [loginUser, setLoginUser] = useState([]);
   const [load, setLoad] = useState(false);
   const [forgetModal, setForgetModal] = useState(false);
   const [forgetPassword, setForgetPassword] = useState('');
-  const [termChecked, setTermChecked] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [loginOtpModal, setLoginOtpModal] = useState(false);
+  const [loginUser, setLoginUser] = useState([]);
+  const [check, setCheck] = useState(false);
+  const [logged, setLogged] = useState('');
+  const [otpState, setOtpState] = useState({
+    one: '',
+    two: '',
+    three: '',
+    four: '',
+  });
 
-  const dispatch = useDispatch();
-
-  function SignInFunction() {
-    if (load)
-      return (
-        <ActivityIndicator
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 50,
-          }}
-        />
-      );
-    return (
-      <Animated.View
-        style={{marginTop: SIZES.padding, height: SIZES.height * 0.55}}
-      >
-        <View style={styles.authContainer}>
-          <Text
-            style={{
-              width: '60%',
-              lineHeight: 45,
-              color: COLORS.dark,
-              ...FONTS.dark,
-              fontSize: SIZES.h1,
-              paddingHorizontal: 10,
-            }}
-          >
-            Sign in to continue
-          </Text>
-          <KeyboardAwareScrollView
-            enableOnAndroid={true}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps={'handled'}
-            extraScrollHeight={-300}
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: 'center',
-            }}
-          >
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-              }}
-              placeholder="Email"
-              value={email}
-              onChange={text => setEmail(text)}
-              prependComponent={
-                <Image
-                  source={require('../../assets/icons/email.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              }
-            />
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-              }}
-              placeholder="Password"
-              secureTextEntry={true}
-              value={password}
-              onChange={text => setPassword(text)}
-              prependComponent={
-                <Image
-                  source={require('../../assets/icons/lock.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              }
-            />
-            <View style={{alignItems: 'flex-end'}}>
-              <TextButton
-                label={'Forgot password'}
-                contentContainerStyle={{
-                  marginTop: SIZES.radius,
-                  backgroundColor: 'null',
-                }}
-                labelStyle={{
-                  color: COLORS.support1,
-                  ...FONTS.h4,
-                  paddingHorizontal: SIZES.padding,
-                }}
-                onPress={() => setForgetModal(true)}
-              />
-            </View>
-            <TextButton
-              label={'Log In'}
-              contentContainerStyle={{
-                height: 55,
-                borderRadius: SIZES.radius,
-                margin: 10,
-              }}
-              labelStyle={{
-                color: COLORS.light,
-                ...FONTS.h4,
-              }}
-              onPress={() => submitHandle()}
-            />
-          </KeyboardAwareScrollView>
-        </View>
-      </Animated.View>
-    );
-  }
-
-  function SignUpFunction() {
-    return (
-      <KeyboardAwareScrollView>
-        <View style={styles.authContainer}>
-          <Text
-            style={{
-              width: '60%',
-              lineHeight: 45,
-              color: COLORS.dark,
-              ...FONTS.dark,
-              fontSize: SIZES.h1,
-              paddingHorizontal: 10,
-            }}
-          >
-            Sign up
-          </Text>
-
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Name"
-            value={name}
-            onChange={() => setName()}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/person.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e)}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/email.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-          />
-
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Number"
-            value={number}
-            onChange={u => setNumber(u)}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/call.png')}
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Password"
-            secureTextEntry={true}
-            value={password}
-            onChange={p => setPassword(p)}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/lock.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Confirm Password"
-            secureTextEntry={click}
-            value={confirmPassword}
-            onChange={p => setConfirmPassword(p)}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/lock.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-            appendComponent={
-              <TouchableOpacity onPress={() => setClick(!click)}>
-                <Image
-                  source={
-                    !click
-                      ? require('../../assets/icons/eye.png')
-                      : require('../../assets/icons/eye-off.png')
-                  }
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              </TouchableOpacity>
-            }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Designation"
-            value={designation}
-            onChange={d => setDesignation(d)}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/credit_card.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-          />
-          {/* <CheckBox
-            containerStyle={{backgroundColor: '', lineHeight: 20}}
-            isSelected={termChecked}
-            onPress={() => setTermChecked(!termChecked)}
-          /> */}
-          <TextButton
-            label={'Sign Up'}
-            contentContainerStyle={{
-              height: 55,
-              borderRadius: SIZES.radius,
-              margin: 10,
-            }}
-            labelStyle={{
-              color: COLORS.light,
-              ...FONTS.h4,
-            }}
-            onPress={() => HandleSignUp()}
-          />
-        </View>
-      </KeyboardAwareScrollView>
-    );
-  }
-
-  const AuthContainer = () => {
-    if (mode) {
-      return SignUpFunction();
+  const handleEmailCheck = e => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    setEmail(e);
+    if (reg.test(e)) {
+      setCheck(false);
     } else {
-      return SignInFunction();
+      setCheck(true);
     }
   };
+
+  const onChangeOtp = (name, value) => {
+    setOtpState({
+      ...otpState,
+      [name]: value,
+    });
+  };
+
+  const dispatch = useDispatch();
 
   const submitHandle = async () => {
     const url = constants.endPoint.login;
     const params = {
-      email: 'admin@gmail.com',
-      password: '12345678',
-      //   email,
-      //   password,
+      email,
+      password,
+      logout_from_all_devices: 'yes',
     };
-    try {
-      setLoad(true);
-      const result = await ApiMethod.postData(url, params, null);
-      //   console.log('result', result?.data?.data?.access_token);
-
-      //   return;
-      setLoginUser(result?.data);
-
-      if (result?.data?.data) {
-        AsyncStorage.setItem('@user', token);
-        console.log('asyncUserToken', token);
-        dispatch(userLoginFun(result?.data?.data));
-        setLoad(false);
-        navigation.navigate('MyTab');
-      }
-    } catch (error) {
-      console.log('error', error);
-    }
+    const result = await ApiMethod.postData(url, params, null)
+      .then(function () {
+        console.log('login result', result);
+        // setLoad(true);
+        if (result) {
+          setLoginOtpModal(false);
+          setLoginUser(result.data);
+        } else {
+          Alert.alert(`retry ${result.message}`);
+          setLoginOtpModal(true);
+          Alert.alert(`${result.data.message} successfully`);
+        }
+      })
+      .catch(function (error) {
+        if (!error) {
+          const logInCondition = error.response?.data?.data?.is_logged_in;
+          setLogged(logInCondition);
+          Alert.alert(`something went wrong`, `${logInCondition}`, [
+            {text: 'ok', onPress: () => {}},
+          ]);
+          console.log('error****', error.message);
+        } else {
+          setLoginOtpModal(true);
+        }
+      });
   };
 
   const HandleSignUp = async () => {
@@ -440,6 +182,395 @@ const AuthMain = ({navigation}) => {
     }
   }
 
+  const verifyOtp = async () => {
+    let url = constants.endPoint.verifyOtp;
+    let params = {
+      //   email: loginUser.data[0],
+      //   otp: loginUser.data[1],
+      email: 'admin@gmail.com',
+      otp: '1234',
+    };
+
+    console.log('params', params);
+    // setLoad(true);
+    try {
+      const otpResult = await ApiMethod.postData(url, params, null);
+      //   console.log('access_token', otpResult.data.data);
+      //   return;
+
+      if (otpResult) {
+        Alert.alert(`${otpResult.data.message}`);
+        AsyncStorage.setItem('@user', otpResult.data.data.access_token);
+        dispatch(userLoginFun(otpResult?.data.data));
+        setLoad(false);
+        setLoginOtpModal(false);
+        navigation.navigate('MyTab');
+      }
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  function SignInFunction() {
+    if (load)
+      return (
+        <ActivityIndicator
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 50,
+          }}
+        />
+      );
+    return (
+      <View style={{marginTop: SIZES.padding, height: SIZES.height / 2}}>
+        <View style={styles.authContainer}>
+          <Text
+            style={{
+              width: '60%',
+              lineHeight: 45,
+              color: COLORS.dark,
+              ...FONTS.dark,
+              fontSize: SIZES.h1,
+              paddingHorizontal: 10,
+            }}
+          >
+            Sign in to continue
+          </Text>
+          <KeyboardAwareScrollView
+            enableOnAndroid={true}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps={'handled'}
+            extraScrollHeight={-300}
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: 'center',
+            }}
+          >
+            <FormInput
+              containerStyle={{
+                borderRadius: SIZES.radius,
+                backgroundColor: COLORS.error,
+              }}
+              placeholder="Email"
+              value={email}
+              onChange={e => handleEmailCheck(e)}
+              onFocus={() => setCheck()}
+              prependComponent={
+                <Image
+                  source={require('../../assets/icons/email.png')}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    marginRight: SIZES.base,
+                  }}
+                />
+              }
+            />
+            {check ? (
+              <Text style={{color: COLORS.error}}>invalid email formate</Text>
+            ) : (
+              <Text></Text>
+            )}
+
+            <FormInput
+              containerStyle={{
+                borderRadius: SIZES.radius,
+                backgroundColor: COLORS.error,
+              }}
+              placeholder="Password"
+              secureTextEntry={true}
+              value={password}
+              onChange={text => setPassword(text)}
+              onFocus={t => setErrors(t)}
+              error={errors}
+              //   maxLength={8}
+              prependComponent={
+                <Image
+                  source={require('../../assets/icons/lock.png')}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    marginRight: SIZES.base,
+                  }}
+                />
+              }
+            />
+            {errors ? (
+              <Text style={{color: COLORS.error}}>please enter password</Text>
+            ) : (
+              <Text></Text>
+            )}
+            {logged ? (
+              <View style={{marginHorizontal: 12}}>
+                <CheckBox
+                  CheckBoxText={'logout from all devices'}
+                  containerStyle={{backgroundColor: '', lineHeight: 20}}
+                  isSelected={enableCheck}
+                  onPress={() => {
+                    setEnableCheck(!enableCheck);
+                  }}
+                />
+              </View>
+            ) : null}
+
+            <View style={{alignItems: 'flex-end'}}>
+              <TextButton
+                label={'Forgot password'}
+                contentContainerStyle={{
+                  marginTop: SIZES.radius,
+                  backgroundColor: 'null',
+                }}
+                labelStyle={{
+                  color: COLORS.support1,
+                  ...FONTS.h4,
+                  paddingHorizontal: SIZES.padding,
+                }}
+                onPress={() => setForgetModal(true)}
+              />
+            </View>
+            <TextButton
+              label={'Log In'}
+              contentContainerStyle={{
+                height: 55,
+                borderRadius: SIZES.radius,
+                margin: 10,
+              }}
+              labelStyle={{
+                color: COLORS.light,
+                ...FONTS.h4,
+              }}
+              onPress={() => {
+                var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+                //   if (password.match(passW) && email) {
+                if (email) {
+                  submitHandle();
+                } else {
+                  Alert.alert(
+                    'validation failed',
+                    'Password must be at least 8 characters and contain at least 1 uppercase character, 1 number, and 1 special character',
+                    [
+                      ({text: 'ok', onPress: () => {}},
+                      {
+                        text: '',
+                      }),
+                    ],
+                  );
+                }
+                // navigation.navigate('MyTab');
+              }}
+
+              //   onPress={() => submitHandle()}
+            />
+          </KeyboardAwareScrollView>
+        </View>
+      </View>
+    );
+  }
+
+  function SignUpFunction() {
+    return (
+      <KeyboardAwareScrollView>
+        <View style={styles.authContainer}>
+          <Text
+            style={{
+              width: '60%',
+              lineHeight: 45,
+              color: COLORS.dark,
+              ...FONTS.dark,
+              fontSize: SIZES.h1,
+              paddingHorizontal: 10,
+            }}
+          >
+            Sign up
+          </Text>
+
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Name"
+            value={name}
+            onChange={() => setName()}
+            error={errors}
+            onFocus={() => setErrors()}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/person.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e)}
+            error={errors}
+            onFocus={() => setErrors()}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/email.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Number"
+            value={number}
+            onChange={u => setNumber(u)}
+            error={errors}
+            onFocus={() => setErrors()}
+            prependComponent={
+              //   <Image
+              //     source={require('../../assets/icons/call.png')}
+              //     style={{
+              //       width: 20,
+              //       height: 20,
+              //       marginRight: SIZES.base,
+              //     }}
+              //   />
+              <Entypo
+                style={{marginHorizontal: 5}}
+                name="old-phone"
+                size={22}
+                color={COLORS.grey}
+              />
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Password"
+            secureTextEntry={true}
+            value={password}
+            onChange={p => setPassword(p)}
+            error={errors}
+            onFocus={() => setErrors()}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/lock.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Confirm Password"
+            secureTextEntry={!click}
+            value={confirmPassword}
+            onChange={p => setConfirmPassword(p)}
+            error={errors}
+            onFocus={() => setErrors()}
+            prependComponent={
+              <Image
+                source={require('../../assets/icons/lock.png')}
+                style={{
+                  width: 25,
+                  height: 25,
+                  marginRight: SIZES.base,
+                }}
+              />
+            }
+            appendComponent={
+              <TouchableOpacity onPress={() => setClick(!click)}>
+                <Image
+                  source={
+                    !click
+                      ? require('../../assets/icons/eye-off.png')
+                      : require('../../assets/icons/eye.png')
+                  }
+                  style={{
+                    width: 25,
+                    height: 25,
+                    marginRight: SIZES.base,
+                  }}
+                />
+              </TouchableOpacity>
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+            }}
+            placeholder="Designation"
+            value={designation}
+            onChange={d => setDesignation(d)}
+            error={errors}
+            onFocus={() => setErrors()}
+            prependComponent={
+              <MaterialIcons
+                style={{marginHorizontal: 5}}
+                name={'design-services'}
+                size={24}
+                color={COLORS.grey}
+              />
+            }
+          />
+          <TextButton
+            label={'Sign Up'}
+            contentContainerStyle={{
+              height: 55,
+              borderRadius: SIZES.radius,
+              margin: 10,
+            }}
+            labelStyle={{
+              color: COLORS.light,
+              ...FONTS.h4,
+            }}
+            onPress={() => {
+              if (
+                (email, password, confirmPassword, name, number, designation)
+              ) {
+                HandleSignUp();
+                Alert.alert('locally form submitted');
+              } else {
+                Alert.alert('validation failed');
+              }
+            }}
+          />
+        </View>
+      </KeyboardAwareScrollView>
+    );
+  }
+
+  const AuthContainer = () => {
+    if (mode) {
+      return SignUpFunction();
+    } else {
+      return SignInFunction();
+    }
+  };
+  //   console.log('loginUser', loginUser);
+
   useEffect(() => {
     myFunction();
     // async () => {
@@ -452,7 +583,8 @@ const AuthMain = ({navigation}) => {
     // };
   }, []);
 
-  //   if (loader || token) return <LoaderFile />;
+  // if (loader || !token) return <LoaderFile />;
+
   return (
     <View
       style={{
@@ -474,7 +606,12 @@ const AuthMain = ({navigation}) => {
       <View style={styles.authContainer}>{AuthContainer()}</View>
 
       <View
-        style={{alignItems: 'flex-start', position: 'absolute', marginTop: 490}}
+        style={{
+          alignItems: 'flex-start',
+          position: 'absolute',
+          marginTop: 500,
+          marginHorizontal: 16,
+        }}
       >
         <TextButton
           label={mode == false ? 'new user registration' : null}
@@ -598,6 +735,122 @@ const AuthMain = ({navigation}) => {
               }}
               onPress={() => resetPassword()}
             />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={loginOtpModal}
+        onRequestClose={() => {
+          //   Alert.alert('Modal has been closed.');
+          setLoginOtpModal(!loginOtpModal);
+        }}
+      >
+        <View
+          style={{
+            justifyContent: 'center',
+            flex: 1,
+            alignItems: 'center',
+            backgroundColor: COLORS.light20,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row-reverse',
+              justifyContent: 'space-between',
+              marginBottom: 20,
+              backgroundColor: COLORS.secondary,
+              borderRadius: SIZES.radius,
+            }}
+          >
+            <View
+              style={{
+                margin: SIZES.padding,
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+              }}
+            >
+              <TextInput
+                style={{
+                  width: '15%',
+                  borderRadius: SIZES.radius,
+                  borderColor: COLORS.light,
+                  backgroundColor: COLORS.light,
+                  borderWidth: 1,
+                  elevation: 2,
+                  fontSize: SIZES.h2,
+                  textAlign: 'center',
+                }}
+                placeholder={'0'}
+                value={otpState.one}
+                onChangeText={o => onChangeOtp('one', o)}
+              />
+              <TextInput
+                style={{
+                  width: '15%',
+                  borderRadius: SIZES.radius,
+                  borderColor: COLORS.light,
+                  backgroundColor: COLORS.light,
+                  borderWidth: 1,
+                  elevation: 2,
+                  fontSize: SIZES.h2,
+                  textAlign: 'center',
+                }}
+                placeholder={'0'}
+                value={otpState.two}
+                onChangeText={t => onChangeOtp('two', t)}
+              />
+              <TextInput
+                style={{
+                  width: '15%',
+                  borderRadius: SIZES.radius,
+                  borderColor: COLORS.light,
+                  backgroundColor: COLORS.light,
+                  borderWidth: 1,
+                  elevation: 2,
+                  fontSize: SIZES.h2,
+                  textAlign: 'center',
+                }}
+                placeholder={'0'}
+                value={otpState.three}
+                onChangeText={t => onChangeOtp('three', t)}
+              />
+              <TextInput
+                style={{
+                  width: '15%',
+                  borderRadius: SIZES.radius,
+                  borderColor: COLORS.light,
+                  backgroundColor: COLORS.light,
+                  borderWidth: 1,
+                  elevation: 2,
+                  fontSize: SIZES.h2,
+                  textAlign: 'center',
+                }}
+                placeholder={'0'}
+                value={otpState.four}
+                onChangeText={f => onChangeOtp('four', f)}
+              />
+
+              <TextButton
+                label={'Submit'}
+                contentContainerStyle={{
+                  borderRadius: SIZES.radius,
+                  //   margin: 10,
+                }}
+                labelStyle={{
+                  color: COLORS.light,
+                  ...FONTS.h4,
+                  paddingHorizontal: SIZES.padding,
+                }}
+                onPress={() => {
+                  setTimeout(() => {
+                    verifyOtp();
+                  }, 1000);
+                }}
+              />
+            </View>
           </View>
         </View>
       </Modal>

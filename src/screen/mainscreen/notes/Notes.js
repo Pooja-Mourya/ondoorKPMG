@@ -42,8 +42,6 @@ const Notes = ({navigation}) => {
   const [actionModal, setActionModal] = useState(false);
   const [checked, setChecked] = useState(false);
 
-  const [agendaText, setAgendaText] = useState(false);
-
   const handelNotesList = async () => {
     const url = constants.endPoint.notes;
     const params = {
@@ -77,12 +75,15 @@ const Notes = ({navigation}) => {
     }
   };
 
-  const NoteAction = async id => {
+  const NoteAction = async () => {
     const url = constants.endPoint.noteAction;
     const params = {
-      ids: [id],
-      action: checked,
+      ids: [listState[0].id],
+      action: listState[0].status === 1 ? 'inactive' : 'active',
     };
+    // console.log('parasdhbk', params);
+    console.log('listState.id', listState);
+    console.log('listState.status', listState);
     try {
       const ActionRes = await ApiMethod.postData(url, params, token);
       if (ActionRes) {
@@ -97,19 +98,20 @@ const Notes = ({navigation}) => {
 
   useEffect(() => {
     handelNotesList();
+    // console.log('first', listState[0].id);
   }, [page]);
 
   const onTextLayout = e => {
-    setLengthMore(e.nativeEvent.lines.length >= 3); //to check the text is more than 4 lines or not
+    setLengthMore(e.nativeEvent.lines.length >= 2); //to check the text is more than 4 lines or not
     // console.log(e.nativeEvent);
   };
 
   return (
     <>
       <Header
-        userName={'Niharika'}
-        userTitle={'manager'}
-        searchBar={true}
+        userName={true}
+        userTitle={true}
+        textHeader={'Note List'}
         rightIcon={true}
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
@@ -129,6 +131,7 @@ const Notes = ({navigation}) => {
           />
         }
         renderItem={({item, index}) => {
+          //   console.log('itemAction', item);
           return (
             <>
               <View
@@ -136,38 +139,78 @@ const Notes = ({navigation}) => {
                   backgroundColor: COLORS.support3_08,
                   margin: 10,
                   borderRadius: SIZES.radius,
-                  padding: SIZES.padding,
-                  //   elevation: 2,
+                  borderRightWidth: 5,
+                  borderRightColor: COLORS.primary,
                 }}
               >
-                {iconModal === index ? (
-                  <View
+                <View
+                  style={{
+                    backgroundColor: COLORS.secondary,
+                    borderTopRightRadius: SIZES.radius,
+                    padding: 12,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIconModal(index);
+                    }}
                     style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      zIndex: 2,
-                      width: '100%',
-                      height: '100%',
-                      margin: 40,
                       position: 'absolute',
-                      backgroundColor: COLORS.support5,
-                      borderBottomRightRadius: SIZES.radius,
-                      borderTopLeftRadius: SIZES.radius,
+                      alignSelf: 'flex-end',
+                      marginTop: 10,
                     }}
                   >
-                    <View
+                    <Ionicons
+                      name="ellipsis-vertical"
+                      size={30}
+                      color={COLORS.dark}
+                    />
+                  </TouchableOpacity>
+
+                  <View style={{flexDirection: 'row'}}>
+                    <Text
                       style={{
-                        justifyContent: 'space-around',
-                        flexDirection: 'row',
+                        width: '85%',
+                        color: COLORS.primary,
+                        textTransform: 'uppercase',
+                        fontWeight: '600',
+                        ...FONTS.font1,
                       }}
                     >
-                      <AntDesign
-                        onPress={() => setIconModal('')}
-                        name="close"
-                        size={25}
-                        color={COLORS.light}
-                      />
-                      <TouchableOpacity
+                      {item.created_by.name}{' '}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={{padding: SIZES.padding}}>
+                  {iconModal === index ? (
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        zIndex: 2,
+                        width: '100%',
+                        height: '100%',
+                        margin: 40,
+                        position: 'absolute',
+                        backgroundColor: COLORS.support1,
+                        borderBottomRightRadius: SIZES.radius,
+                        borderTopLeftRadius: SIZES.radius,
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: 'space-around',
+                          flexDirection: 'row',
+                        }}
+                      >
+                        <AntDesign
+                          onPress={() => setIconModal('')}
+                          name="close"
+                          size={25}
+                          color={COLORS.light}
+                        />
+                        {/* <TouchableOpacity
                         onPress={() => {
                           handleDelete(item.id);
                           navigation.navigate('Notes');
@@ -178,153 +221,197 @@ const Notes = ({navigation}) => {
                           size={20}
                           color={COLORS.error}
                         />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('ViewNotes', item)}
-                      >
-                        <AntDesign
-                          name="eyeo"
-                          size={25}
-                          color={COLORS.support3}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setAddNotesModal(true, item);
-                          setEditable(item);
-                        }}
-                      >
-                        <AntDesign
-                          name="edit"
-                          size={20}
-                          color={COLORS.support3}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => setActionModal(true)}>
-                        <MaterialCommunityIcons
-                          name="list-status"
-                          size={20}
-                          color={COLORS.error}
-                        />
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate('ViewNotes', item)}
+                        >
+                          <AntDesign
+                            name="eyeo"
+                            size={25}
+                            color={COLORS.support3}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setAddNotesModal(true, item);
+                            setEditable(item);
+                          }}
+                        >
+                          <AntDesign
+                            name="edit"
+                            size={20}
+                            color={COLORS.support3}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => setActionModal(true, item)}
+                        >
+                          <MaterialCommunityIcons
+                            name="list-status"
+                            size={20}
+                            color={COLORS.error}
+                          />
+                        </TouchableOpacity>
+                      </View>
                     </View>
+                  ) : null}
+                  <View style={{}}>
+                    <Text
+                      numberOfLines={2}
+                      style={{...FONTS.base, fontWeight: '400', height: 40}}
+                    >
+                      {item?.meeting?.agenda_of_meeting}
+                    </Text>
                   </View>
-                ) : null}
-                <TouchableOpacity
-                  onPress={() => {
-                    setIconModal(index);
-                  }}
-                  style={{
-                    position: 'absolute',
-                    alignSelf: 'flex-end',
-                    marginTop: 10,
-                  }}
-                >
-                  <Ionicons
-                    name="ellipsis-vertical"
-                    size={30}
-                    color={COLORS.dark}
-                  />
-                </TouchableOpacity>
-
-                <View style={{flexDirection: 'row'}}>
-                  <Text
-                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
-                  >
-                    {' '}
-                    Create By :{' '}
-                  </Text>
-                  <Text>{item.created_by.name}</Text>
-                </View>
-
-                <View style={{flexDirection: 'row'}}>
-                  <Text
-                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
-                  >
-                    {' '}
-                    Meeting Agenda :{' '}
-                  </Text>
 
                   <Text
-                    onTextLayout={onTextLayout}
-                    numberOfLines={textShown ? undefined : 1}
-                    style={{width: '50%'}}
-                  >
-                    {item?.meeting?.agenda_of_meeting}
-                  </Text>
-                </View>
-
-                <Text
-                  style={{
-                    width: '100%',
-                    ...FONTS.base,
-                    fontWeight: '700',
-                    textAlign: 'center',
-                    marginTop: 10,
-                  }}
-                >
-                  Decision
-                </Text>
-                <Text
-                  onTextLayout={onTextLayout}
-                  numberOfLines={textShown ? undefined : 3}
-                  style={{lineHeight: 21}}
-                >
-                  {item.decision}
-                </Text>
-
-                <View style={{flexDirection: 'row'}}>
-                  <Text
-                    style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
-                  >
-                    {' '}
-                    Status :{' '}
-                  </Text>
-                  <Text>{item.status == 1 ? 'active' : 'inactive'}</Text>
-                  <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={actionModal}
-                    onRequestClose={() => {
-                      setActionModal(!actionModal);
+                    style={{
+                      width: '100%',
+                      ...FONTS.base,
+                      fontWeight: '700',
+                      textAlign: 'center',
+                      marginTop: 10,
                     }}
                   >
-                    <View
+                    Decision
+                  </Text>
+                  <Text
+                    onTextLayout={onTextLayout}
+                    numberOfLines={textShown ? undefined : 2}
+                    style={{
+                      lineHeight: 21,
+                      height: 45,
+                      ...FONTS,
+                      fontWeight: '400',
+                    }}
+                  >
+                    {item.decision}
+                  </Text>
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text
                       style={{
-                        flex: 1,
-                        backgroundColor: COLORS.light20,
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        padding: 5,
+                        borderRadius: SIZES.radius,
+                        ...FONTS.font1,
+                        color: COLORS.dark,
+                        fontWeight: '500',
+                      }}
+                    >
+                      Duration: {item.duration}
+                    </Text>
+                    <Text
+                      style={{
+                        color: item.status == 2 ? 'red' : 'green',
+                        backgroundColor:
+                          item.status == 2
+                            ? COLORS.support4_08
+                            : COLORS.support3_08,
+                        padding: 5,
+                        borderRadius: SIZES.radius,
+                        ...FONTS.font1,
+                      }}
+                    >
+                      {item.status == 1 ? 'active' : 'inactive'}
+                    </Text>
+                    <Modal
+                      animationType="slide"
+                      transparent={true}
+                      visible={actionModal}
+                      onRequestClose={() => {
+                        setActionModal(!actionModal);
                       }}
                     >
                       <View
-                        style={{backgroundColor: COLORS.success, width: '80%'}}
+                        style={{
+                          flex: 1,
+                          backgroundColor: COLORS.light08,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
                       >
-                        <Text> id : {item.id} </Text>
-                        <View style={{flexDirection: 'row'}}>
-                          <RadioButton
-                            value={item.status}
-                            status={
-                              checked === item.status ? 'checked' : 'unchecked'
-                            }
-                            onPress={() => setChecked(!checked)}
-                          />
-                          <Text style={{marginTop: 8}}>
-                            {!checked ? 'Active' : 'inactive'}
-                          </Text>
-                        </View>
-                        <TextButton
-                          label={'submit'}
-                          contentContainerStyle={{
-                            padding: 10,
+                        <View
+                          style={{
+                            backgroundColor: COLORS.secondary,
+                            width: '80%',
+                            padding: 30,
                             borderRadius: SIZES.radius,
                           }}
-                          onPress={() => NoteAction(item.id)}
-                        />
+                        >
+                          <Text
+                            style={{
+                              ...FONTS.font1,
+                              fontSize: 18,
+                              textAlign: 'center',
+                            }}
+                          >
+                            id : {item.id}
+                          </Text>
+                          <View
+                            style={{
+                              padding: 10,
+                            }}
+                          >
+                            <View
+                              style={{
+                                padding: 5,
+                                paddingHorizontal: 10,
+                                borderRadius: 25,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  marginTop: 0,
+                                  color: item.status == 2 ? 'green' : 'red',
+                                  ...FONTS.font1,
+                                  fontSize: 18,
+                                }}
+                              >
+                                {!item.status == 2
+                                  ? `Activated`
+                                  : 'Deactivated'}
+                              </Text>
+                              <Text style={{...FONTS.font1, fontSize: 18}}>
+                                {item.created_by.email}
+                              </Text>
+                            </View>
+                          </View>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <TextButton
+                              label={'yes'}
+                              contentContainerStyle={{
+                                padding: 10,
+                                borderRadius: SIZES.radius,
+                                width: '40%',
+                              }}
+                              onPress={() => NoteAction()}
+                            />
+                            <TextButton
+                              label={'no'}
+                              contentContainerStyle={{
+                                padding: 10,
+                                borderRadius: SIZES.radius,
+                                width: '40%',
+                              }}
+                              onPress={() => setActionModal(false)}
+                            />
+                          </View>
+                        </View>
                       </View>
-                    </View>
-                  </Modal>
+                    </Modal>
+                  </View>
                 </View>
+
                 {/* {!lengthMore ? (
                   <Text
                     onPress={() => setAgendaText(agendaText)}

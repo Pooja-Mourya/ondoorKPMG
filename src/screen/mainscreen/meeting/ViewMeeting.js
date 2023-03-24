@@ -1,5 +1,15 @@
-import {StyleSheet, Text, View, Image, Modal, Alert} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Modal,
+  Alert,
+  Linking,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
+import React, {useEffect, useState, useRef} from 'react';
 import {COLORS, constants, FONTS, SIZES} from '../../../constants';
 import ApiMethod from '../../../Services/APIService';
 import {useSelector} from 'react-redux';
@@ -36,51 +46,28 @@ const ViewMeeting = props => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filterModal, setFilterModal] = useState(false);
   const [listState, setListState] = useState([]);
-  const [checked, setChecked] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  //   const ViewMeetingAPI = async id => {
-  //     let url = constants.endPoint.meeting + '/' + id;
-  //     const result = await ApiMethod.getData(url, null, token);
-  //     console.log('ViewMeeting', result);
-  //   };
-
-  //   useEffect(() => {
-  //     ViewMeetingAPI();
-  //   }, []);
-
+  //   console.log('routeParm', routeParm);
   const MeetingAction = async () => {
     const url = constants.endPoint.meetingAction;
     const params = {
       ids: [routeParm.id],
-      action: checked,
+      action: routeParm.status === 1 ? 'inactive' : 'active',
     };
+
+    console.log('actionParams', params);
     try {
       const mitActionRes = await ApiMethod.postData(url, params, token);
       if (mitActionRes) {
         Alert.alert('meeting Action Update Successfully');
       }
-      setChecked(false);
+
       setFilterModal(false);
     } catch (error) {
       console.log('error', error);
     }
   };
-
-  const handleActionAlert = () => {
-    Alert.alert(`activate ${routeParm.meeting_title}`, '', [
-      {
-        text: 'no',
-        onPress: () => {
-          console.log('no');
-        },
-      },
-      {
-        text: 'yes',
-        onPress: () => MeetingAction(),
-      },
-    ]);
-  };
-
   const handleMeetingList = async () => {
     const url = constants.endPoint.meetingList;
     const params = {
@@ -113,6 +100,19 @@ const ViewMeeting = props => {
     }
   };
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      console.log('routeParm', routeParm);
+    }, 1000);
+  }, []);
+
+  //   useEffect(() => {
+  //     if (routeParm || MeetingAction()) {
+  //       handleMeetingList();
+  //     }
+  //   }, []);
   if (isRefreshing) return <ActivityIndicator />;
   return (
     <>
@@ -121,14 +121,21 @@ const ViewMeeting = props => {
         onPressArrow={() => navigation.navigate('Meeting')}
         textHeader={'Meeting Details'}
       />
-      <View
+      <ScrollView
         style={{
           height: SIZES.height,
-          flex: 1,
-          justifyContent: 'space-between',
           flexDirection: 'column',
           backgroundColor: COLORS.support3_08,
         }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => {
+              onRefresh();
+              //   handleMeetingList();
+            }}
+          />
+        }
       >
         <View
           style={{
@@ -228,7 +235,88 @@ const ViewMeeting = props => {
             >
               Status
             </Text>
-            <Text>{routeParm.is_repeat == 1 ? 'Active' : 'Inactive'}</Text>
+            <View
+              style={{
+                backgroundColor: routeParm.status == 1 ? 'green' : 'red',
+                padding: 5,
+                paddingHorizontal: 10,
+                borderRadius: 25,
+              }}
+            >
+              <Text style={{marginTop: 0, color: COLORS.light}}>
+                {routeParm.status == 1 ? 'Active' : 'Inactive'}
+              </Text>
+            </View>
+          </View>
+
+          <Text
+            style={{
+              ...FONTS.base,
+              color: COLORS.dark,
+              fontSize: SIZES.h3,
+              marginTop: 10,
+            }}
+          >
+            Agenda of Meeting :
+          </Text>
+          <Text>{routeParm?.agenda_of_meeting}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+              }}
+            >
+              Render Id:
+            </Text>
+            <Text>{routeParm?.meetRandomId}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+              }}
+            >
+              Meeting Reference :
+            </Text>
+            <Text>{routeParm?.meeting_ref_no}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+              }}
+            >
+              Meeting File :
+            </Text>
+            <Text onPress={() => Linking.openURL(routeParm.invite_file)}>
+              {routeParm?.invite_file}
+            </Text>
+          </View>
+
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+              }}
+            >
+              Meeting link :
+              <Text
+                style={{color: 'blue'}}
+                onPress={() => Linking.openURL(routeParm.meeting_link)}
+              >
+                meeting link
+              </Text>
+            </Text>
           </View>
 
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -237,53 +325,136 @@ const ViewMeeting = props => {
                 ...FONTS.base,
                 color: COLORS.dark,
                 fontSize: SIZES.h3,
-                marginTop: 10,
               }}
             >
               Meeting Date | Time
             </Text>
             <View style={{flexDirection: 'row'}}>
-              <Text>{moment(routeParm.meeting_date).format('L')} / </Text>
-              <Text> {routeParm.meeting_time}</Text>
+              <Text>{moment(routeParm.meeting_date).format('L')}</Text>
+              <Text> {moment(routeParm.meeting_time).format('LST')}</Text>
             </View>
           </View>
-
-          {/* <Image
-          style={{width: 100, height: 100}}
-          source={{
-            uri:
-              'https://graphicsfamily.com/wp-content/uploads/edd/2021/08/Free-Creative-Abstract-Logo-Design-Template-scaled.jpg',
-          }}
-        /> */}
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-          }}
-        >
-          <TouchableOpacity
-            style={{paddingBottom: 20}}
-            onPress={() => {
-              navigation.navigate('AddMeeting', routeParm);
+          <Text
+            style={{
+              ...FONTS.base,
+              color: COLORS.primary,
+              fontSize: SIZES.h3,
+              textAlign: 'center',
+              marginVertical: 10,
             }}
           >
-            <AntDesign name="edit" size={20} color={COLORS.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(routeParm.id)}>
-            <AntDesign name="delete" size={20} color={COLORS.error} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setFilterModal(true)}>
-            <MaterialCommunityIcons
-              name="list-status"
-              size={20}
-              color={COLORS.error}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+            Attendees
+          </Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                textAlign: 'right',
+              }}
+            >
+              Created At:
+            </Text>
+            <Text>{moment(routeParm.created_at).format('L')}</Text>
+          </View>
 
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                textAlign: 'right',
+              }}
+            >
+              Update At:
+            </Text>
+            <Text>{moment(routeParm.updated_at).format('L')}</Text>
+          </View>
+
+          {routeParm.attendees.map((n, i) => {
+            return (
+              <View key={i} style={{}}>
+                <Text>{i}</Text>
+                <Text>
+                  Name :<Text style={{}}>{n.user.name}</Text>
+                </Text>
+                <Text>
+                  Email : <Text>{n.user.email}</Text>
+                </Text>
+              </View>
+            );
+          })}
+          <Text
+            style={{
+              ...FONTS.base,
+              color: COLORS.primary,
+              fontSize: SIZES.h3,
+              textAlign: 'center',
+              marginVertical: 10,
+            }}
+          >
+            Organizer
+          </Text>
+
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+              }}
+            >
+              Organizer Name :
+            </Text>
+            <Text style={{width: '70%'}}>{routeParm.organiser.name}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+              }}
+            >
+              Organizer email :
+            </Text>
+            <Text style={{width: '70%'}}>{routeParm.organiser.email}</Text>
+          </View>
+
+          <Text>
+            Documents : <Text>{routeParm.documents}</Text>
+          </Text>
+        </View>
+      </ScrollView>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          marginTop: 20,
+        }}
+      >
+        <TouchableOpacity
+          style={{paddingBottom: 20}}
+          onPress={() => {
+            navigation.navigate('AddMeeting', routeParm);
+          }}
+        >
+          <AntDesign name="edit" size={20} color={COLORS.primary} />
+        </TouchableOpacity>
+        {/* <TouchableOpacity onPress={() => handleDelete(routeParm.id)}>
+          <AntDesign name="delete" size={20} color={COLORS.error} />
+        </TouchableOpacity> */}
+        <TouchableOpacity onPress={() => setFilterModal(true)}>
+          <MaterialCommunityIcons
+            name="list-status"
+            size={20}
+            color={COLORS.error}
+          />
+        </TouchableOpacity>
+      </View>
       <Modal
         animationType="slide"
         transparent={true}
@@ -296,31 +467,72 @@ const ViewMeeting = props => {
         <View
           style={{
             flex: 1,
-            backgroundColor: COLORS.light20,
+            backgroundColor: COLORS.light60,
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
-          <View style={{backgroundColor: COLORS.success, width: '80%'}}>
-            <Text> id : {routeParm.id}</Text>
-            <View style={{flexDirection: 'row'}}>
-              <RadioButton
-                value={routeParm.status}
-                status={checked === routeParm.status ? 'checked' : 'unchecked'}
-                onPress={() => setChecked(!checked)}
-              />
-              <Text style={{marginTop: 8}}>
-                {!checked ? 'Active' : 'inactive'}
-              </Text>
-            </View>
-            <TextButton
-              label={'submit'}
-              contentContainerStyle={{
+          <View
+            style={{
+              backgroundColor: COLORS.secondary,
+              width: '80%',
+              padding: 30,
+              borderRadius: SIZES.radius,
+            }}
+          >
+            <Text style={{...FONTS.font1, fontSize: 18, textAlign: 'center'}}>
+              {' '}
+              id : {routeParm.id}
+            </Text>
+            <View
+              style={{
                 padding: 10,
-                borderRadius: SIZES.radius,
               }}
-              onPress={() => handleActionAlert()}
-            />
+            >
+              <View
+                style={{
+                  padding: 5,
+                  paddingHorizontal: 10,
+                  borderRadius: 25,
+                }}
+              >
+                <Text
+                  style={{
+                    marginTop: 0,
+                    color: routeParm.status == 2 ? 'green' : 'red',
+                    ...FONTS.font1,
+                    fontSize: 18,
+                  }}
+                >
+                  {!routeParm.status == 2 ? `Activated` : 'Deactivated'}
+                </Text>
+                <Text style={{...FONTS.font1, fontSize: 18}}>
+                  {routeParm.meeting_title}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <TextButton
+                label={'yes'}
+                contentContainerStyle={{
+                  padding: 10,
+                  borderRadius: SIZES.radius,
+                  width: '40%',
+                }}
+                onPress={() => MeetingAction()}
+              />
+              <TextButton
+                label={'no'}
+                contentContainerStyle={{
+                  padding: 10,
+                  borderRadius: SIZES.radius,
+                  width: '40%',
+                }}
+                onPress={() => setFilterModal(false)}
+              />
+            </View>
           </View>
         </View>
       </Modal>

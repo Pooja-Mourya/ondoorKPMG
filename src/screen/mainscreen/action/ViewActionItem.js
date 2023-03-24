@@ -1,26 +1,33 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
+import {Alert, StyleSheet, Text, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
 import {TouchableOpacity} from 'react-native';
-import {COLORS, SIZES} from '../../../constants';
+import {COLORS, FONTS, SIZES} from '../../../constants';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useEffect} from 'react';
+import ApiMethod from '../../../Services/APIService';
+import {ScrollView} from 'react-native';
+import moment from 'moment/moment';
 
+const STATUS = [
+  {id: '1', status: 'In Progress'},
+  {id: '2', status: 'Completed'},
+  {id: '3', status: 'On Hold'},
+  {id: '4', status: 'Not Started'},
+  {id: '5', status: 'Cancelled'},
+];
 const ViewActionItem = props => {
   const {navigation} = props;
   const items = props.route.params;
 
-  //   console.log(
-  //     'items',
-  //     items.documents.map(item => console.log(item)),
-  //   );
   const [openPer, setOpenPre] = useState(false);
   const [widthPre, setWidthPre] = useState(0);
   const [isInc, setIsInc] = useState(true);
+  const [listState, setListState] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const progressFunction = () => {
     if (isInc) {
@@ -30,16 +37,11 @@ const ViewActionItem = props => {
     }
     if (isInc && widthPre + 5 === 100) setIsInc(false);
     if (!isInc && widthPre - 5 === 0) setIsInc(true);
-    // setOpenPre(false);
+    setWidthPre(listState);
   };
 
-  //   useEffect(() => {
-  //     if (items.complete_percentage === '100%') {
-  //       setOpenPre(false);
-  //     }
-  //   }, []);
-
   console.log('status', items.status);
+  if (isRefreshing) return <ActivityIndicator />;
   return (
     <>
       <Header
@@ -47,168 +49,328 @@ const ViewActionItem = props => {
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
       />
-      <View
-        style={{
-          padding: SIZES.padding,
-          backgroundColor: COLORS.secondary,
-          flex: 1,
-          justifyContent: 'space-evenly',
-        }}
-      >
-        {/* <View>
-          {openPer ? (
-            <View
-              style={{
-                backgroundColor: COLORS.light20,
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: SIZES.padding,
-                borderRadius: SIZES.radius,
-                flexDirection: 'row',
+      <ScrollView style={{flex: 1, backgroundColor: COLORS.secondary}}>
+        <View
+          style={{
+            padding: SIZES.padding,
+            backgroundColor: COLORS.light20,
+            borderRadius: SIZES.radius,
+            margin: 10,
+          }}
+        >
+          {/* <View>
+            {openPer ? (
+              <View
+                style={{
+                  backgroundColor: COLORS.light20,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: SIZES.padding,
+                  borderRadius: SIZES.radius,
+                  flexDirection: 'row',
+                }}
+              >
+                <View style={{width: '80%'}}>
+                  <TouchableOpacity
+                    onPress={() => progressFunction()}
+                    style={{
+                      borderWidth: 1,
+                      height: 10,
+                      alignSelf: 'center',
+                      backgroundColor: COLORS.primary,
+                      // width: `${items.complete_percentage}%`,
+                      width: `${widthPre}%`,
+                    }}
+                  ></TouchableOpacity>
+                  <Text style={{textAlign: 'center'}}>
+                    {items.complete_percentage > 0
+                      ? `${widthPre}%`
+                      : items.complete_percentage}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setOpenPre(false)}>
+                  <AntDesign
+                    style={{
+                      backgroundColor: COLORS.light,
+                      marginTop: -10,
+                      borderRadius: 50,
+                      padding: 5,
+                      elevation: 1,
+                      marginLeft: 10,
+                    }}
+                    name="close"
+                    size={20}
+                    color={COLORS.dark}
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : null}
+
+            <TouchableOpacity
+              onPress={() => {
+                setOpenPre(!openPer);
               }}
             >
-              <View style={{width: '80%'}}>
-                <TouchableOpacity
-                  onPress={() => progressFunction()}
-                  style={{
-                    borderWidth: 1,
-                    height: 10,
-                    alignSelf: 'center',
-                    backgroundColor: COLORS.primary,
-                    // width: `${items.complete_percentage}%`,
-                    width: `${widthPre}%`,
-                  }}
-                ></TouchableOpacity>
-                <Text style={{textAlign: 'center'}}>
-                  {items.complete_percentage > 0
-                    ? `${widthPre}%`
-                    : items.complete_percentage}
-                </Text>
-              </View>
-              <TouchableOpacity onPress={() => setOpenPre(false)}>
-                <AntDesign
-                  style={{
-                    backgroundColor: COLORS.light,
-                    marginTop: -10,
-                    borderRadius: 50,
-                    padding: 5,
-                    elevation: 1,
-                    marginLeft: 10,
-                  }}
-                  name="close"
-                  size={20}
+              <Text>
+                <FontAwesome5 name="percentage" size={20} color={COLORS.dark} />
+                Percentage %
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => handleComplete()}>
+              <Text>
+                <Ionicons
+                  name="checkmark-done-sharp"
+                  size={25}
                   color={COLORS.dark}
                 />
-              </TouchableOpacity>
-            </View>
-          ) : null}
+                Complete
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {
-              setOpenPre(!openPer);
-            }}
-          >
-            <Text>
-              <FontAwesome5 name="percentage" size={20} color={COLORS.dark} />
-              Percentage %
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity>
+              <Text>
+                <MaterialCommunityIcons
+                  name="gesture-tap-hold"
+                  size={25}
+                  color={COLORS.dark}
+                />
+                On Hold
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity>
-            <Text>
-              <Ionicons
-                name="checkmark-done-sharp"
-                size={25}
-                color={COLORS.dark}
-              />
-              Complete
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity>
+              <Text>
+                <Entypo name="progress-one" size={25} color={COLORS.dark} />
+                In Progress
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity>
-            <Text>
-              <MaterialCommunityIcons
-                name="gesture-tap-hold"
-                size={25}
-                color={COLORS.dark}
-              />
-              On Hold
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity>
+              <Text>
+                <AntDesign name="close" size={25} color={COLORS.dark} />
+                Cancelled
+              </Text>
+            </TouchableOpacity>
+          </View> */}
 
-          <TouchableOpacity>
-            <Text>
-              <Entypo name="progress-one" size={25} color={COLORS.dark} />
-              In Progress
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <Text>
-              <AntDesign name="close" size={25} color={COLORS.dark} />
-              Cancelled
-            </Text>
-          </TouchableOpacity>
-        </View> */}
-
-        <Text>
-          Meeting Title: <Text>{items.meeting.meeting_title}</Text>
-        </Text>
-        <Text>
-          Task : <Text>{items.task}</Text>
-        </Text>
-        <Text>
-          Comment : <Text>{items.comment}</Text>
-        </Text>
-        <Text>
-          Document : <Text>{items.documents[0]}</Text>
-        </Text>
-        <Text>
-          Priority : <Text>{items.priority}</Text>
-        </Text>
-        <Text>
-          Due Date: <Text>{items.due_date}</Text>
-        </Text>
-        <Text>
-          Status: <Text>{items.status}</Text>
-        </Text>
-        <View style={{flexDirection: 'row'}}>
-          <Text>
-            Complete %:{' '}
-            {/* <Text>
-              {items.complete_percentage > 0
-                ? widthPre
-                : items.complete_percentage}
-            </Text> */}
-          </Text>
-          <View style={{}}>
-            <TouchableOpacity
-              onPress={() => progressFunction()}
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
               style={{
-                borderWidth: 1,
-                height: 10,
-                alignSelf: 'center',
-                backgroundColor: COLORS.primary,
-                width: `${items.complete_percentage}%`,
-                // width: `${widthPre}%`,
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
               }}
-            ></TouchableOpacity>
-            <Text style={{textAlign: 'center'}}>
-              {items.complete_percentage}
+            >
+              Meeting Title:
+            </Text>
+            <Text style={{marginTop: 10}}>{items.meeting.meeting_title}</Text>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Meeting Id:
+            </Text>
+            <Text style={{marginTop: 10}}>{items.meeting_id}</Text>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Note Id:
+            </Text>
+            <Text style={{marginTop: 10}}>{items.note_id}</Text>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Owner Id:
+            </Text>
+            <Text style={{marginTop: 10}}>{items.owner_id}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Task :
+            </Text>
+            <Text style={{marginTop: 10}}>{items.task}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Comment :
+            </Text>
+            <Text style={{marginTop: 10}}>{items.comment}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Document :
+            </Text>
+            <Text style={{marginTop: 10}}>{items.documents[0]}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Priority :
+            </Text>
+            <Text style={{marginTop: 10}}>{items.priority}</Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Due Date:
+            </Text>
+            <Text style={{marginTop: 10}}>
+              {moment(items.due_date).format('L')}
             </Text>
           </View>
-        </View>
 
-        <Text>
-          Complete Date: <Text>{items.complete_date}</Text>
-        </Text>
-        <Text>
-          Open Date: <Text>{items.date_opened}</Text>
-        </Text>
-        <Text>
-          Reference Id: <Text>{items.mm_ref_id}</Text>
-        </Text>
-      </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Status:
+            </Text>
+            <Text style={{marginTop: 10}}>
+              {items.status == 1 ? 'active' : ' inactive'}
+            </Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Complete %
+            </Text>
+            <View style={{}}>
+              <TouchableOpacity
+                onPress={() => progressFunction()}
+                style={{
+                  borderWidth: 1,
+                  height: 10,
+                  alignSelf: 'center',
+                  backgroundColor: COLORS.primary,
+                  width: `${items.complete_percentage}%`,
+                  // width: `${widthPre}%`,
+                }}
+              ></TouchableOpacity>
+              <Text style={{textAlign: 'center'}}>
+                {items.complete_percentage} %
+              </Text>
+            </View>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Complete Date:
+            </Text>
+            <Text style={{marginTop: 10}}>
+              {items.complete_date ?? 'undefine'}
+            </Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Open Date:
+            </Text>
+            <Text style={{marginTop: 10}}>
+              {moment(items.date_opened).format('L')}
+            </Text>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Reference Id:
+            </Text>
+            <Text style={{marginTop: 10}}>{items.mm_ref_id}</Text>
+          </View>
+        </View>
+      </ScrollView>
     </>
   );
 };

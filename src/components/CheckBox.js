@@ -10,11 +10,12 @@ const CheckBox = ({containerStyle, isSelected, onPress, CheckBoxText}) => {
     >
       <View
         style={{
-          width: 25,
-          height: 25,
+          width: 23,
+          height: 23,
           alignItems: 'center',
           justifyContent: 'center',
           borderColor: isSelected ? COLORS.primary : COLORS.light,
+          borderRadius: SIZES.radius,
           backgroundColor: isSelected ? COLORS.primary : COLORS.dark,
           marginTop: 10,
         }}

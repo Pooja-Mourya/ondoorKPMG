@@ -11,9 +11,6 @@ import {ImageUpload} from '../screen';
 const Tab = createBottomTabNavigator();
 
 export default function MyTab() {
-  const Home = () => {
-    return <Text>screens</Text>;
-  };
   return (
     <Tab.Navigator
       screenOptions={{
@@ -99,7 +96,6 @@ export default function MyTab() {
             );
           },
         })}
-        // h={false}
         name="More"
         component={MyDrawer}
       />
