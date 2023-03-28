@@ -7,17 +7,20 @@ import {
   Animated,
   TouchableOpacity,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import FormInput from '../components/FormInput';
 import {COLORS, FONTS, SIZES} from '../constants';
 import TextButton from '../components/TextButton';
+// import {Timer} from './Authentication/Timer';
+import Timer from './Authentication/Timer';
 
 const ValidationForm = () => {
   const [email, setEmail] = useState('');
   const [check, setCheck] = useState(false);
   const [inputs, setInputs] = React.useState({name: '', password: ''});
   const [errors, setErrors] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
+  const [time, setTime] = useState(100);
+  const timerRef = useRef(time);
 
   const handleEmailCheck = e => {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -62,6 +65,21 @@ const ValidationForm = () => {
       Alert.alert('validation failed');
     }
   };
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      timerRef.current -= 1;
+      if (timerRef.current < 0) {
+        clearInterval(timerId);
+      } else {
+        setTime(timerRef.current);
+      }
+    }, 1000);
+    return () => {
+      clearInterval(timerId);
+    };
+  }, []);
+
   const fadeAnim = useRef(new Animated.Value(100)).current;
 
   const fadeIn = () => {
@@ -83,7 +101,6 @@ const ValidationForm = () => {
 
   const myValue = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
 
-  console.log('myValue', myValue);
   const moveElement = () => {
     Animated.timing(myValue, {
       toValue: {x: 100, y: 500},
@@ -94,7 +111,8 @@ const ValidationForm = () => {
 
   return (
     <>
-      <View
+      <Timer />
+      {/* <View
         style={{
           margin: SIZES.padding,
           padding: 10,
@@ -197,6 +215,8 @@ const ValidationForm = () => {
           <Text style={{backgroundColor: 'deepskyblue'}}>click Move</Text>
         </TouchableOpacity>
       </View>
+      <Text>{time < 0 ? '0' : time}</Text>
+       */}
     </>
   );
 };

@@ -8,6 +8,7 @@ import {
   Linking,
   ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import {COLORS, constants, FONTS, SIZES} from '../../../constants';
@@ -20,21 +21,9 @@ import {ActivityIndicator} from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import {RadioButton} from 'react-native-paper';
 import TextButton from '../../../components/TextButton';
-import {Dropdown} from 'react-native-element-dropdown';
+import axios from 'axios';
 
-const data = [
-  {
-    id: '1',
-    sta: 'active',
-  },
-  {
-    id: '2',
-    sta: 'inactive',
-  },
-];
 const ViewMeeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
@@ -47,6 +36,7 @@ const ViewMeeting = props => {
   const [filterModal, setFilterModal] = useState(false);
   const [listState, setListState] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [getMeet, setGetMeet] = useState({});
 
   //   console.log('routeParm', routeParm);
   const MeetingAction = async () => {
@@ -68,6 +58,22 @@ const ViewMeeting = props => {
       console.log('error', error);
     }
   };
+
+  const getMeetingList = async () => {
+    const url = constants.endPoint.meeting + '/' + routeParm.id;
+    setIsRefreshing(true);
+    try {
+      const result = await ApiMethod.getData(url, token, null);
+      console.log('GetResult', result.data.data, 'url', url);
+
+      setGetMeet(result?.data?.data);
+      setIsRefreshing(false);
+      return;
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
   const handleMeetingList = async () => {
     const url = constants.endPoint.meetingList;
     const params = {
@@ -108,11 +114,13 @@ const ViewMeeting = props => {
     }, 1000);
   }, []);
 
-  //   useEffect(() => {
-  //     if (routeParm || MeetingAction()) {
-  //       handleMeetingList();
-  //     }
-  //   }, []);
+  console.log('getMeeting', getMeet);
+  useEffect(() => {
+    //   if (routeParm || MeetingAction()) {
+    //     handleMeetingList();
+    //   }
+    getMeetingList();
+  }, []);
   if (isRefreshing) return <ActivityIndicator />;
   return (
     <>
@@ -160,7 +168,7 @@ const ViewMeeting = props => {
             >
               User Id
             </Text>
-            <Text>{routeParm.id}</Text>
+            <Text>{getMeet.id}</Text>
           </View>
           <View
             style={{
@@ -178,7 +186,7 @@ const ViewMeeting = props => {
             >
               Title
             </Text>
-            <Text>{routeParm.meeting_title}</Text>
+            <Text>{getMeet.meeting_title}</Text>
           </View>
 
           <View
@@ -197,7 +205,7 @@ const ViewMeeting = props => {
             >
               Meeting Date
             </Text>
-            <Text>{routeParm.meeting_date}</Text>
+            <Text>{getMeet.meeting_date}</Text>
           </View>
 
           <View
@@ -216,7 +224,7 @@ const ViewMeeting = props => {
             >
               Created At
             </Text>
-            <Text>{moment(routeParm.created_at).format('L')}</Text>
+            <Text>{moment(getMeet.created_at).format('L')}</Text>
           </View>
 
           <View
@@ -237,14 +245,14 @@ const ViewMeeting = props => {
             </Text>
             <View
               style={{
-                backgroundColor: routeParm.status == 1 ? 'green' : 'red',
+                backgroundColor: getMeet.status == 1 ? 'green' : 'red',
                 padding: 5,
                 paddingHorizontal: 10,
                 borderRadius: 25,
               }}
             >
               <Text style={{marginTop: 0, color: COLORS.light}}>
-                {routeParm.status == 1 ? 'Active' : 'Inactive'}
+                {getMeet.status == 1 ? 'Active' : 'Inactive'}
               </Text>
             </View>
           </View>
@@ -259,7 +267,7 @@ const ViewMeeting = props => {
           >
             Agenda of Meeting :
           </Text>
-          <Text>{routeParm?.agenda_of_meeting}</Text>
+          <Text>{getMeet?.agenda_of_meeting}</Text>
           <View style={{flexDirection: 'row'}}>
             <Text
               style={{
@@ -270,7 +278,7 @@ const ViewMeeting = props => {
             >
               Render Id:
             </Text>
-            <Text>{routeParm?.meetRandomId}</Text>
+            <Text>{getMeet?.meetRandomId}</Text>
           </View>
 
           <View style={{flexDirection: 'row'}}>
@@ -283,7 +291,7 @@ const ViewMeeting = props => {
             >
               Meeting Reference :
             </Text>
-            <Text>{routeParm?.meeting_ref_no}</Text>
+            <Text>{getMeet?.meeting_ref_no}</Text>
           </View>
 
           <View style={{flexDirection: 'row'}}>
@@ -296,8 +304,8 @@ const ViewMeeting = props => {
             >
               Meeting File :
             </Text>
-            <Text onPress={() => Linking.openURL(routeParm.invite_file)}>
-              {routeParm?.invite_file}
+            <Text onPress={() => Linking.openURL(getMeet.invite_file)}>
+              {getMeet?.invite_file}
             </Text>
           </View>
 
@@ -312,7 +320,7 @@ const ViewMeeting = props => {
               Meeting link :
               <Text
                 style={{color: 'blue'}}
-                onPress={() => Linking.openURL(routeParm.meeting_link)}
+                onPress={() => Linking.openURL(getMeet.meeting_link)}
               >
                 meeting link
               </Text>
@@ -330,8 +338,8 @@ const ViewMeeting = props => {
               Meeting Date | Time
             </Text>
             <View style={{flexDirection: 'row'}}>
-              <Text>{moment(routeParm.meeting_date).format('L')}</Text>
-              <Text> {moment(routeParm.meeting_time).format('LST')}</Text>
+              <Text>{moment(getMeet.meeting_date).format('L')}</Text>
+              <Text> {moment(getMeet.meeting_time).format('LST')}</Text>
             </View>
           </View>
           <Text
@@ -356,7 +364,7 @@ const ViewMeeting = props => {
             >
               Created At:
             </Text>
-            <Text>{moment(routeParm.created_at).format('L')}</Text>
+            <Text>{moment(getMeet.created_at).format('L')}</Text>
           </View>
 
           <View style={{flexDirection: 'row'}}>
@@ -370,22 +378,23 @@ const ViewMeeting = props => {
             >
               Update At:
             </Text>
-            <Text>{moment(routeParm.updated_at).format('L')}</Text>
+            <Text>{moment(getMeet.updated_at).format('L')}</Text>
           </View>
-
-          {routeParm.attendees.map((n, i) => {
-            return (
-              <View key={i} style={{}}>
-                <Text>{i}</Text>
-                <Text>
-                  Name :<Text style={{}}>{n.user.name}</Text>
-                </Text>
-                <Text>
-                  Email : <Text>{n.user.email}</Text>
-                </Text>
-              </View>
-            );
-          })}
+          {/* <FlatList
+            data={getMeet.attendees}
+            keyExtractor={({n, i}) => {
+              return (
+                <View key={i} style={{}}>
+                  <Text>
+                    Name :<Text style={{}}>{n.user.name}</Text>
+                  </Text>
+                  <Text>
+                    Email : <Text>{n.user.email}</Text>
+                  </Text>
+                </View>
+              );
+            }}
+          /> */}
           <Text
             style={{
               ...FONTS.base,
@@ -398,7 +407,7 @@ const ViewMeeting = props => {
             Organizer
           </Text>
 
-          <View style={{flexDirection: 'row'}}>
+          {/* <View style={{flexDirection: 'row'}}>
             <Text
               style={{
                 ...FONTS.base,
@@ -408,10 +417,14 @@ const ViewMeeting = props => {
             >
               Organizer Name :
             </Text>
-            <Text style={{width: '70%'}}>{routeParm.organiser.name}</Text>
-          </View>
+            <Text style={{width: '70%'}}>
+              {!getMeet.organiser.name
+                ? '______________'
+                : getMeet.organiser.name}
+            </Text>
+          </View> */}
 
-          <View style={{flexDirection: 'row'}}>
+          {/* <View style={{flexDirection: 'row'}}>
             <Text
               style={{
                 ...FONTS.base,
@@ -421,12 +434,16 @@ const ViewMeeting = props => {
             >
               Organizer email :
             </Text>
-            <Text style={{width: '70%'}}>{routeParm.organiser.email}</Text>
-          </View>
+            <Text style={{width: '70%'}}>
+              {getMeet.organiser.email
+                ? '_________________'
+                : getMeet.organiser.email}
+            </Text>
+          </View> */}
 
-          <Text>
-            Documents : <Text>{routeParm.documents}</Text>
-          </Text>
+          {/* <Text>
+            Documents : <Text>{getMeet.documents}</Text>
+          </Text> */}
         </View>
       </ScrollView>
       <View
@@ -439,14 +456,11 @@ const ViewMeeting = props => {
         <TouchableOpacity
           style={{paddingBottom: 20}}
           onPress={() => {
-            navigation.navigate('AddMeeting', routeParm);
+            navigation.navigate('AddMeeting', getMeet);
           }}
         >
           <AntDesign name="edit" size={20} color={COLORS.primary} />
         </TouchableOpacity>
-        {/* <TouchableOpacity onPress={() => handleDelete(routeParm.id)}>
-          <AntDesign name="delete" size={20} color={COLORS.error} />
-        </TouchableOpacity> */}
         <TouchableOpacity onPress={() => setFilterModal(true)}>
           <MaterialCommunityIcons
             name="list-status"
@@ -482,7 +496,7 @@ const ViewMeeting = props => {
           >
             <Text style={{...FONTS.font1, fontSize: 18, textAlign: 'center'}}>
               {' '}
-              id : {routeParm.id}
+              id : {getMeet.id}
             </Text>
             <View
               style={{
@@ -499,15 +513,15 @@ const ViewMeeting = props => {
                 <Text
                   style={{
                     marginTop: 0,
-                    color: routeParm.status == 2 ? 'green' : 'red',
+                    color: getMeet.status == 2 ? 'green' : 'red',
                     ...FONTS.font1,
                     fontSize: 18,
                   }}
                 >
-                  {!routeParm.status == 2 ? `Activated` : 'Deactivated'}
+                  {!getMeet.status == 2 ? `Activated` : 'Deactivated'}
                 </Text>
                 <Text style={{...FONTS.font1, fontSize: 18}}>
-                  {routeParm.meeting_title}
+                  {getMeet.meeting_title}
                 </Text>
               </View>
             </View>

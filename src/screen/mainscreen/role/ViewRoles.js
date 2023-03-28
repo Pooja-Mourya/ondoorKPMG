@@ -24,7 +24,7 @@ const ViewRoles = props => {
           margin: 10,
         }}
       >
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text
             style={{
               ...FONTS.base,
@@ -32,11 +32,11 @@ const ViewRoles = props => {
               fontSize: SIZES.h3,
             }}
           >
-            Role Name :{' '}
+            Role Name{' '}
           </Text>
           <Text style={{marginTop: 3}}>{roleView.name}</Text>
         </View>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text
             style={{
               ...FONTS.base,
@@ -44,11 +44,11 @@ const ViewRoles = props => {
               fontSize: SIZES.h3,
             }}
           >
-            guard name:{' '}
+            guard name{' '}
           </Text>
           <Text style={{marginTop: 3}}>{roleView.guard_name}</Text>
         </View>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text
             style={{
               ...FONTS.base,
@@ -56,11 +56,11 @@ const ViewRoles = props => {
               fontSize: SIZES.h3,
             }}
           >
-            se name :{' '}
+            se name{' '}
           </Text>
           <Text style={{marginTop: 3}}>{roleView.se_name}</Text>
         </View>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text
             style={{
               ...FONTS.base,
@@ -68,13 +68,13 @@ const ViewRoles = props => {
               fontSize: SIZES.h3,
             }}
           >
-            Created At :{' '}
+            Created At{' '}
           </Text>
           <Text style={{marginTop: 3}}>
             {moment(roleView.create_at).format('L')}
           </Text>
         </View>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text
             style={{
               ...FONTS.base,
@@ -82,7 +82,7 @@ const ViewRoles = props => {
               fontSize: SIZES.h3,
             }}
           >
-            Updated At :{' '}
+            Updated At{' '}
           </Text>
           <Text style={{marginTop: 3}}>
             {moment(roleView.updated_at).format('L')}

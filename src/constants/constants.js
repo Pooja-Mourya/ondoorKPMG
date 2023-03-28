@@ -61,5 +61,6 @@ export default {
     permissions: 'permissions',
     permission: 'permission',
     verifyOtp: 'verify-otp',
+    userAction: 'user-action',
   },
 };

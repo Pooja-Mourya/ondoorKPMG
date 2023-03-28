@@ -122,22 +122,17 @@ const AddMeeting = props => {
         authorization: 'Bearer ' + token,
       },
       data: {
-        meeting_id: '29',
+        meeting_id: state.meeting_id.id,
         duration: state.duration,
-        // notes:
-        //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
-        // decision:
-        //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
-        //
         notes: state.notes,
         decision: state.decision,
         documents: [
-          {
-            file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
-            file_extension: '',
-            file_name: '',
-            uploading_file_name: '',
-          },
+          //   {
+          //     file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+          //     file_extension: '',
+          //     file_name: '',
+          //     uploading_file_name: '',
+          //   },
         ],
       },
     });
@@ -212,7 +207,7 @@ const AddMeeting = props => {
     }
   }, []);
 
-  console.log('editable', editable);
+  console.log('listState', listState);
   if (isLoading) return <ActivityIndicator />;
   return (
     <>
@@ -264,7 +259,7 @@ const AddMeeting = props => {
             data={listState}
             search
             maxHeight={300}
-            labelField="meeting_title"
+            labelField={'meeting_title'}
             valueField="meeting_id"
             placeholder="Select meeting id"
             searchPlaceholder="Search..."
@@ -281,7 +276,19 @@ const AddMeeting = props => {
               />
             )}
           />
-
+          {/* <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            placeholder="meeting_id"
+            value={state.meeting_id}
+            onChange={d => onchangeState('meeting_id', d)}
+            error={errors.meeting_id}
+            onFocus={() => handleError(null, 'meeting_id')}
+            keyboardType="numeric"
+          /> */}
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,

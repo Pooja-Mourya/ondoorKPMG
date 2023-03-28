@@ -20,17 +20,17 @@ import ApiMethod from '../../Services/APIService';
 import {useSelector} from 'react-redux';
 import {Keyboard} from 'react-native';
 
-const data = [
-  {
-    id: '1',
-    role: 'admin',
-  },
+// const data = [
+//   {
+//     id: '1',
+//     role: 'admin',
+//   },
 
-  {
-    id: '2',
-    role: 'user',
-  },
-];
+//   {
+//     id: '2',
+//     role: 'user',
+//   },
+// ];
 
 const AddUser = props => {
   const {navigation} = props;
@@ -42,6 +42,7 @@ const AddUser = props => {
   const [click, setClick] = useState(false);
   const [load, setLoad] = useState(false);
   const [errors, setErrors] = useState(false);
+  const [data, setData] = useState([]);
   const [input, setInput] = useState({
     role_id: '',
     name: '',
@@ -102,7 +103,7 @@ const AddUser = props => {
   const submitHandle = async () => {
     const url = constants.endPoint.user;
     const params = {
-      role_id: data.user,
+      role_id: input.role_id.id,
       name: input.name,
       email: input.email,
       mobile_number: input.mobile_number,
@@ -110,6 +111,10 @@ const AddUser = props => {
       password: input.password,
       confirm_password: input.confirm_password,
     };
+
+    // console.log('params', params);
+
+    // return;
     try {
       setLoad(true);
       const result = await ApiMethod.postData(url, params, token);
@@ -145,14 +150,34 @@ const AddUser = props => {
     }
   };
 
+  const handleRoles = async () => {
+    const url = constants.endPoint.roles;
+    const params = {
+      //   page: 1,
+      //   per_page_record: '10',
+    };
+    setLoad(true);
+    try {
+      const result = await ApiMethod.postData(url, params, token);
+      console.log('result', result?.data?.data, 'url', url);
+      setData(result?.data?.data);
+      setLoad(false);
+      return;
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  console.log('data', data);
   useEffect(() => {
+    handleRoles();
     if (userEdit) {
       setInput({
         ...input,
         role_id: userEdit.role_id,
         name: userEdit.name,
         email: userEdit.email,
-        mobile_number: userEdit.mobile_number,
+        mobile_number: +userEdit.mobile_number,
         designation: userEdit.designation,
         password: userEdit.password,
         confirm_password: userEdit.confirm_password,
@@ -186,7 +211,7 @@ const AddUser = props => {
             data={data}
             search
             maxHeight={300}
-            labelField="role"
+            labelField="name"
             valueField="id"
             placeholder="Select role"
             searchPlaceholder="Search..."
@@ -362,11 +387,12 @@ const AddUser = props => {
               //   } else {
               //     Alert.alert('validation failed');
               //   }
-              if (validate()) {
-                submitHandle();
-              } else {
-                Alert.alert('validation failed');
-              }
+              //   if (validate()) {
+              //     submitHandle();
+              //   } else {
+              //     Alert.alert('validation failed');
+              //   }
+              submitHandle();
             }}
           />
         </View>

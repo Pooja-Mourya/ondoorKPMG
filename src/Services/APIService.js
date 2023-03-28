@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {constants} from '../constants';
+import {useNavigation} from '@react-navigation/native';
 
 const ApiMethod = {
   getData: async (endPoint, token) => {
@@ -53,6 +54,7 @@ const ApiMethod = {
   },
 
   postData: async (endPoint, body, token) => {
+    // const navigation = useNavigation();
     let url = constants.base_url + endPoint;
     let headers = {
       Accept: '*/*',
@@ -66,6 +68,7 @@ const ApiMethod = {
     };
 
     if (constants.base_url + '/' + 'unauthorized') {
+      //   navigation.navigate('AuthMain');
       AsyncStorage.removeItem('@user');
     }
     // console.log('config--', config);

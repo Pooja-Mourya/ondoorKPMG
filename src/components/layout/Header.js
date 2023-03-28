@@ -58,8 +58,12 @@ const Header = ({
               }}
             >
               {/* {userToken.name} */}
-              {userToken?.name ? userToken?.name?.slice(0, 1) : null}
-              {userToken?.email ? userToken?.email?.slice(0, 1) : null}
+              {userToken?.name
+                ? userToken?.name?.slice(0, 1).toUpperCase()
+                : null}
+              {userToken?.email
+                ? userToken?.email?.slice(0, 1).toLowerCase()
+                : null}
             </Text>
           </View>
         ) : null}

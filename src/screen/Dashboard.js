@@ -45,7 +45,7 @@ const UserList = ({navigation}) => {
   if (isRefreshing === true) return <ActivityIndicator />;
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      {/* <Text
+      <Text
         style={{
           backgroundColor: COLORS.primary,
           width: '80%',
@@ -93,7 +93,7 @@ const UserList = ({navigation}) => {
         }}
       >
         TODAY MEETING COUNT : {listState.todayMeetingCount}
-      </Text> */}
+      </Text>
     </View>
   );
 };

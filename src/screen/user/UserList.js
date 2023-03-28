@@ -18,7 +18,6 @@ import {RefreshControl} from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import UserFilter from './UserFilter';
-import RadioButton from 'react-native-paper';
 import TextButton from '../../components/TextButton';
 
 const UserList = ({navigation}) => {
@@ -65,16 +64,33 @@ const UserList = ({navigation}) => {
     }
   };
 
+  const userActionApi = item => {
+    setIsRefreshing(true);
+    try {
+      let url = constants.endPoint.userAction;
+      const params = {
+        ids: [item.id],
+        action: item.status === 1 ? 'inactive' : 'active',
+      };
+      const ActionResult = ApiMethod.postData(url, params, token);
+      console.log('actionResult', ActionResult);
+      userListApi();
+      setIsRefreshing(false);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
   useEffect(() => {
     userListApi();
-  }, [page]);
+  }, []);
 
   //   useEffect(() => {
   //     if (mode) {
   //       navigation.navigate('AuthMain');
   //     }
   //   }, []);
-  if (isRefreshing === true) return <ActivityIndicator />;
+  //   if (isRefreshing === true) return <ActivityIndicator />;
   return (
     <>
       <Header
@@ -103,23 +119,37 @@ const UserList = ({navigation}) => {
             <>
               <View
                 style={{
-                  backgroundColor: COLORS.support3_08,
+                  backgroundColor: COLORS.light80,
                   margin: 10,
                   borderRadius: SIZES.radius,
-                  padding: SIZES.padding,
                 }}
               >
                 <View
                   style={{
                     flexDirection: 'row',
-                    alignSelf: 'flex-end',
-                    width: '40%',
                     justifyContent: 'space-between',
+                    padding: 10,
+                    backgroundColor: COLORS.support1,
+                    borderTopLeftRadius: SIZES.radius,
+                    borderBottomRightRadius: SIZES.radius,
                   }}
                 >
-                  <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                  <Text
+                    style={{
+                      fontWeight: '500',
+                      paddingTop: 3,
+                      ...FONTS.font1,
+                      width: '50%',
+                      color: COLORS.light,
+                      textTransform: 'uppercase',
+                      fontSize: 20,
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+                  {/* <TouchableOpacity onPress={() => handleDelete(item.id)}>
                     <AntDesign name="delete" size={20} color={COLORS.error} />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <TouchableOpacity
                     onPress={() => navigation.navigate('ViewUser', item)}
                   >
@@ -130,7 +160,7 @@ const UserList = ({navigation}) => {
                   >
                     <AntDesign name="edit" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setActionModal(true)}>
+                  <TouchableOpacity onPress={() => setActionModal(true, item)}>
                     <MaterialCommunityIcons
                       name="list-status"
                       size={25}
@@ -156,41 +186,151 @@ const UserList = ({navigation}) => {
                     }}
                   >
                     <View
-                      style={{backgroundColor: COLORS.success, width: '80%'}}
+                      style={{
+                        backgroundColor: COLORS.secondary,
+                        width: '80%',
+                        borderRadius: SIZES.radius,
+                        padding: SIZES.padding,
+                      }}
                     >
-                      <Text> id : {item.id}</Text>
-                      {/* <View style={{flexDirection: 'row'}}>
-                        <RadioButton
-                          value={item.status != null ?? ''}
-                          status={
-                            checked === item.status ? 'checked' : 'unchecked'
-                          }
-                          onPress={() => setChecked(!checked)}
-                        />
-                        <Text style={{marginTop: 8}}>
-                          {!checked ? 'Active' : 'inactive'}
-                        </Text>
-                      </View> */}
-                      <Text>
-                        status : {item.status == 1 ? 'active' : 'inactive'}
-                      </Text>
-                      <TextButton
-                        label={'submit'}
-                        contentContainerStyle={{
-                          padding: 10,
-                          borderRadius: SIZES.radius,
+                      <Text
+                        style={{
+                          ...FONTS.font1,
+                          fontSize: 18,
+                          textAlign: 'center',
                         }}
-                        onPress={() => {}}
-                      />
+                      >
+                        {' '}
+                        id : {item.id}
+                      </Text>
+                      <View
+                        style={{
+                          padding: 10,
+                        }}
+                      >
+                        <View
+                          style={{
+                            padding: 5,
+                            paddingHorizontal: 10,
+                            borderRadius: 25,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              marginTop: 0,
+                              color: item.status == 2 ? 'green' : 'red',
+                              ...FONTS.font1,
+                              fontSize: 18,
+                            }}
+                          >
+                            {!item.status == 2 ? `Activated` : 'Deactivated'}
+                          </Text>
+                          <Text style={{...FONTS.font1, fontSize: 18}}>
+                            {item.name}
+                          </Text>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <TextButton
+                          label={'yes'}
+                          contentContainerStyle={{
+                            padding: 10,
+                            borderRadius: SIZES.radius,
+                            width: '40%',
+                          }}
+                          onPress={() => {
+                            userActionApi(item);
+                            setActionModal(false);
+                          }}
+                        />
+                        <TextButton
+                          label={'no'}
+                          contentContainerStyle={{
+                            padding: 10,
+                            borderRadius: SIZES.radius,
+                            width: '40%',
+                          }}
+                          onPress={() => setActionModal(false)}
+                        />
+                      </View>
                     </View>
                   </View>
                 </Modal>
-                <Text>Id: {item.id}</Text>
-                <Text>Name: {item.name}</Text>
-                <Text>Email: {item.email}</Text>
-                <Text>Designation: {item.designation}</Text>
-                <Text>Number: {item.mobile_number}</Text>
-                <Text>Status: {item.status == 1 ? 'active' : 'inactive'}</Text>
+                {/* <Text>Id: {item.id}</Text> */}
+
+                <View style={{padding: SIZES.padding, marginTop: -20}}>
+                  <Text
+                    style={{
+                      fontWeight: '600',
+                      paddingTop: 5,
+                      ...FONTS.font1,
+                      textAlign: 'center',
+                      width: '100%',
+                      fontSize: 20,
+                    }}
+                  >
+                    {item.email}
+                  </Text>
+                  <Text
+                    style={{
+                      fontWeight: '500',
+                      paddingTop: 7,
+                      ...FONTS.body1,
+                      textAlign: 'center',
+                      textDecorationLine: 'underline',
+                      fontSize: 18,
+                      color: COLORS.primary,
+                    }}
+                  >
+                    {item.designation}
+                  </Text>
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <View style={{flexDirection: 'row', paddingTop: 3}}>
+                      <AntDesign
+                        name="phone"
+                        size={18}
+                        color={COLORS.primary}
+                      />
+                      <Text
+                        style={{
+                          fontWeight: '500',
+                          ...FONTS.font1,
+                          paddingHorizontal: 10,
+                        }}
+                      >
+                        {item.mobile_number}
+                      </Text>
+                    </View>
+
+                    <Text
+                      style={{
+                        fontWeight: '500',
+                        paddingTop: 3,
+                        ...FONTS.font1,
+                        color: item.status == 1 ? 'green' : 'red',
+                        backgroundColor:
+                          item.status == 1
+                            ? COLORS.support3_08
+                            : COLORS.support4_08,
+                        borderRadius: SIZES.radius,
+                        padding: 5,
+                      }}
+                    >
+                      {item.status == 1 ? 'active' : 'inactive'}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </>
           );
@@ -200,10 +340,10 @@ const UserList = ({navigation}) => {
           //   setPage(page + 1);
           userListApi(page + 1);
         }}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={() => (
-          <ActivityIndicator size={'large'} color={'rosybrown'} />
-        )}
+        // onEndReachedThreshold={0.1}
+        // ListFooterComponent={() => (
+        //   <ActivityIndicator size={'large'} color={'rosybrown'} />
+        // )}
       />
       <FAB
         icon="plus"

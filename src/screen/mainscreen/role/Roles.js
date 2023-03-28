@@ -60,17 +60,17 @@ const Meeting = ({navigation}) => {
 
   useEffect(() => {
     handleRoles();
-  }, [page]);
+  }, []);
   return (
     <>
       <Header
         userName={true}
         userTitle={true}
         textHeader={'Roles List'}
-        rightIcon={true}
+        // rightIcon={true}
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
-        onPressSort={() => setFilterModal(!filterModal)}
+        // onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
 

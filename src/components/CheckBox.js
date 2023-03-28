@@ -1,6 +1,7 @@
 import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS, SIZES} from '../constants';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 
 const CheckBox = ({containerStyle, isSelected, onPress, CheckBoxText}) => {
   return (
@@ -14,22 +15,29 @@ const CheckBox = ({containerStyle, isSelected, onPress, CheckBoxText}) => {
           height: 23,
           alignItems: 'center',
           justifyContent: 'center',
-          borderColor: isSelected ? COLORS.primary : COLORS.light,
+          //   borderColor: isSelected ? COLORS.primary : COLORS.light,
           borderRadius: SIZES.radius,
-          backgroundColor: isSelected ? COLORS.primary : COLORS.dark,
+          //   backgroundColor: isSelected ? COLORS.primary : COLORS.dark,
           marginTop: 10,
         }}
       >
         {isSelected ? (
-          <Image
-            source={require('../assets/icons/checkmark.png')}
-            style={{width: 20, height: 20, tintColor: COLORS.light}}
+          //   <Image
+          //     source={require('../assets/icons/checkmark.png')}
+          //     style={{width: 20, height: 20, tintColor: COLORS.light}}
+          //   />
+          <Fontisto
+            name="check"
+            size={10}
+            style={{borderWidth: 1, padding: 2}}
+            color={COLORS.primary}
           />
         ) : (
-          <Image
-            source={require('../assets/icons/close.png')}
-            style={{width: 20, height: 20, tintColor: COLORS.light}}
-          />
+          //   <Image
+          //     source={require('../assets/icons/close.png')}
+          //     style={{width: 20, height: 20, tintColor: COLORS.light}}
+          //   />
+          <Fontisto name="checkbox-passive" size={18} color={COLORS.primary} />
         )}
       </View>
       <Text

@@ -6750,6 +6750,11 @@ plist@^3.0.2, plist@^3.0.5:
     base64-js "^1.5.1"
     xmlbuilder "^9.0.7"
 
+popup-ui@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/popup-ui/-/popup-ui-1.2.2.tgz"
+  integrity sha512-2vJZ79lOSyHuVEH0zHfB8ga3LY9xYpuggKA2sT9tTKbcOsKlJnuvY/kEugIM1xW0+svxWE9Orku1tRQQvR9Hog==
+
 posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.npmjs.org/posix-character-classes/-/posix-character-classes-0.1.1.tgz"
@@ -6992,6 +6997,11 @@ react-native-communications@2.2.1:
   resolved "https://registry.npmjs.org/react-native-communications/-/react-native-communications-2.2.1.tgz"
   integrity sha512-5+C0X9mopI0+qxyQHzOPEi5v5rxNBQjxydPPiKMQSlX1RBIcJ8uTcqUPssQ9Mo8p6c1IKIWJUSqCj4jAmD0qVQ==
 
+react-native-countdown-circle-timer@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.npmjs.org/react-native-countdown-circle-timer/-/react-native-countdown-circle-timer-3.2.1.tgz"
+  integrity sha512-iHiOgipG0hMprerswqUCUfjGo9hL0UhKNS0BGh4o6yY9Lu7f3VXQ7EJt757Obwn74AiF5MOHURIdqldoGnVrDw==
+
 react-native-date-picker@^4.2.9:
   version "4.2.9"
   resolved "https://registry.npmjs.org/react-native-date-picker/-/react-native-date-picker-4.2.9.tgz"
@@ -7171,7 +7181,7 @@ react-native-size-matters@^0.4.0:
   resolved "https://registry.npmjs.org/react-native-size-matters/-/react-native-size-matters-0.4.0.tgz"
   integrity sha512-8/C0htHrFWeUm9N8JegmadovUfgTWkGBkDPZ1N3YkXtDWb+98Ya2gThiKcu445r8c7YhcrBfnHz/mYsXIusaOQ==
 
-react-native-svg@^13.8.0, react-native-svg@>=12.1.0:
+react-native-svg@^13.8.0, react-native-svg@>=12.1.0, react-native-svg@>=6.2.1:
   version "13.8.0"
   resolved "https://registry.npmjs.org/react-native-svg/-/react-native-svg-13.8.0.tgz"
   integrity sha512-G8Mx6W86da+vFimZBJvA93POw8yz0fgDS5biy6oIjMWVJVQSDzCyzwO/zY0yuZmCDhKSZzogl5m0wXXvW2OcTA==
@@ -7186,10 +7196,10 @@ react-native-swiper@^1.5.13:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-toast-message@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.npmjs.org/react-native-toast-message/-/react-native-toast-message-2.1.5.tgz"
-  integrity sha512-mk3rELtBEhrhWBCN6CTaw0gypgL9ZNauX3xx1LUs4uee9vc0pVsghrKxO57vroUCcNL2hDeZSLJWdQNMCkGeaQ==
+react-native-toast-message@^2.1.6:
+  version "2.1.6"
+  resolved "https://registry.npmjs.org/react-native-toast-message/-/react-native-toast-message-2.1.6.tgz"
+  integrity sha512-VctXuq20vmRa9AE13acaNZhrLcS3FaBS2zEevS3+vhBsnVZYG0FIlWIis9tVnpnNxUb3ART+BWtwQjzSttXTng==
 
 react-native-typing-animation@0.1.7:
   version "0.1.7"
@@ -7204,7 +7214,7 @@ react-native-vector-icons@*, react-native-vector-icons@^9.2.0, react-native-vect
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.71 || 1000.0.0", "react-native@>= 0.47.x", "react-native@>= 0.55.x", "react-native@>= 0.62", "react-native@>= 0.64.3", react-native@>=0.20.0, react-native@>=0.42.0, react-native@>=0.46, react-native@>=0.48.4, react-native@>=0.57, react-native@>=0.59, react-native@>=0.61.0, react-native@>=0.65.0, react-native@0.68.1:
+react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.71 || 1000.0.0", "react-native@>= 0.47.x", "react-native@>= 0.55.x", "react-native@>= 0.62", "react-native@>= 0.64.3", react-native@>=0.20.0, react-native@>=0.42.0, react-native@>=0.46, react-native@>=0.48.4, react-native@>=0.50.0, react-native@>=0.57, react-native@>=0.59, react-native@>=0.61.0, react-native@>=0.65.0, react-native@0.68.1:
   version "0.68.1"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.68.1.tgz"
   integrity sha512-5gfvslo5NO2Ece2k/q41eVOK3ca4u1QAOf+qM+auvOiUA4/QR5Yr0WfSGbRpUr2GaFgv7qP11F4+elCravg7uQ==

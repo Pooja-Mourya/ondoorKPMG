@@ -66,6 +66,7 @@ const AddMeeting = props => {
     is_multiple: '',
     meeting_time_end: '',
     meeting_time_start: '',
+    meeting_link: '',
   });
 
   const uniEmail = invitation => {
@@ -114,6 +115,7 @@ const AddMeeting = props => {
       meeting_time_start: state.meeting_time_start,
       meeting_ref_no: state.meeting_ref_no,
       agenda_of_meeting: state.agenda_of_meeting,
+      meeting_link: state.meeting_link,
       is_repeat: state.is_repeat,
       attendees: state.attendees?.map(e => ({
         email: e,
@@ -134,6 +136,7 @@ const AddMeeting = props => {
       if (result?.data?.data?.access_token) {
         navigation.navigate('Meeting');
       }
+      navigation.navigate('Meeting');
     } catch (error) {
       console.log('error', error);
     }
@@ -259,12 +262,12 @@ const AddMeeting = props => {
           email: e,
         })),
         documents: [
-          {
-            file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
-            file_extension: '',
-            file_name: '',
-            uploading_file_name: '',
-          },
+          //   {
+          //     file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+          //     file_extension: '',
+          //     file_name: '',
+          //     uploading_file_name: '',
+          //   },
         ],
       });
     }
@@ -306,7 +309,9 @@ const AddMeeting = props => {
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
               marginTop: 10,
+              color: COLORS.dark,
             }}
+            placeholderTextColor={COLORS.dark}
             placeholder="Meeting Date"
             value={state.meeting_date}
             onChange={d => {
@@ -372,6 +377,16 @@ const AddMeeting = props => {
             placeholder="Meeting reference no."
             value={state.meeting_ref_no}
             onChange={r => onchangeState('meeting_ref_no', r)}
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            placeholder="Meeting Link"
+            value={state.meeting_link}
+            onChange={r => onchangeState('meeting_link', r)}
           />
           <FormInput
             containerStyle={{

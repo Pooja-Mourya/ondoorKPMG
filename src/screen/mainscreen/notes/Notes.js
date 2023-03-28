@@ -131,7 +131,6 @@ const Notes = ({navigation}) => {
           />
         }
         renderItem={({item, index}) => {
-          //   console.log('itemAction', item);
           return (
             <>
               <View
@@ -204,12 +203,6 @@ const Notes = ({navigation}) => {
                           flexDirection: 'row',
                         }}
                       >
-                        <AntDesign
-                          onPress={() => setIconModal('')}
-                          name="close"
-                          size={25}
-                          color={COLORS.light}
-                        />
                         {/* <TouchableOpacity
                         onPress={() => {
                           handleDelete(item.id);
@@ -223,7 +216,10 @@ const Notes = ({navigation}) => {
                         />
                       </TouchableOpacity> */}
                         <TouchableOpacity
-                          onPress={() => navigation.navigate('ViewNotes', item)}
+                          onPress={() => {
+                            navigation.navigate('ViewNotes', item);
+                            setIconModal(false);
+                          }}
                         >
                           <AntDesign
                             name="eyeo"
@@ -233,8 +229,9 @@ const Notes = ({navigation}) => {
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => {
-                            setAddNotesModal(true, item);
+                            setAddNotesModal(true, item.id);
                             setEditable(item);
+                            setIconModal(false);
                           }}
                         >
                           <AntDesign
@@ -244,7 +241,10 @@ const Notes = ({navigation}) => {
                           />
                         </TouchableOpacity>
                         <TouchableOpacity
-                          onPress={() => setActionModal(true, item)}
+                          onPress={() => {
+                            setActionModal(true, item);
+                            setIconModal(false);
+                          }}
                         >
                           <MaterialCommunityIcons
                             name="list-status"
@@ -447,7 +447,6 @@ const Notes = ({navigation}) => {
         transparent={true}
         visible={filterModal}
         onRequestClose={() => {
-          //   Alert.alert('Modal has been closed.');
           setFilterModal(!filterModal);
         }}
       >
