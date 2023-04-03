@@ -17,14 +17,17 @@ import Feather from 'react-native-vector-icons/Feather';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {COLORS, constants, FONTS, SIZES} from '../constants';
 import TextButton from '../components/TextButton';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ApiMethod from '../Services/APIService';
 import {TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {userLoginFun} from '../redux/slice/UserSlice';
 
 function CustomDrawerContent(props) {
-  const [loader, setLoader] = useState(false);
   const token = useSelector(state => state?.user?.user?.access_token);
+
+  const dispatch = useDispatch();
+  const [loader, setLoader] = useState(false);
 
   const {navigation} = props;
   const submitHandle = async () => {
@@ -33,10 +36,10 @@ function CustomDrawerContent(props) {
     // return;
     try {
       setLoader(true);
-      const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result);
-
+      const result = await ApiMethod.postData(url, params, null);
+      console.log('result', result?.data?.data);
       AsyncStorage.removeItem('@user');
+      //   AsyncStorage.clear();
       setLoader(false);
       navigation.navigate('AuthMain');
     } catch (error) {
@@ -44,7 +47,13 @@ function CustomDrawerContent(props) {
     }
   };
 
-  //   if (loader) return <ActivityIndicator />;
+  //   const submitHandle = async () => {
+  //     await AsyncStorage.removeItem('@user');
+  //     navigation.navigate('AuthMain');
+  //     dispatch(userLoginFun({}));
+  //   };
+
+  if (loader) return <ActivityIndicator />;
   return (
     <View style={{flex: 1}}>
       <View
@@ -92,7 +101,12 @@ function CustomDrawerContent(props) {
           }}
         >
           <AntDesign name="logout" size={20} color={COLORS.light} />
-          <TouchableOpacity onPress={() => submitHandle()}>
+          <TouchableOpacity
+            onPress={() => {
+              submitHandle();
+              //   AsyncStorage.removeItem('@user');
+            }}
+          >
             <Text
               style={{
                 ...FONTS.font1,

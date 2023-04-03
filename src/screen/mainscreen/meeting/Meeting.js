@@ -20,6 +20,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 import TextButton from '../../../components/TextButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Meeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -48,7 +49,8 @@ const Meeting = props => {
       setIsRefreshing(false);
       return;
     } catch (error) {
-      console.log('error', error);
+      //   Alert.alert('Unauthenticated');
+      console.log('meeting list error', error);
     }
   };
 
@@ -58,24 +60,7 @@ const Meeting = props => {
 
   return (
     <>
-      <Header
-        userName={true}
-        userTitle={true}
-        // textHeader={
-        //   <TextButton
-        //     label={'active'}
-        //     contentContainerStyle={{
-        //       padding: SIZES.padding,
-        //       borderRadius: SIZES.radius,
-        //     }}
-        //   />
-        // }
-        // rightIcon={true}
-        // leftIcon={true}
-        // onPressArrow={() => navigation.goBack()}
-        // onPressSort={() => setFilterModal(!filterModal)}
-        userProfile={true}
-      />
+      <Header userName={true} userTitle={true} userProfile={true} />
       <View
         style={{
           justifyContent: 'space-between',
@@ -223,15 +208,15 @@ const Meeting = props => {
             </>
           );
         }}
-        // onEndReached={() => {
-        //   //   console.log('load more');
-        //   //   setPage(page + 1);
-        //   handleMeetingList(page + 1);
-        // }}
-        // onEndReachedThreshold={0.1}
-        // ListFooterComponent={() => (
-        //   <ActivityIndicator size={'large'} color={'rosybrown'} />
-        // )}
+        onEndReached={() => {
+          //   console.log('load more');
+          //   setPage(page + 1);
+          handleMeetingList(page + 1);
+        }}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={() => (
+          <ActivityIndicator size={'large'} color={'rosybrown'} />
+        )}
       />
       <FAB
         icon="plus"

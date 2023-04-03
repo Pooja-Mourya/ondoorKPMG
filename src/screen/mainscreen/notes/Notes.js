@@ -281,7 +281,7 @@ const Notes = ({navigation}) => {
                     style={{
                       lineHeight: 21,
                       height: 45,
-                      ...FONTS,
+                      ...FONTS.font1,
                       fontWeight: '400',
                     }}
                   >

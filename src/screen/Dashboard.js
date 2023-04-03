@@ -58,7 +58,7 @@ const UserList = ({navigation}) => {
           color: COLORS.light,
         }}
       >
-        USER COUNT : {listState.userCount}
+        {/* USER COUNT : {!listState.userCount ? null : listState.userCount} */}
       </Text>
       <Text
         style={{
@@ -75,7 +75,7 @@ const UserList = ({navigation}) => {
           //   paddingTop: 20,
         }}
       >
-        MEETING COUNT : {listState.meetingCount}
+        {/* MEETING COUNT : {listState.meetingCount} */}
       </Text>
       <Text
         style={{
@@ -92,7 +92,7 @@ const UserList = ({navigation}) => {
           //   paddingTop: 20,
         }}
       >
-        TODAY MEETING COUNT : {listState.todayMeetingCount}
+        {/* TODAY MEETING COUNT : {listState.todayMeetingCount} */}
       </Text>
     </View>
   );

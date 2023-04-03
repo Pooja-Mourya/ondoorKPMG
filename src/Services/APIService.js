@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import {Alert} from 'react-native';
 import {constants} from '../constants';
-import {useNavigation} from '@react-navigation/native';
 
 const ApiMethod = {
   getData: async (endPoint, token) => {
@@ -49,12 +49,12 @@ const ApiMethod = {
       //   console.log('response', response);
       return response;
     } catch (error) {
+      Alert.alert('Unauthenticated');
       console.log('error', error);
     }
   },
 
   postData: async (endPoint, body, token) => {
-    // const navigation = useNavigation();
     let url = constants.base_url + endPoint;
     let headers = {
       Accept: '*/*',
@@ -66,17 +66,20 @@ const ApiMethod = {
     let config = {
       headers: headers,
     };
-
-    if (constants.base_url + '/' + 'unauthorized') {
-      //   navigation.navigate('AuthMain');
-      AsyncStorage.removeItem('@user');
-    }
     // console.log('config--', config);
     // console.log('url--', url);
     // console.log('body--', body);
-    let response = await axios.post(url, body, config);
-    //   console.log('response', response);
-    return response;
+    try {
+      let response = await axios.post(url, body, config);
+      //   console.log('response', response);
+      return response;
+    } catch (error) {
+      //   if (error) {
+      //     Alert.alert('Unauthenticated');
+      //     AsyncStorage.removeItem('@user');
+      //   }
+      console.log(error);
+    }
   },
 
   deleteData: async (endPoint, token) => {

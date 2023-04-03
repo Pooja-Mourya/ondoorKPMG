@@ -9,27 +9,6 @@ import TextButton from '../../components/TextButton';
 import {useSelector} from 'react-redux';
 
 const Logout = () => {
-  const [logout, setLogout] = useState(true);
-  const [loader, setLoader] = useState(false);
-  const token = useSelector(state => state?.user?.user?.access_token);
-
-  const submitHandle = async () => {
-    const url = constants.endPoint.logout;
-    const params = {};
-    // return;
-    try {
-      setLoader(true);
-      const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result);
-
-      AsyncStorage.removeItem('@user');
-      setLoader(false);
-      navigation.navigate('AuthMain');
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
   if (loader) return <ActivityIndicator />;
 
   return (
@@ -50,19 +29,6 @@ const Logout = () => {
           backgroundColor: COLORS.support1,
         }}
       >
-        <TextButton
-          label={'LOGOUT'}
-          contentContainerStyle={{
-            borderRadius: SIZES.radius,
-            margin: 10,
-          }}
-          labelStyle={{
-            color: COLORS.light,
-            ...FONTS.h4,
-            padding: SIZES.padding,
-          }}
-          onPress={() => submitHandle()}
-        />
         <TextButton
           label={'CANCEL'}
           contentContainerStyle={{

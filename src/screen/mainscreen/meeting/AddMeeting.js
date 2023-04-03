@@ -97,8 +97,8 @@ const AddMeeting = props => {
     }
   };
 
-  const onDelete = val => {
-    console.log('value', val);
+  const onDelete = deleteImage => {
+    console.log('value', deleteImage);
     // const data = selectImage.filter(
     //   item => console.log('localIdentifier', item),
     //   item?.localIdentifier && item?.localIdentifier !== value?.localIdentifier,
@@ -279,7 +279,6 @@ const AddMeeting = props => {
       <Header
         textHeader={editMeeting ? 'Edit Meeting' : 'Create Meeting'}
         leftIcon={true}
-        rightIcon={true}
         onPressArrow={() => navigation.navigate('Meeting')}
       />
       <View

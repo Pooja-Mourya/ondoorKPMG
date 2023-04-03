@@ -18,6 +18,7 @@ export default function MyTab() {
         // tabBarShowLabel: false,
         headerShown: false,
         tabBarActiveBackgroundColor: COLORS.primary,
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tab.Screen
@@ -59,6 +60,7 @@ export default function MyTab() {
         name="Notes"
         component={Notes}
       />
+
       {/* <Tab.Screen
         options={() => ({
           tabBarIcon: () => {

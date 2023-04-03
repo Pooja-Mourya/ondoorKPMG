@@ -37,7 +37,7 @@ export default {
     meetingList: 'meetings',
     meeting: 'meeting',
     logout: 'logout',
-    register: 'register',
+    registerForm: 'register',
     forgetPassword: 'forgot-password',
     userList: 'users',
     uploadFile: 'file-upload',

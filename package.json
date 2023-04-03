@@ -43,6 +43,7 @@
     "react-native-date-picker": "^4.2.9",
     "react-native-document-picker": "^8.1.3",
     "react-native-element-dropdown": "^2.5.0",
+    "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "^2.5.0",
     "react-native-gifted-chat": "^1.0.4",
     "react-native-image-picker": "^4.10.3",
@@ -51,7 +52,9 @@
     "react-native-linear-gradient": "^2.6.2",
     "react-native-modal-datetime-picker": "^14.0.1",
     "react-native-paper": "^5.0.0",
+    "react-native-popable": "^0.4.3",
     "react-native-reanimated": "^2.9.1",
+    "react-native-restart": "^0.0.27",
     "react-native-safe-area-context": "^4.3.1",
     "react-native-screens": "^3.15.0",
     "react-native-shadow-2": "^7.0.6",
@@ -61,7 +64,8 @@
     "react-native-toast-message": "^2.1.6",
     "react-native-vector-icons": "^9.2.0",
     "react-navigation-shared-element": "^3.1.3",
-    "react-redux": "^8.0.5"
+    "react-redux": "^8.0.5",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.10",

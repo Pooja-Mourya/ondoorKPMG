@@ -105,40 +105,44 @@ const ActionList = props => {
             <>
               <View
                 style={{
-                  backgroundColor: COLORS.support1_08,
+                  backgroundColor: COLORS.light,
                   margin: 10,
-                  elevation: 1,
                 }}
               >
-                <View
-                  style={{
-                    padding: 10,
-                    flexDirection: 'row',
-                    alignSelf: 'flex-end',
-                    width: '50%',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 20,
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('ViewActionItem', item)}
+                <View style={{backgroundColor: COLORS.primary}}>
+                  <View
+                    style={{
+                      padding: 10,
+                      flexDirection: 'row',
+                      alignSelf: 'flex-end',
+                      width: '50%',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 20,
+                    }}
                   >
-                    <AntDesign name="eyeo" size={25} color={COLORS.dark} />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('ViewActionItem', item)
+                      }
+                    >
+                      <AntDesign name="eyeo" size={25} color={COLORS.light} />
+                    </TouchableOpacity>
 
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('AddActionItem', item)}
-                  >
-                    <AntDesign name="edit" size={25} color={COLORS.dark} />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setActionModal(true)}>
-                    <MaterialCommunityIcons
-                      name="list-status"
-                      size={25}
-                      color={COLORS.error}
-                    />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('AddActionItem', item)}
+                    >
+                      <AntDesign name="edit" size={25} color={COLORS.success} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setActionModal(true)}>
+                      <MaterialCommunityIcons
+                        name="list-status"
+                        size={25}
+                        color={COLORS.error}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
+
                 <View style={{padding: SIZES.padding}}>
                   <View style={{flexDirection: 'row'}}>
                     <Text
@@ -166,7 +170,9 @@ const ActionList = props => {
                     >
                       Date:{' '}
                     </Text>
-                    <Text style={{width: '50%'}}>{item.date_opened}</Text>
+                    <Text style={{width: '50%'}}>
+                      {moment(item.date_opened).format('LLL')}
+                    </Text>
                   </View>
                   <View style={{flexDirection: 'row'}}>
                     <Text
@@ -178,13 +184,19 @@ const ActionList = props => {
                       {item.complete_percentage} %
                     </Text>
                   </View>
-                  <View style={{flexDirection: 'row'}}>
+                  <View style={{alignItems: 'flex-end'}}>
                     <Text
-                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
+                      style={{
+                        // width: '50%',
+                        backgroundColor: COLORS.primary20,
+                        textAlign: 'center',
+                        // marginHorizontal: 50,
+                        padding: 5,
+                        borderRadius: SIZES.padding,
+                      }}
                     >
-                      Status:{' '}
+                      {item.status}
                     </Text>
-                    <Text style={{width: '50%'}}>{item.status}</Text>
                   </View>
                 </View>
               </View>

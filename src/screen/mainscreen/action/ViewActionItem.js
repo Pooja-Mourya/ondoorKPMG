@@ -49,7 +49,7 @@ const ViewActionItem = props => {
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
       />
-      <ScrollView style={{flex: 1, backgroundColor: COLORS.secondary}}>
+      <ScrollView style={{}}>
         <View
           style={{
             padding: SIZES.padding,
@@ -58,7 +58,330 @@ const ViewActionItem = props => {
             margin: 10,
           }}
         >
-          {/* <View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              //   marginTop: 10,
+              backgroundColor: COLORS.primary,
+            }}
+          >
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.light,
+                fontSize: SIZES.h3,
+                padding: 10,
+                marginTop: 5,
+              }}
+            >
+              Complete %
+            </Text>
+            <View style={{}}>
+              <TouchableOpacity
+                onPress={() => progressFunction()}
+                style={{
+                  borderWidth: 1,
+                  height: 10,
+                  alignSelf: 'center',
+                  backgroundColor: COLORS.light,
+                  width: `${items.complete_percentage}%`,
+                  marginTop: 5,
+                  // width: `${widthPre}%`,
+                }}
+              ></TouchableOpacity>
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.light,
+                  fontSize: SIZES.h3,
+                  padding: 10,
+                }}
+              >
+                {items.complete_percentage} %
+              </Text>
+            </View>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.primary,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              {items.meeting.meeting_title.toUpperCase()}
+            </Text>
+            <Text style={{marginTop: 10}}></Text>
+          </View>
+
+          <View
+            style={{flexDirection: 'column', justifyContent: 'space-between'}}
+          >
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Task
+            </Text>
+            <Text
+              style={{
+                paddingVertical: 10,
+                color: COLORS.primary,
+                ...FONTS.font1,
+                fontWeight: '500',
+                fontSize: 16,
+              }}
+            >
+              {items.task}
+            </Text>
+          </View>
+
+          <View
+            style={{flexDirection: 'column', justifyContent: 'space-between'}}
+          >
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Comment
+            </Text>
+            <Text
+              style={{
+                paddingVertical: 10,
+                color: COLORS.primary,
+                ...FONTS.font1,
+                fontWeight: '500',
+                fontSize: 16,
+              }}
+            >
+              {items.comment}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              marginVertical: 10,
+              backgroundColor: COLORS.secondary20,
+              padding: 10,
+              borderRadius: SIZES.radius,
+            }}
+          >
+            <View
+              style={{flexDirection: 'column', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Priority
+              </Text>
+              <Text style={{textTransform: 'uppercase'}}>{items.priority}</Text>
+            </View>
+
+            <View
+              style={{flexDirection: 'column', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Status
+              </Text>
+              <Text
+                style={{
+                  marginTop: 10,
+                  color: items.status ? 'red' : ' green',
+                  backgroundColor: items.status
+                    ? COLORS.support4_08
+                    : COLORS.support2_08,
+                  padding: 5,
+                  borderRadius: SIZES.radius,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {items.status == 1 ? 'active' : ' inactive'}
+              </Text>
+            </View>
+          </View>
+
+          {/* all action ids */}
+          <View
+            style={{
+              //   marginHorizontal: 30,
+              backgroundColor: COLORS.support4_08,
+              padding: SIZES.padding,
+              borderRadius: SIZES.radius,
+            }}
+          >
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Reference Id:
+              </Text>
+              <Text style={{marginTop: 10}}>{items.mm_ref_id}</Text>
+            </View>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Meeting Id:
+              </Text>
+              <Text style={{marginTop: 10}}>{items.meeting_id}</Text>
+            </View>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Note Id:
+              </Text>
+              <Text style={{marginTop: 10}}>{items.note_id}</Text>
+            </View>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Owner Id:
+              </Text>
+              <Text style={{marginTop: 10}}>{items.owner_id}</Text>
+            </View>
+          </View>
+          <View
+            style={{
+              //   marginHorizontal: 30,
+              backgroundColor: COLORS.primary20,
+              padding: SIZES.padding,
+              borderRadius: SIZES.radius,
+              marginTop: 10,
+            }}
+          >
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Complete Date:
+              </Text>
+              <Text style={{marginTop: 10}}>
+                {items.complete_date ?? 'undefine'}
+              </Text>
+            </View>
+
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Open Date:
+              </Text>
+              <Text style={{marginTop: 10}}>
+                {moment(items.date_opened).format('L')}
+              </Text>
+            </View>
+
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <Text
+                style={{
+                  ...FONTS.base,
+                  color: COLORS.dark,
+                  fontSize: SIZES.h3,
+                  paddingVertical: 10,
+                }}
+              >
+                Due Date:
+              </Text>
+              <Text style={{marginTop: 10}}>
+                {moment(items.due_date).format('L')}
+              </Text>
+            </View>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text
+              style={{
+                ...FONTS.base,
+                color: COLORS.dark,
+                fontSize: SIZES.h3,
+                paddingVertical: 10,
+              }}
+            >
+              Document :
+            </Text>
+            <Text style={{marginTop: 10}}>{items.documents[0]}</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </>
+  );
+};
+
+export default ViewActionItem;
+
+const styles = StyleSheet.create({});
+
+{
+  /* <View>
             {openPer ? (
               <View
                 style={{
@@ -152,229 +475,5 @@ const ViewActionItem = props => {
                 Cancelled
               </Text>
             </TouchableOpacity>
-          </View> */}
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Meeting Title:
-            </Text>
-            <Text style={{marginTop: 10}}>{items.meeting.meeting_title}</Text>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Meeting Id:
-            </Text>
-            <Text style={{marginTop: 10}}>{items.meeting_id}</Text>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Note Id:
-            </Text>
-            <Text style={{marginTop: 10}}>{items.note_id}</Text>
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Owner Id:
-            </Text>
-            <Text style={{marginTop: 10}}>{items.owner_id}</Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Task :
-            </Text>
-            <Text style={{marginTop: 10}}>{items.task}</Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Comment :
-            </Text>
-            <Text style={{marginTop: 10}}>{items.comment}</Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Document :
-            </Text>
-            <Text style={{marginTop: 10}}>{items.documents[0]}</Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Priority :
-            </Text>
-            <Text style={{marginTop: 10}}>{items.priority}</Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Due Date:
-            </Text>
-            <Text style={{marginTop: 10}}>
-              {moment(items.due_date).format('L')}
-            </Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Status:
-            </Text>
-            <Text style={{marginTop: 10}}>
-              {items.status == 1 ? 'active' : ' inactive'}
-            </Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Complete %
-            </Text>
-            <View style={{}}>
-              <TouchableOpacity
-                onPress={() => progressFunction()}
-                style={{
-                  borderWidth: 1,
-                  height: 10,
-                  alignSelf: 'center',
-                  backgroundColor: COLORS.primary,
-                  width: `${items.complete_percentage}%`,
-                  // width: `${widthPre}%`,
-                }}
-              ></TouchableOpacity>
-              <Text style={{textAlign: 'center'}}>
-                {items.complete_percentage} %
-              </Text>
-            </View>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Complete Date:
-            </Text>
-            <Text style={{marginTop: 10}}>
-              {items.complete_date ?? 'undefine'}
-            </Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Open Date:
-            </Text>
-            <Text style={{marginTop: 10}}>
-              {moment(items.date_opened).format('L')}
-            </Text>
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                ...FONTS.base,
-                color: COLORS.dark,
-                fontSize: SIZES.h3,
-                paddingVertical: 10,
-              }}
-            >
-              Reference Id:
-            </Text>
-            <Text style={{marginTop: 10}}>{items.mm_ref_id}</Text>
-          </View>
-        </View>
-      </ScrollView>
-    </>
-  );
-};
-
-export default ViewActionItem;
-
-const styles = StyleSheet.create({});
+          </View> */
+}

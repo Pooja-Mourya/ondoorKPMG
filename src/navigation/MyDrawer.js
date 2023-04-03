@@ -118,16 +118,16 @@ const MyDrawer = () => {
           headerShown: false,
         }}
       />
-      {/* <Drawer.Screen
-        name="Logout"
+      <Drawer.Screen
+        name="Logs"
         component={Logout}
         options={{
           drawerIcon: () => (
-            <AntDesign name="logout" size={20} color={COLORS.dark} />
+            <AntDesign name="iconfontdesktop" size={20} color={COLORS.dark} />
           ),
           headerShown: false,
         }}
-      /> */}
+      />
     </Drawer.Navigator>
   );
 };

@@ -30,9 +30,7 @@ const NotificationApp = props => {
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(0);
-  const [changeColor, setChangeColor] = useState('rgba(78, 85, 175, 1)');
   const [readModal, setReadModal] = useState(false);
-  const [total, setTotal] = useState({});
 
   const handleNotificationList = async () => {
     const url = constants.endPoint.notifications;
@@ -45,7 +43,6 @@ const NotificationApp = props => {
       const result = await ApiMethod.postData(url, params, token);
       console.log('resultNotification', result?.data?.data, 'url', url);
       setListState(result?.data?.data);
-      setTotal(result?.data);
       setIsRefreshing(false);
       return;
     } catch (error) {
@@ -71,7 +68,6 @@ const NotificationApp = props => {
       const result = await ApiMethod.getData(url, token, null);
       console.log('resultRead', result?.data?.data, 'url', url);
       setIsRefreshing(false);
-      setChangeColor('rgba(78, 85, 175, 1)');
     } catch (error) {
       console.log('error', error);
     }
@@ -81,7 +77,6 @@ const NotificationApp = props => {
     handleNotificationList();
   }, [page]);
 
-  console.log('total', total.message);
   return (
     <>
       <View style={{flexDirection: 'row'}}>
@@ -98,26 +93,6 @@ const NotificationApp = props => {
             zIndex: 1,
           }}
           labelStyle={{
-            color: COLORS.light,
-            padding: 10,
-          }}
-        />
-        <TextButton
-          label={`${total.total}`}
-          onPress={() => handleReadAllNotify()}
-          contentContainerStyle={{
-            // height: 55,
-            //
-            borderRadius: SIZES.radius,
-            // margin: 10,
-            position: 'absolute',
-            marginTop: -50,
-            marginLeft: '45%',
-            zIndex: 1,
-            backgroundColor: null,
-          }}
-          labelStyle={{
-            color: COLORS.primary,
             padding: 10,
           }}
         />

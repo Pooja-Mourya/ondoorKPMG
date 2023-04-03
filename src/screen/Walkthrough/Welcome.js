@@ -1,13 +1,38 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
 import {View, Text, Image} from 'react-native';
-import {useSelector} from 'react-redux';
 import TextButton from '../../components/TextButton';
 import {FONTS, SIZES, COLORS} from '../../constants';
+import {useSelector} from 'react-redux';
+import {CommonActions} from '@react-navigation/native';
 
 const Welcome = ({navigation}) => {
   const user = useSelector(state => state?.user?.user);
+  const [loader, setLoader] = useState(false);
+  async function myFunction() {
+    setLoader(true);
+    try {
+      const variable = await AsyncStorage.getItem('@user');
+      console.log('welcomeVariable***', variable);
+      if (variable) {
+        navigation.dispatch({
+          ...CommonActions.reset({
+            index: 0,
+            routes: [{name: 'MyTab'}],
+          }),
+        });
+        setLoader(false);
+        // navigation.navigate('MyTab');
+      }
+      //   navigation.navigate('MyTab');
+    } catch (error) {
+      console.log('AppError', error);
+    }
+  }
 
-  //   console.log('user', user);
+  useEffect(() => {
+    myFunction();
+  }, [user]);
 
   return (
     <View

@@ -4,10 +4,11 @@ import React from 'react';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 import ValidationForm from './ValidationForm';
+import {useSelector} from 'react-redux';
 
-let access_token =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiNDQyOGU2OTdiZjRlZDUwMDdkNzEyNTFlM2U0YWI0NGM4OTQwMmU1MGRmNmVjM2EwYjY5ZDRkZmJiM2M4ZWYwNjk0NmMyNmM1Yzc3ZTI1YjgiLCJpYXQiOjE2Nzg0MjYwOTYuMjc3OTE5MDU0MDMxMzcyMDcwMzEyNSwibmJmIjoxNjc4NDI2MDk2LjI3NzkyMTkxNTA1NDMyMTI4OTA2MjUsImV4cCI6MTcxMDA0ODQ5Ni4yNzYxMjQwMDA1NDkzMTY0MDYyNSwic3ViIjoiMSIsInNjb3BlcyI6W119.b67yoflbxf9f1U2pBvn0PzyY4Fttz0_rFELl69-idEaz5IKnDsc62d3827gbHjx8-93KP3X6ZCAmnHWRJ2OGmZK3FvMHNWmhbmO_zXnt1JNGAEFmb3cNkIlMgnH1pkAOln19JmHfxJb0W6bw8sp0jn4a-JjiKeoIXMy7FNgNkSeAcja9ehZg4Nba4RXKh9oT4bsEnV_D_QIkckp3V1VjJdJVOcH1Qa8WSRiIv5O8SHqfP7PKKzkQYJggKVUCcN92uUlx77N2vXgv5K4uyWRIycYYMG-sCZadY8YI1rD-6aVdcy2T5YyJOJCcZWshvPr31VQA_jJoco6gWUwbrDYjAvZZvuosFJ4L3Nr668eKpo4GibLrHWPwhqb7E6F03ouh7z2GhAVZf9zyXqJAMIqelkVyPPZ9oRetFvhLIXsM2hMkc-87cR-GSYo5ocPq3xrH-wTtoeiiWL54W5hOJBS5B95xKcR4WRGHTMbfCshE34QwnPGuCaSFOC1bhoMEaq_U2TIU0dL-53SCOI7tDlNRidKRh6B974PIMZXbv5IbpSLwkFLHlTALp8eWSfv5294Ihxp4TbIIUWQiSiz_O1TQHh9OUYrvdSdCgGOeYD57t7trhuN7Y28qyevg1hXFFcKSTBE13Zcv5vkqtTAFVmFW3Qe3MhAa9gdoWo3sNdYIeKg';
 const ImageUpload = () => {
+  let access_token = useSelector(state => state?.user?.user?.access_token);
+
   const APIServiceUploadFile = async (
     endpoint,
     singleFile,
@@ -31,7 +32,7 @@ const ImageUpload = () => {
               ? obj.name
               : obj.uri.substr(obj.uri.lastIndexOf('/'), obj.uri.length);
           // //console.log(obj);
-          formDataRes.append('file[0]', obj);
+          formDataRes.append('file', obj);
         }
       });
     } else {

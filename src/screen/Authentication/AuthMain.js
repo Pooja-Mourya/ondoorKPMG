@@ -9,6 +9,7 @@ import {
   Animated,
   ActivityIndicator,
   TextInput,
+  TouchableHighlight,
 } from 'react-native';
 
 import React, {useEffect, useState} from 'react';
@@ -24,15 +25,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector} from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
+import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Alert} from 'react-native';
 import LoaderFile from '../LoaderFile';
-import {CommonActions} from '@react-navigation/native';
+import {} from '@react-navigation/native';
 import CheckBox from '../../components/CheckBox';
+import {
+  CountdownCircleTimer,
+  useCountdown,
+  counterclockwise,
+} from 'react-native-countdown-circle-timer';
+import Toast from 'react-native-toast-message';
+import Changepassword from './Changepassword';
 
 const AuthMain = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
-  const [enableCheck, setEnableCheck] = useState(false);
+
+  //   console.log('token', token);
+
+  const [enableCheck, setEnableCheck] = useState('');
   const [mode, setMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -47,14 +59,17 @@ const AuthMain = ({navigation}) => {
   const [forgetPassword, setForgetPassword] = useState('');
   const [loader, setLoader] = useState(false);
   const [loginOtpModal, setLoginOtpModal] = useState(false);
-  const [loginUser, setLoginUser] = useState([]);
   const [check, setCheck] = useState(false);
-  const [logged, setLogged] = useState('');
+  const [logged, setLogged] = useState(false);
+  const [timer, setTimer] = useState('');
+  const [popModal, setPopModal] = useState(false);
   const [otpState, setOtpState] = useState({
     one: '',
     two: '',
     three: '',
     four: '',
+    five: '',
+    six: '',
   });
 
   const handleEmailCheck = e => {
@@ -81,37 +96,36 @@ const AuthMain = ({navigation}) => {
     const params = {
       email,
       password,
+      //   logout_from_all_devices: enableCheck === true && 'yes',
       logout_from_all_devices: 'yes',
     };
-    const result = await ApiMethod.postData(url, params, null)
-      .then(function () {
-        console.log('login result', result);
-        // setLoad(true);
-        if (result) {
-          setLoginOtpModal(false);
-          setLoginUser(result.data);
-        } else {
-          Alert.alert(`retry ${result.message}`);
+    await ApiMethod.postData(url, params, null)
+      .then(function (res) {
+        console.log('login result', res.data.message);
+        // setEmail('');
+        setPassword('');
+        setEnableCheck('');
+        setOtpState('');
+        if (res.data.message) {
           setLoginOtpModal(true);
-          Alert.alert(`${result.data.message} successfully`);
         }
       })
       .catch(function (error) {
-        if (!error) {
-          const logInCondition = error.response?.data?.data?.is_logged_in;
-          setLogged(logInCondition);
-          Alert.alert(`something went wrong`, `${logInCondition}`, [
-            {text: 'ok', onPress: () => {}},
-          ]);
-          console.log('error****', error.message);
-        } else {
-          setLoginOtpModal(true);
+        if (error) {
+          setLogged(error.response?.data?.data?.is_logged_in);
+          Alert.alert(
+            `something went wrong`,
+            `${error.response?.data?.message}`,
+
+            [{text: 'ok'}],
+          );
+          console.log('error*', error.message);
         }
       });
   };
 
   const HandleSignUp = async () => {
-    const url = constants.endPoint.register;
+    const url = constants.endPoint.registerForm;
     const params = {
       role_id: '2',
       name: name,
@@ -164,11 +178,10 @@ const AuthMain = ({navigation}) => {
     setLoader(true);
     try {
       const variable = await AsyncStorage.getItem('@user');
-
-      if (variable !== null) {
-        console.log('variable', variable);
-        // navigation.navigate('MyTab');
-
+      console.log('variable***', variable);
+      if (!variable) {
+        AsyncStorage.removeItem('@user');
+      } else {
         navigation.dispatch({
           ...CommonActions.reset({
             index: 0,
@@ -182,34 +195,58 @@ const AuthMain = ({navigation}) => {
     }
   }
 
+  useEffect(() => {
+    myFunction();
+  }, [token]);
+
   const verifyOtp = async () => {
     let url = constants.endPoint.verifyOtp;
     let params = {
-      //   email: loginUser.data[0],
-      //   otp: loginUser.data[1],
-      email: 'admin@gmail.com',
-      otp: '1234',
+      email,
+      otp:
+        otpState.one +
+        otpState.two +
+        otpState.three +
+        otpState.four +
+        otpState.five +
+        otpState.six,
     };
-
-    console.log('params', params);
-    // setLoad(true);
     try {
       const otpResult = await ApiMethod.postData(url, params, null);
-      //   console.log('access_token', otpResult.data.data);
-      //   return;
-
+      console.log('otpResult', otpResult.data.data);
       if (otpResult) {
         Alert.alert(`${otpResult.data.message}`);
         AsyncStorage.setItem('@user', otpResult.data.data.access_token);
         dispatch(userLoginFun(otpResult?.data.data));
         setLoad(false);
         setLoginOtpModal(false);
+        setEmail('');
         navigation.navigate('MyTab');
       }
     } catch (error) {
+      Alert.alert('enter correct otp', 'Unauthenticated');
       console.log('error', error);
+      AsyncStorage.removeItem('@user');
     }
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoginOtpModal(false);
+      setOtpState('');
+    }, 30000);
+  }, []);
+
+  // useEffect(() => {
+  //   if (verifyOtp()) {
+  //     setTimeout(() => {
+  //       <View style={{backgroundColor: COLORS.light}}>
+  //         <Changepassword />
+  //         <Text>up</Text>
+  //       </View>;
+  //     }, 1000);
+  //   }
+  // }, []);
 
   function SignInFunction() {
     if (load)
@@ -226,6 +263,21 @@ const AuthMain = ({navigation}) => {
     return (
       <View style={{marginTop: SIZES.padding, height: SIZES.height / 2}}>
         <View style={styles.authContainer}>
+          {/* {!logged && (
+            <Text
+              style={{
+                ...FONTS.font1,
+                color: COLORS.error,
+                backgroundColor: COLORS.support4_08,
+                fontWeight: '500',
+                borderRadius: SIZES.radius,
+                margin: 10,
+                passing: 10,
+              }}
+            >
+              Too many fail login attempt your ip has restricted for 15 minutes.
+            </Text>
+          )} */}
           <Text
             style={{
               width: '60%',
@@ -234,19 +286,20 @@ const AuthMain = ({navigation}) => {
               ...FONTS.dark,
               fontSize: SIZES.h1,
               paddingHorizontal: 10,
+              marginBottom: 30,
             }}
           >
             Sign in to continue
           </Text>
           <KeyboardAwareScrollView
-            enableOnAndroid={true}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps={'handled'}
-            extraScrollHeight={-300}
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: 'center',
-            }}
+          // enableOnAndroid={true}
+          // keyboardDismissMode="on-drag"
+          // keyboardShouldPersistTaps={'handled'}
+          // extraScrollHeight={-300}
+          // contentContainerStyle={{
+          //   flexGrow: 1,
+          //   justifyContent: 'center',
+          // }}
           >
             <FormInput
               containerStyle={{
@@ -280,7 +333,7 @@ const AuthMain = ({navigation}) => {
                 backgroundColor: COLORS.error,
               }}
               placeholder="Password"
-              secureTextEntry={true}
+              secureTextEntry={!click}
               value={password}
               onChange={text => setPassword(text)}
               onFocus={t => setErrors(t)}
@@ -296,14 +349,30 @@ const AuthMain = ({navigation}) => {
                   }}
                 />
               }
+              appendComponent={
+                <TouchableOpacity onPress={() => setClick(!click)}>
+                  <Image
+                    source={
+                      click
+                        ? require('../../assets/icons/eye.png')
+                        : require('../../assets/icons/eye-off.png')
+                    }
+                    style={{
+                      width: 25,
+                      height: 25,
+                      marginRight: 25,
+                    }}
+                  />
+                </TouchableOpacity>
+              }
             />
             {errors ? (
               <Text style={{color: COLORS.error}}>please enter password</Text>
             ) : (
               <Text></Text>
             )}
-            {logged ? (
-              <View style={{marginHorizontal: 12}}>
+            <View style={{marginHorizontal: 12}}>
+              {logged && (
                 <CheckBox
                   CheckBoxText={'logout from all devices'}
                   containerStyle={{backgroundColor: '', lineHeight: 20}}
@@ -312,8 +381,8 @@ const AuthMain = ({navigation}) => {
                     setEnableCheck(!enableCheck);
                   }}
                 />
-              </View>
-            ) : null}
+              )}
+            </View>
 
             <View style={{alignItems: 'flex-end'}}>
               <TextButton
@@ -331,7 +400,13 @@ const AuthMain = ({navigation}) => {
               />
             </View>
             <TextButton
-              label={'Log In'}
+              label={
+                !loginOtpModal ? (
+                  'Log In'
+                ) : (
+                  <ActivityIndicator color={COLORS.light} />
+                )
+              }
               contentContainerStyle={{
                 height: 55,
                 borderRadius: SIZES.radius,
@@ -345,6 +420,7 @@ const AuthMain = ({navigation}) => {
                 var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
                 //   if (password.match(passW) && email) {
                 if (email) {
+                  //   setLoginOtpModal(true);
                   submitHandle();
                 } else {
                   Alert.alert(
@@ -440,14 +516,6 @@ const AuthMain = ({navigation}) => {
             error={errors}
             onFocus={() => setErrors()}
             prependComponent={
-              //   <Image
-              //     source={require('../../assets/icons/call.png')}
-              //     style={{
-              //       width: 20,
-              //       height: 20,
-              //       marginRight: SIZES.base,
-              //     }}
-              //   />
               <Entypo
                 style={{marginHorizontal: 5}}
                 name="old-phone"
@@ -569,21 +637,8 @@ const AuthMain = ({navigation}) => {
       return SignInFunction();
     }
   };
-  //   console.log('loginUser', loginUser);
 
-  useEffect(() => {
-    myFunction();
-    // async () => {
-    //   if (componentMounted.current) {
-    //     myFunction();
-    //     return () => {
-    //       componentMounted.current = false;
-    //     };
-    //   }
-    // };
-  }, []);
-
-  // if (loader || !token) return <LoaderFile />;
+  //   if (loader || !token) return <LoaderFile />;
 
   return (
     <View
@@ -632,20 +687,52 @@ const AuthMain = ({navigation}) => {
       </View>
       {mode == false ? (
         <View style={{flex: 2, marginTop: 400, alignItems: 'center'}}>
-          <Text>OR login with</Text>
+          <Text style={{fontWeight: '700', ...FONTS.font1}}>OR login with</Text>
           <View style={{flexDirection: 'row', marginVertical: 20}}>
-            <Image
-              source={require('../../assets/icons/google.png')}
-              style={{width: 40, height: 40, marginHorizontal: 10}}
-            />
-            <Image
-              source={require('../../assets/icons/twitter.png')}
-              style={{width: 40, height: 40, marginHorizontal: 10}}
-            />
-            <Image
-              source={require('../../assets/icons/linkedin.png')}
-              style={{width: 40, height: 40, marginHorizontal: 10}}
-            />
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor={COLORS.primary}
+              style={{
+                borderRadius: SIZES.radius,
+                padding: 10,
+              }}
+              onPress={() => {}}
+            >
+              <Image
+                source={require('../../assets/icons/google.png')}
+                style={{width: 40, height: 40, marginHorizontal: 10}}
+              />
+            </TouchableHighlight>
+
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor={COLORS.primary}
+              style={{
+                borderRadius: SIZES.radius,
+                padding: 10,
+              }}
+              onPress={() => {}}
+            >
+              <Image
+                source={require('../../assets/icons/twitter.png')}
+                style={{width: 40, height: 40, marginHorizontal: 10}}
+              />
+            </TouchableHighlight>
+
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor={COLORS.primary}
+              style={{
+                borderRadius: SIZES.radius,
+                padding: 10,
+              }}
+              onPress={() => {}}
+            >
+              <Image
+                source={require('../../assets/icons/linkedin.png')}
+                style={{width: 40, height: 40, marginHorizontal: 10}}
+              />
+            </TouchableHighlight>
           </View>
         </View>
       ) : (
@@ -753,18 +840,102 @@ const AuthMain = ({navigation}) => {
             justifyContent: 'center',
             flex: 1,
             alignItems: 'center',
-            backgroundColor: COLORS.light20,
+            backgroundColor: COLORS.primary,
           }}
         >
           <View
             style={{
-              flexDirection: 'row-reverse',
               justifyContent: 'space-between',
               marginBottom: 20,
-              backgroundColor: COLORS.secondary,
+              backgroundColor: COLORS.light,
               borderRadius: SIZES.radius,
+              borderWidth: 5,
+              borderColor: COLORS.secondary,
             }}
           >
+            <View style={{margin: 20, alignItems: 'center'}}>
+              <CountdownCircleTimer
+                isPlaying
+                duration={180}
+                colors={[
+                  '#004777',
+                  '#F7B801',
+                  '#A30000',
+                  '#A30000',
+                  '#004777',
+                  '#F7B801',
+                  '#A30000',
+                ]}
+                rotation={counterclockwise}
+                counterclockwise={true}
+                colorsTime={[60, 50, 40, 30, 20, 10, 0]}
+                size={150}
+              >
+                {({remainingTime}) => {
+                  //   console.log('remainingTime', remainingTime);
+                  setTimer(remainingTime);
+                  return (
+                    <View
+                      style={{
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text style={{...FONTS.font1}}>you can login</Text>
+                      <Text
+                        style={{
+                          color: COLORS.primary,
+                          fontSize: 20,
+                          fontWeight: '700',
+                          padding: 8,
+                        }}
+                      >
+                        {remainingTime}
+                      </Text>
+                      <Text>Seconds</Text>
+                    </View>
+                  );
+                }}
+              </CountdownCircleTimer>
+            </View>
+
+            <Text
+              style={{
+                color: COLORS.error,
+                fontSize: 18,
+                textAlign: 'center',
+                paddingVertical: 25,
+              }}
+            >
+              otp time 3 minutes
+            </Text>
+            <TextButton
+              label={
+                !load ? (
+                  'Resend OTP'
+                ) : (
+                  <ActivityIndicator size={'large'} color={'white'} />
+                )
+              }
+              contentContainerStyle={{
+                marginTop: 15,
+                backgroundColor: COLORS.grey,
+                // elevation: 1,
+                marginHorizontal: SIZES.padding,
+                paddingVertical: SIZES.padding,
+                borderRadius: SIZES.radius,
+              }}
+              labelStyle={{
+                color: COLORS.dark,
+                ...FONTS.h4,
+                //   paddingHorizontal: SIZES.padding,
+              }}
+              onPress={() => {
+                setLoginOtpModal(false);
+                submitHandle();
+                setOtpState('');
+              }}
+            />
             <View
               style={{
                 margin: SIZES.padding,
@@ -783,6 +954,7 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                maxLength={1}
                 placeholder={'0'}
                 value={otpState.one}
                 onChangeText={o => onChangeOtp('one', o)}
@@ -798,6 +970,7 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                maxLength={1}
                 placeholder={'0'}
                 value={otpState.two}
                 onChangeText={t => onChangeOtp('two', t)}
@@ -813,6 +986,7 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                maxLength={1}
                 placeholder={'0'}
                 value={otpState.three}
                 onChangeText={t => onChangeOtp('three', t)}
@@ -828,29 +1002,82 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                maxLength={1}
                 placeholder={'0'}
                 value={otpState.four}
                 onChangeText={f => onChangeOtp('four', f)}
               />
-
-              <TextButton
-                label={'Submit'}
-                contentContainerStyle={{
+              <TextInput
+                style={{
+                  width: '15%',
                   borderRadius: SIZES.radius,
-                  //   margin: 10,
+                  borderColor: COLORS.light,
+                  backgroundColor: COLORS.light,
+                  borderWidth: 1,
+                  elevation: 2,
+                  fontSize: SIZES.h2,
+                  textAlign: 'center',
                 }}
-                labelStyle={{
-                  color: COLORS.light,
-                  ...FONTS.h4,
-                  paddingHorizontal: SIZES.padding,
+                maxLength={1}
+                placeholder={'0'}
+                value={otpState.five}
+                onChangeText={f => onChangeOtp('five', f)}
+              />
+              <TextInput
+                style={{
+                  width: '15%',
+                  borderRadius: SIZES.radius,
+                  borderColor: COLORS.light,
+                  backgroundColor: COLORS.light,
+                  borderWidth: 1,
+                  elevation: 2,
+                  fontSize: SIZES.h2,
+                  textAlign: 'center',
                 }}
-                onPress={() => {
+                maxLength={1}
+                placeholder={'0'}
+                value={otpState.six}
+                onChangeText={f => onChangeOtp('six', f)}
+              />
+            </View>
+
+            <TextButton
+              label={
+                <View style={{marginTop: 20}}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      backgroundColor: {...(otpState != '')}
+                        ? COLORS.primary
+                        : COLORS.primary20,
+                      borderRadius: SIZES.radius,
+                      padding: 12,
+                    }}
+                    // onPress={() => show()}
+                  >
+                    Verify OTP...
+                    <Feather name="arrow-right" size={20} color={COLORS.dark} />
+                  </Text>
+                </View>
+              }
+              contentContainerStyle={{
+                marginTop: 15,
+                backgroundColor: null,
+              }}
+              labelStyle={{
+                color: COLORS.dark,
+                ...FONTS.h4,
+                margin: 15,
+              }}
+              onPress={() => {
+                // show();
+                if ({...otpState}) {
                   setTimeout(() => {
                     verifyOtp();
                   }, 1000);
-                }}
-              />
-            </View>
+                }
+              }}
+            />
           </View>
         </View>
       </Modal>

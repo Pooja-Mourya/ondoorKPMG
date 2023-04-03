@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
+  PermissionsAndroid,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
@@ -27,6 +28,8 @@ import moment from 'moment';
 import DocumentPicker, {types} from 'react-native-document-picker';
 import axios from 'axios';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PRIORITY = [
   {id: '1', priority: 'Low'},
@@ -57,6 +60,7 @@ const AddActionItem = props => {
   const [user, setUser] = useState([]);
   const [listState, setListState] = useState([]);
   const [noteList, setNoteList] = useState([]);
+  const [filePath, setFilePath] = useState([]);
   const [state, setState] = useState({
     meeting_id: '',
     note_id: '',
@@ -69,12 +73,12 @@ const AddActionItem = props => {
     image: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
     comment: '',
     documents: [
-      {
-        file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
-        file_extension: '',
-        file_name: '',
-        uploading_file_name: '',
-      },
+      //   {
+      //     file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+      //     file_extension: '',
+      //     file_name: '',
+      //     uploading_file_name: '',
+      //   },
     ],
   });
   const [stateError, setStateError] = useState('');
@@ -125,6 +129,7 @@ const AddActionItem = props => {
       navigation.navigate('ActionList');
       //   console.log('create api response ...', res);
     } catch (error) {
+      Alert.alert(error);
       console.log('error', error);
     }
   };
@@ -144,19 +149,6 @@ const AddActionItem = props => {
       console.log('error', error);
     }
   };
-  const ListUser = async () => {
-    const url = constants.endPoint.userList;
-    const params = {};
-
-    try {
-      const result = await ApiMethod.postData(url, params, token);
-      //   console.log('userResult', result?.data?.data);
-      setUser(result?.data?.data);
-      return;
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
 
   const onchangeState = (name, value) => {
     setState({
@@ -165,26 +157,27 @@ const AddActionItem = props => {
     });
   };
 
-  const uploadFile = async imagePath => {
+  const uploadFile = async () => {
     let url = constants.base_url + constants.endPoint.uploadFile;
     let formDataRes = new FormData();
-    formDataRes.append('is_multiple', 1);
-    console.log('sadsadsadsa', imagePath);
-    imagePath?.map((e, i) => {
-      let obj = e;
-      if (!obj.size) {
-        obj['size'] = e.fileSize;
+
+    filePath.map((obj, index) => {
+      if (!obj.size) obj['size'] = obj.fileSize ?? obj.size;
+      if (!obj.name) {
+        obj['name'] = obj.fileName
+          ? obj.fileName
+          : obj.name
+          ? obj.name
+          : obj.uri.substr(obj.uri.lastIndexOf('/'), obj.uri.length);
       }
-      if (!e?.name) {
-        obj['name'] =
-          e.fileName ?? e.uri.substr(e.uri.lastIndexOf('/'), e.uri.length);
-      }
-      //   if (!e?.value) {
-      //     obj['value'] = e?.uri;
-      //   }
-      formDataRes.append(`file[${i}]`, obj);
+      formDataRes.append('file[]', [obj]);
     });
 
+    formDataRes.append('is_multiple', 1);
+
+    console.log('formDataRes', JSON.stringify(formDataRes));
+
+    // return;
     let headers = {
       Accept: '*/*',
       'content-type': 'multipart/form-data',
@@ -206,7 +199,6 @@ const AddActionItem = props => {
       //   setUploadFiles(imageResponse);
     } catch (error) {
       console.log('error', error);
-      console.log('imageResponse', imageResponse);
     }
   };
 
@@ -229,6 +221,22 @@ const AddActionItem = props => {
       } else {
         throw err;
       }
+    }
+  };
+
+  const ListUser = async () => {
+    const url = constants.endPoint.userList;
+    const params = {};
+
+    try {
+      const result = await ApiMethod.postData(url, params, token);
+      //   console.log('userResult', result?.data?.data);
+      setUser(result?.data?.data);
+      return;
+    } catch (error) {
+      //   AsyncStorage.removeItem('@user');
+      //   navigation.navigate('AuthMain');
+      console.log('error', error);
     }
   };
 
@@ -256,13 +264,94 @@ const AddActionItem = props => {
     }
   };
 
+  const chooseFile = type => {
+    let options = {
+      mediaType: type,
+      maxWidth: 300,
+      maxHeight: 550,
+      quality: 1,
+    };
+    launchImageLibrary(options, response => {
+      console.log('Response = ', response.assets[0]);
+
+      if (response.didCancel) {
+        alert('User cancelled camera picker');
+        return;
+      } else if (response.errorCode == 'camera_unavailable') {
+        alert('Camera not available on device');
+        return;
+      } else if (response.errorCode == 'permission') {
+        alert('Permission not satisfied');
+        return;
+      } else if (response.errorCode == 'others') {
+        alert(response.errorMessage);
+        return;
+      }
+      //   console.log('base64 -> ', Obj.base64);
+      //   console.log('uri -> ', Obj.uri);
+      //   console.log('width -> ', Obj.width);
+      //   console.log('height -> ', Obj.height);
+      //   console.log('fileSize -> ', Obj.fileSize);
+      //   console.log('type -> ', Obj.type);
+      //   console.log('fileName -> ', Obj.fileName);
+      setFilePath(response.assets);
+      uploadFile();
+    });
+  };
+
+  const meeting = listState.map(e => ({e: e.id}));
+  const notes = noteList.map(e => ({e: e.notes}));
+
+  const handleActionSubmit = async () => {
+    let url = constants.endPoint.action;
+    let data = {
+      meeting_id: state.meeting_id.id,
+      note_id: state.note_id.id,
+      owner_id: state?.owner_id?.id,
+      date_opened: state.date_opened,
+      task: state.task,
+      priority: String(state.priority?.priority).toLowerCase(),
+      due_date: state.due_date,
+      complete_percentage: state.complete_percentage,
+      //   image: formData.append(
+      //     'image',
+      //     filePath.map(e => ({
+      //       uri: e.uri,
+      //     })),
+      //   ),
+      image: '',
+      comment: state.comment,
+      documents: [
+        // {
+        //   file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+        //   file_extension: '',
+        //   file_name: '',
+        //   uploading_file_name: '',
+        // },
+      ],
+    };
+
+    console.log('firstData', data);
+    try {
+      await ApiMethod.postData(url, data, token);
+      Alert.alert('Record successfully created.');
+      navigation.navigate('ActionList');
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  //   console.log('meeting', meeting, '/n', 'notes', notes);
+
   useEffect(() => {
     ListUser();
     handleMeetingList();
-    handleNoteList();
+    if (meeting == notes) {
+      handleNoteList();
+    }
   }, []);
 
-  console.log('editDataAction', editData);
+  //   console.log('editDataAction', editData);
   useEffect(() => {
     if (editData) {
       setState({
@@ -288,15 +377,12 @@ const AddActionItem = props => {
       });
     }
   }, []);
-  if (isLoading) return <ActivityIndicator />;
 
-  //   console.log('editData.meeting_id.id', editData.meeting_id.id);
   return (
     <>
       <Header
         textHeader={editData ? 'Edit Action Item' : 'Create Action Item'}
         leftIcon={true}
-        rightIcon={true}
         onPressArrow={() => navigation.navigate('Meeting')}
       />
       <View
@@ -308,9 +394,6 @@ const AddActionItem = props => {
           borderRadius: SIZES.radius,
         }}
       >
-        {/* <Text style={{...FONTS.body2, fontSize: SIZES.h2}}>Basic Details</Text>
-        <Text>Enter basic details of the meeting</Text> */}
-
         <KeyboardAwareScrollView>
           <Dropdown
             style={styles.dropdown}
@@ -322,7 +405,7 @@ const AddActionItem = props => {
             search
             maxHeight={300}
             labelField="meeting_title"
-            valueField="meeting_id"
+            valueField="id"
             placeholder="Select meeting id"
             searchPlaceholder="Search..."
             value={state.meeting_id}
@@ -609,7 +692,7 @@ const AddActionItem = props => {
             contentContainerStyle={{
               height: 55,
               borderRadius: SIZES.radius,
-              margin: 10,
+              marginTop: 10,
             }}
             labelStyle={{
               color: COLORS.light,
@@ -619,12 +702,13 @@ const AddActionItem = props => {
               if (editData) {
                 handleUpdateData();
               } else {
-                submitHandle();
+                handleActionSubmit();
               }
             }}
           />
         </KeyboardAwareScrollView>
       </View>
+
       {open && (
         <DatePicker
           modal
