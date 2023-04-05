@@ -29,34 +29,47 @@ const Meeting = props => {
 
   const {navigation} = props;
   const [listState, setListState] = useState([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
   const [filterData, setFilterData] = useState({}); //filter data
   const [filterModal, setFilterModal] = useState(false);
   const [activeStatus, setActiveStatus] = useState('1');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loader, setLoader] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageRe, setPageRe] = useState(false);
 
-  const handleMeetingList = async () => {
+  const handleMeetingList = async (page, refresh) => {
     const url = constants.endPoint.meetingList;
     const params = {
-      page: 1,
-      per_page_record: '10',
+      page: page ? page : 1,
+      per_page_record: '1',
     };
-    setIsRefreshing(true);
-    try {
-      const result = await ApiMethod.postData(url, params, token);
-      //   console.log('result', result?.data?.data, 'url', url);
-      setListState(result?.data?.data?.data);
-      setIsRefreshing(false);
-      return;
-    } catch (error) {
-      //   Alert.alert('Unauthenticated');
-      console.log('meeting list error', error.response);
+    const result = await ApiMethod.postData(url, params, token);
+    //   console.log('result', result?.data?.data, 'url', url);
+
+    if (result) {
+      if (!page) {
+        setPage(1);
+        setListState(result?.data?.data?.data);
+        setLoader(false);
+        if (refresh) setIsRefreshing(false);
+      } else {
+        let temp = [...listState];
+        temp = temp.concat(result?.data?.data?.data);
+        setPage(page);
+        setListState([...temp]);
+        setPageRe(false);
+      }
+    } else {
+      if (!page) setLoader(false);
+      else setPageRe(false);
+      if (refresh) setIsRefreshing(false);
+      Alert.alert('error in pagination');
     }
   };
 
   useEffect(() => {
     handleMeetingList();
-  }, [page]);
+  }, []);
 
   return (
     <>
@@ -209,9 +222,8 @@ const Meeting = props => {
           );
         }}
         onEndReached={() => {
-          //   console.log('load more');
-          setPage(page + 1);
-          handleMeetingList(page + 1);
+          console.log('load more');
+          handleMeetingList(page + 1, null, true);
         }}
         onEndReachedThreshold={0.1}
         ListFooterComponent={() => (

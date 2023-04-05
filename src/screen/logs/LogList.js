@@ -28,17 +28,18 @@ const LogList = ({navigation}) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [filterModal, setFilterModal] = useState(false);
+  //   const [pageRe, setPageRe] = useState(false);
 
   const userListApi = async () => {
     const url = constants.endPoint.logsList;
     const params = {
-      page: 1,
+      page: page + 1 ?? page,
       per_page_record: '20',
     };
     setIsRefreshing(true);
     try {
       const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result?.data?.data?.data, 'url', url);
+      //   console.log('result', result?.data?.data?.data, 'url', url);
       setListState(result?.data?.data?.data);
       setIsRefreshing(false);
       return;
@@ -48,11 +49,11 @@ const LogList = ({navigation}) => {
   };
 
   useEffect(() => {
-    userListApi();
-  }, []);
+    userListApi(null, true);
+  }, [page + 1]);
 
   //   console.log('listState', listState);
-  if (isRefreshing === true) return <ActivityIndicator />;
+  //   if (isRefreshing === true) return <ActivityIndicator />;
   return (
     <>
       <Header
@@ -72,7 +73,7 @@ const LogList = ({navigation}) => {
       >
         <View style={{flexDirection: 'column'}}>
           <View style={{flexDirection: 'row', backgroundColor: COLORS.primary}}>
-            {/* <Text style={styles.titleStyle}>S.No</Text> */}
+            <Text style={styles.titleStyle}>S.No</Text>
             <Text style={styles.titleStyle}>User</Text>
             <Text style={styles.titleStyle}>Event</Text>
             <Text style={styles.titleStyle}>Type</Text>
@@ -85,13 +86,15 @@ const LogList = ({navigation}) => {
           </View>
 
           <FlatList
+            style={{marginTop: 20}}
             data={Array.isArray(listState) ? listState : null}
             keyExtractor={item => item.id}
             refreshControl={
               <RefreshControl
                 refreshing={isRefreshing}
                 onRefresh={() => {
-                  userListApi(null, true);
+                  console.log('loading...');
+                  userListApi(true);
                 }}
               />
             }
@@ -99,7 +102,7 @@ const LogList = ({navigation}) => {
               return (
                 <>
                   <View style={{flexDirection: 'row'}}>
-                    {/* <Text style={styles.contentStyle}>{index}</Text> */}
+                    <Text style={styles.contentStyle}>{index}</Text>
                     <Text style={styles.contentStyle}>
                       {item.created_by.name}
                     </Text>
@@ -137,7 +140,9 @@ const LogList = ({navigation}) => {
             }}
             onEndReachedThreshold={0.1}
             ListFooterComponent={() => (
-              <ActivityIndicator size={'large'} color={'rosybrown'} />
+              <View style={{marginRight: 900, marginTop: 10}}>
+                <ActivityIndicator size={'large'} color={'rosybrown'} />
+              </View>
             )}
           />
         </View>

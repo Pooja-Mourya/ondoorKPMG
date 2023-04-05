@@ -43,7 +43,6 @@ const AddMeeting = props => {
 
   const [enableCheck, setEnableCheck] = useState(false);
   const [selectImage, setSelectImage] = useState(null);
-  const [singleFile, setSingleFile] = useState(null);
   const [uploadFiles, setUploadFiles] = useState([]);
   const [user, setUser] = useState([]);
   const [date, setDate] = useState(new Date());
@@ -97,15 +96,6 @@ const AddMeeting = props => {
     }
   };
 
-  const onDelete = deleteImage => {
-    console.log('value', deleteImage);
-    // const data = selectImage.filter(
-    //   item => console.log('localIdentifier', item),
-    //   item?.localIdentifier && item?.localIdentifier !== value?.localIdentifier,
-    // );
-    setSelectImage(data);
-  };
-
   const submitHandle = async () => {
     const url = constants.endPoint.meeting;
     const params = {
@@ -128,8 +118,11 @@ const AddMeeting = props => {
           uploading_file_name: '',
         },
       ],
+      //   documents: uploadFiles,
     };
 
+    // console.log('meeting params', params);
+    // return;
     try {
       const result = await ApiMethod.postData(url, params, token);
       //   return;
@@ -198,7 +191,6 @@ const AddMeeting = props => {
       //   }
       formDataRes.append(`file[${i}]`, obj);
     });
-
     let headers = {
       Accept: '*/*',
       'content-type': 'multipart/form-data',
@@ -216,8 +208,8 @@ const AddMeeting = props => {
     let imageResponse = '';
     try {
       imageResponse = await axios.post(url, formDataRes, config);
-      //   console.log('imageResponse', imageResponse);
-      //   setUploadFiles(imageResponse);
+      console.log('imageResponse', imageResponse);
+      setUploadFiles(imageResponse);
     } catch (error) {
       console.log('error', error);
       console.log('imageResponse', imageResponse);
@@ -534,8 +526,8 @@ const AddMeeting = props => {
               marginTop: 10,
             }}
             placeholder="Upload Document"
-            value={selectImage?.[0]?.name}
-            onChange={d => onchangeState('documents', console.log('d', d))}
+            value={selectImage?.[0]?.uri}
+            onChange={d => onchangeState('documents', d)}
             appendComponent={
               <AntDesign
                 name={'upload'}
@@ -552,12 +544,10 @@ const AddMeeting = props => {
                 (item?.filename ?? item?.path) + index
               }
               renderItem={({item}) => {
-                // console.log('item', item);
+                console.log('item', item.uri);
                 return (
                   <View style={{}}>
-                    {/* {} */}
                     <Image
-                      width={250}
                       source={{uri: item.uri}}
                       style={{
                         width: 100,
@@ -568,7 +558,7 @@ const AddMeeting = props => {
                     />
                     {/* <Text>{item.name}</Text> */}
                     <TouchableOpacity
-                      onPress={() => onDelete(item)}
+                      //   onPress={() => onDelete(item)}
                       activeOpacity={0.9}
                       style={{position: 'absolute', padding: 5}}
                     >

@@ -5,6 +5,7 @@ import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 import ValidationForm from './ValidationForm';
 import {useSelector} from 'react-redux';
+import MyImage from '../../MyImage';
 
 const ImageUpload = () => {
   let access_token = useSelector(state => state?.user?.user?.access_token);
@@ -159,7 +160,9 @@ const ImageUpload = () => {
         <Text style={{color: '#fff', fontWeight: '700'}}>Upload</Text>
       </TouchableOpacity>
 
-      <ValidationForm />
+      <MyImage />
+
+      {/* <ValidationForm /> */}
     </View>
   );
 };
