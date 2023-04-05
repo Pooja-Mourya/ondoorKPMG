@@ -24,8 +24,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {userLoginFun} from '../redux/slice/UserSlice';
 
 function CustomDrawerContent(props) {
-  const token = useSelector(state => state?.user?.user?.access_token);
+  const token = useSelector(state => state?.user?.user);
 
+  //   console.log('user', token.name);
   const dispatch = useDispatch();
   const [loader, setLoader] = useState(false);
 
@@ -72,13 +73,24 @@ function CustomDrawerContent(props) {
             borderRadius: 50,
             borderWidth: 3,
             borderColor: COLORS.light,
+            resizeMode: 'center',
           }}
           source={{
             uri:
-              'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=600',
+              'https://p.kindpng.com/picc/s/230-2307640_kpmg-logo-png-transparent-png.png',
           }}
         />
-        <Text style={{textAlign: 'center', fontSize: SIZES.h3}}>USER NAME</Text>
+        <Text
+          style={{
+            textAlign: 'center',
+            fontSize: SIZES.h3,
+            // textTransform: 'uppercase',
+            paddingBottom: 10,
+            fontWeight: '700',
+          }}
+        >
+          {token.email}
+        </Text>
       </View>
       <DrawerItemList {...props} />
       <DrawerContentScrollView {...props}></DrawerContentScrollView>

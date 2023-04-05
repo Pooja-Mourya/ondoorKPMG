@@ -29,7 +29,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Alert} from 'react-native';
 import LoaderFile from '../LoaderFile';
-import {} from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 import CheckBox from '../../components/CheckBox';
 import {
   CountdownCircleTimer,
@@ -181,6 +181,7 @@ const AuthMain = ({navigation}) => {
       console.log('variable***', variable);
       if (!variable) {
         AsyncStorage.removeItem('@user');
+        navigation.navigate('AuthMain');
       } else {
         navigation.dispatch({
           ...CommonActions.reset({
@@ -203,13 +204,14 @@ const AuthMain = ({navigation}) => {
     let url = constants.endPoint.verifyOtp;
     let params = {
       email,
-      otp:
-        otpState.one +
-        otpState.two +
-        otpState.three +
-        otpState.four +
-        otpState.five +
-        otpState.six,
+      //   otp:
+      //     otpState.one +
+      //     otpState.two +
+      //     otpState.three +
+      //     otpState.four +
+      //     otpState.five +
+      //     otpState.six,
+      otp: '963852',
     };
     try {
       const otpResult = await ApiMethod.postData(url, params, null);

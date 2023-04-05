@@ -2,6 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {Alert} from 'react-native';
 import {constants} from '../constants';
+import {handleNavigation} from '../../src/navigation/MyStack';
+import {userLoginFun} from '../redux/slice/UserSlice';
+import {useDispatch} from 'react-redux';
 
 const ApiMethod = {
   getData: async (endPoint, token) => {
@@ -22,6 +25,14 @@ const ApiMethod = {
       let response = await axios.get(url, config);
       return response;
     } catch (error) {
+      if (error.response.data.code === 401) {
+        Alert.alert(error.response.data.message);
+        AsyncStorage.removeItem('@user');
+        handleNavigation();
+        // dispatch(userLoginFun({}));
+      }
+      //   console.log(error.response.data.code, 'c');
+
       console.log('error', error);
     }
   },
@@ -55,6 +66,8 @@ const ApiMethod = {
   },
 
   postData: async (endPoint, body, token) => {
+    // const dispatch = useDispatch();
+
     let url = constants.base_url + endPoint;
     let headers = {
       Accept: '*/*',
@@ -74,11 +87,13 @@ const ApiMethod = {
       //   console.log('response', response);
       return response;
     } catch (error) {
-      //   if (error) {
-      //     Alert.alert('Unauthenticated');
-      //     AsyncStorage.removeItem('@user');
-      //   }
-      console.log(error);
+      if (error.response.data.code === 401) {
+        Alert.alert(error.response.data.message);
+        AsyncStorage.removeItem('@user');
+        handleNavigation();
+        // dispatch(userLoginFun({}));
+      }
+      //   console.log(error.response.data.code, 'c');
     }
   },
 
@@ -105,6 +120,14 @@ const ApiMethod = {
       //   console.log('response', response);
       return response;
     } catch (error) {
+      if (error.response.data.code === 401) {
+        Alert.alert(error.response.data.message);
+        AsyncStorage.removeItem('@user');
+        handleNavigation();
+        // dispatch(userLoginFun({}));
+      }
+      //   console.log(error.response.data.code, 'c');
+
       console.log('error', error);
     }
   },
@@ -132,6 +155,14 @@ const ApiMethod = {
       //   console.log('response', response);
       return response;
     } catch (error) {
+      if (error.response.data.code === 401) {
+        Alert.alert(error.response.data.message);
+        AsyncStorage.removeItem('@user');
+        handleNavigation();
+        // dispatch(userLoginFun({}));
+      }
+      //   console.log(error.response.data.code, 'c');
+
       console.log('error', error);
     }
   },

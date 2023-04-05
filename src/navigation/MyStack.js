@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {createRef, useRef} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {NavigationContainer} from '@react-navigation/native';
+import {CommonActions, NavigationContainer} from '@react-navigation/native';
 import {
   Welcome,
   Walkthrough,
@@ -26,9 +26,20 @@ import {
 
 const Stack = createStackNavigator();
 
+const navigationUseRef = createRef();
+export function handleNavigation() {
+  //   console.log('navigation');
+  navigationUseRef.current.dispatch(
+    CommonActions.reset({
+      index: 0,
+      routes: [{name: 'AuthMain'}],
+    }),
+  );
+}
+
 const MyStack = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationUseRef}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,

@@ -31,6 +31,7 @@ import Dashboard from '../screen/Dashboard';
 import NotificationApp from '../screen/mainscreen/notification/NotificationApp';
 import PermissionList from '../screen/mainscreen/permission/PermissionList';
 import Logout from '../screen/Authentication/Logout';
+import LogList from '../screen/logs/LogList';
 
 const Drawer = createDrawerNavigator();
 
@@ -39,7 +40,7 @@ const MyDrawer = () => {
     <Drawer.Navigator
       initialRouteName="DASHBOARD"
       screenOptions={{
-        activeTintColor: 'red',
+        // activeTintColor: 'red',
         itemStyle: {marginVertical: 5},
         drawerActiveBackgroundColor: COLORS.primary,
         drawerActiveTintColor: 'white',
@@ -120,7 +121,7 @@ const MyDrawer = () => {
       />
       <Drawer.Screen
         name="Logs"
-        component={Logout}
+        component={LogList}
         options={{
           drawerIcon: () => (
             <AntDesign name="iconfontdesktop" size={20} color={COLORS.dark} />

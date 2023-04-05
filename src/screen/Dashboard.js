@@ -18,10 +18,8 @@ const UserList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
   //   console.log('token', token);
-  const [listState, setListState] = useState([]);
+  const [listState, setListState] = useState({});
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
-
   const userListApi = async () => {
     const url = constants.endPoint.dashboard;
     const params = {};
@@ -58,7 +56,7 @@ const UserList = ({navigation}) => {
           color: COLORS.light,
         }}
       >
-        {/* USER COUNT : {!listState.userCount ? null : listState.userCount} */}
+        USER COUNT : {listState?.userCount ? listState?.userCount : '0'}
       </Text>
       <Text
         style={{
@@ -75,7 +73,8 @@ const UserList = ({navigation}) => {
           //   paddingTop: 20,
         }}
       >
-        {/* MEETING COUNT : {listState.meetingCount} */}
+        MEETING COUNT :{' '}
+        {listState?.meetingCount ? listState?.meetingCount : '0'}
       </Text>
       <Text
         style={{
@@ -92,7 +91,8 @@ const UserList = ({navigation}) => {
           //   paddingTop: 20,
         }}
       >
-        {/* TODAY MEETING COUNT : {listState.todayMeetingCount} */}
+        TODAY MEETING COUNT :
+        {listState?.todayMeetingCount ? listState?.todayMeetingCount : '0'}
       </Text>
     </View>
   );

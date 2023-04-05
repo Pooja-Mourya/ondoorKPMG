@@ -25,7 +25,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Meeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
-  console.log('token', token);
+  //   console.log('token', token);
 
   const {navigation} = props;
   const [listState, setListState] = useState([]);
@@ -44,13 +44,13 @@ const Meeting = props => {
     setIsRefreshing(true);
     try {
       const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result?.data?.data, 'url', url);
+      //   console.log('result', result?.data?.data, 'url', url);
       setListState(result?.data?.data?.data);
       setIsRefreshing(false);
       return;
     } catch (error) {
       //   Alert.alert('Unauthenticated');
-      console.log('meeting list error', error);
+      console.log('meeting list error', error.response);
     }
   };
 
@@ -210,12 +210,14 @@ const Meeting = props => {
         }}
         onEndReached={() => {
           //   console.log('load more');
-          //   setPage(page + 1);
+          setPage(page + 1);
           handleMeetingList(page + 1);
         }}
         onEndReachedThreshold={0.1}
         ListFooterComponent={() => (
-          <ActivityIndicator size={'large'} color={'rosybrown'} />
+          <View style={{marginTop: 22}}>
+            <ActivityIndicator size={'large'} color={'rosybrown'} />
+          </View>
         )}
       />
       <FAB

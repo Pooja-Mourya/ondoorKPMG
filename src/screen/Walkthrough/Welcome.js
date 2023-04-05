@@ -22,9 +22,7 @@ const Welcome = ({navigation}) => {
           }),
         });
         setLoader(false);
-        // navigation.navigate('MyTab');
       }
-      //   navigation.navigate('MyTab');
     } catch (error) {
       console.log('AppError', error);
     }
@@ -32,7 +30,7 @@ const Welcome = ({navigation}) => {
 
   useEffect(() => {
     myFunction();
-  }, [user]);
+  }, []);
 
   return (
     <View
