@@ -40,7 +40,7 @@ const ViewActionItem = props => {
     setWidthPre(listState);
   };
 
-  console.log('status', items.status);
+  //   console.log('status', items.status);
   if (isRefreshing) return <ActivityIndicator />;
   return (
     <>
@@ -210,16 +210,28 @@ const ViewActionItem = props => {
               <Text
                 style={{
                   marginTop: 10,
-                  color: items.status ? 'red' : ' green',
-                  backgroundColor: items.status
-                    ? COLORS.support4_08
-                    : COLORS.support2_08,
+                  color:
+                    items.status === 'in_progress'
+                      ? COLORS.primary
+                      : items.status === 'on_hold'
+                      ? COLORS.success
+                      : items.status === 'cancelled'
+                      ? COLORS.error
+                      : items.status === 'completed' && 'green',
+                  backgroundColor:
+                    items.status === 'in_progress'
+                      ? COLORS.secondary
+                      : items.status === 'on_hold'
+                      ? COLORS.dark
+                      : items.status === 'cancelled'
+                      ? COLORS.support4_08
+                      : items.status === 'completed' && COLORS.support1_08,
                   padding: 5,
                   borderRadius: SIZES.radius,
                   textTransform: 'uppercase',
                 }}
               >
-                {items.status == 1 ? 'active' : ' inactive'}
+                {items.status}
               </Text>
             </View>
           </View>
@@ -294,6 +306,7 @@ const ViewActionItem = props => {
               <Text style={{marginTop: 10}}>{items.owner_id}</Text>
             </View>
           </View>
+
           <View
             style={{
               //   marginHorizontal: 30,
@@ -357,6 +370,7 @@ const ViewActionItem = props => {
               </Text>
             </View>
           </View>
+
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text
               style={{

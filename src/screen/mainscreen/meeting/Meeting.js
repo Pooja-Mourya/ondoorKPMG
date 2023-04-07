@@ -41,7 +41,7 @@ const Meeting = props => {
     const url = constants.endPoint.meetingList;
     const params = {
       page: page ? page : 1,
-      per_page_record: '1',
+      per_page_record: '10',
     };
     const result = await ApiMethod.postData(url, params, token);
     //   console.log('result', result?.data?.data, 'url', url);
@@ -73,16 +73,17 @@ const Meeting = props => {
 
   return (
     <>
-      <Header userName={true} userTitle={true} userProfile={true} />
+      <Header
+        textHeader={'Meeting List '}
+        // rightIcon={true}
+        leftIcon={true}
+        onPressArrow={() => navigation.goBack()}
+      />
       <View
         style={{
           justifyContent: 'space-between',
           flexDirection: 'row',
-          //   marginHorizontal: 10,
           padding: 10,
-          marginTop: 65,
-          position: 'absolute',
-          backgroundColor: COLORS.light,
           width: '100%',
         }}
       >
@@ -222,7 +223,7 @@ const Meeting = props => {
           );
         }}
         onEndReached={() => {
-          console.log('load more');
+          //   console.log('load more');
           handleMeetingList(page + 1, null, true);
         }}
         onEndReachedThreshold={0.1}

@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   ScrollView,
@@ -46,9 +47,7 @@ const AddRole = props => {
 
   const token = useSelector(state => state?.user?.user?.access_token);
 
-  const [selected, setSelected] = useState([]);
   const [se_name, setSe_name] = useState([]);
-
   const [checkUser, setCheckUser] = useState([]);
   const [checkRole, setCheckRole] = useState([]);
   const [checkMeeting, setCheckMeeting] = useState([]);
@@ -60,11 +59,13 @@ const AddRole = props => {
   const [meeting, setMeeting] = useState();
   const [action, setAction] = useState();
   const [notification, setNotification] = useState();
+  const [loader, setLoader] = useState(false);
 
-  const handleRoles = async () => {
+  const handleRoles = async ({navigation}) => {
     const url = constants.endPoint.permissions;
     const params = {};
     try {
+      setLoader(true);
       const result = await ApiMethod.postData(url, params, token);
       let obj = {};
       result?.data?.data.map(item => {
@@ -79,8 +80,7 @@ const AddRole = props => {
       setMeeting(obj.meeting);
       setAction(obj['action-items']);
       setNotification(obj.notifications);
-
-      return;
+      setLoader(false);
     } catch (error) {
       console.log('error', error);
     }
@@ -186,13 +186,18 @@ const AddRole = props => {
   }, []);
   useEffect(() => {
     if (editRole) {
-      //   setSelected(editRole.selected);
       setSe_name(editRole.se_name);
     }
   }, []);
+
+  if (loader === true) return <ActivityIndicator />;
   return (
     <>
-      <Header textHeader={editRole ? 'EDIT ROLE' : 'ADD ROLE'} />
+      <Header
+        textHeader={editRole ? 'EDIT ROLE' : 'ADD ROLE'}
+        leftIcon={true}
+        onPressArrow={() => navigation.goBack()}
+      />
       <ScrollView
         style={{
           margin: 10,

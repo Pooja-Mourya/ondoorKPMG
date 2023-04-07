@@ -36,74 +36,7 @@ const Header = ({
         // height: (SIZES.height * 1) / 12,
       }}
     >
-      <View style={{flexDirection: 'row'}}>
-        {userProfile ? (
-          <View
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 50,
-              top: 5,
-              left: 10,
-              backgroundColor: COLORS.dark,
-            }}
-          >
-            <Text
-              style={{
-                zIndex: 1,
-                color: COLORS.light,
-                fontSize: 25,
-                textAlign: 'center',
-                marginTop: 5,
-              }}
-            >
-              {/* {userToken.name} */}
-              {userToken?.name
-                ? userToken?.name?.slice(0, 1).toUpperCase()
-                : null}
-              {userToken?.email
-                ? userToken?.email?.slice(0, 1).toLowerCase()
-                : null}
-            </Text>
-          </View>
-        ) : null}
-        {userTitle ? (
-          <View style={{margin: 10, paddingHorizontal: 10, width: '60%'}}>
-            <Text style={{fontSize: 16, color: COLORS.dark}}>
-              {userToken.name}
-            </Text>
-            <Text>{userToken.email}</Text>
-          </View>
-        ) : null}
-
-        {iconVideoCall ? (
-          <TouchableOpacity onPress={() => navigation.navigate('ChatVideo')}>
-            <Image
-              source={require('../../assets/icons/live-streaming.png')}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 50,
-                top: 10,
-              }}
-            />
-          </TouchableOpacity>
-        ) : null}
-        {iconNotification ? (
-          <TouchableOpacity onPress={() => setBellModal(true)}>
-            <Image
-              source={require('../../assets/icons/bell.png')}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 50,
-                top: 10,
-                left: 15,
-              }}
-            />
-          </TouchableOpacity>
-        ) : null}
-      </View>
+     
       {/* 122 */}
       <View
         style={{
@@ -200,3 +133,75 @@ const Header = ({
 export default Header;
 
 const styles = StyleSheet.create({});
+
+
+
+
+// <View style={{flexDirection: 'row'}}>
+// {userProfile ? (
+//   <View
+//     style={{
+//       width: 50,
+//       height: 50,
+//       borderRadius: 50,
+//       top: 5,
+//       left: 10,
+//       backgroundColor: COLORS.dark,
+//     }}
+//   >
+//     <Text
+//       style={{
+//         zIndex: 1,
+//         color: COLORS.light,
+//         fontSize: 25,
+//         textAlign: 'center',
+//         marginTop: 5,
+//       }}
+//     >
+//       {/* {userToken.name} */}
+//       {userToken?.name
+//         ? userToken?.name?.slice(0, 1).toUpperCase()
+//         : null}
+//       {userToken?.email
+//         ? userToken?.email?.slice(0, 1).toLowerCase()
+//         : null}
+//     </Text>
+//   </View>
+// ) : null}
+// {userTitle ? (
+//   <View style={{margin: 10, paddingHorizontal: 10, width: '60%'}}>
+//     <Text style={{fontSize: 16, color: COLORS.dark}}>
+//       {userToken.name}
+//     </Text>
+//     <Text>{userToken.email}</Text>
+//   </View>
+// ) : null}
+
+// {iconVideoCall ? (
+//   <TouchableOpacity onPress={() => navigation.navigate('ChatVideo')}>
+//     <Image
+//       source={require('../../assets/icons/live-streaming.png')}
+//       style={{
+//         width: 30,
+//         height: 30,
+//         borderRadius: 50,
+//         top: 10,
+//       }}
+//     />
+//   </TouchableOpacity>
+// ) : null}
+// {iconNotification ? (
+//   <TouchableOpacity onPress={() => setBellModal(true)}>
+//     <Image
+//       source={require('../../assets/icons/bell.png')}
+//       style={{
+//         width: 30,
+//         height: 30,
+//         borderRadius: 50,
+//         top: 10,
+//         left: 15,
+//       }}
+//     />
+//   </TouchableOpacity>
+// ) : null}
+// </View>

@@ -22,59 +22,94 @@ import ActionFilter from './ActionFilter';
 import TextButton from '../../../components/TextButton';
 import {Dropdown} from 'react-native-element-dropdown';
 import ActionItemAction from './ActionItemAction';
+import ActionById from './ActionById';
+import Entypo from 'react-native-vector-icons/Entypo';
+import * as Progress from 'react-native-progress';
 
 const ActionList = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
   const {navigation} = props;
   const [listState, setListState] = useState([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
-  const [filterModal, setFilterModal] = useState(false);
+
   const [actionModal, setActionModal] = useState(false);
   const [actionItem, setActionItem] = useState({});
+  const [actionData, setActionData] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [loader, setLoader] = useState(false);
+  const [pageRe, setPageRe] = useState(false);
+  const [newModal, setNewModal] = useState(false);
+  const [moveById, setMoveById] = useState(false);
+  const [state, setState] = useState({
+    ids: '',
+    action: '',
+    percent: '',
+  });
 
-  const handleActionList = async () => {
+  const onchangeState = (name, value) => {
+    setState({
+      ...state,
+      [name]: value,
+    });
+  };
+
+  const handleActionList = async (page, refresh) => {
     const url = constants.endPoint.actionList;
     const params = {
-      //   page: 1,
-      //   per_page_record: '10',
+      page: page ? page : 1,
+      per_page_record: '1',
     };
-    // setIsRefreshing(true);
+    const result = await ApiMethod.postData(url, params, token);
+    if (result) {
+      if (!page) {
+        setPage(1);
+        setListState(result?.data?.data?.data);
+        setLoader(false);
+        if (refresh) setIsRefreshing(false);
+      } else {
+        let temp = [...listState];
+        temp = temp.concat(result?.data?.data?.data);
+        setPage(page);
+        setListState([...temp]);
+        setPageRe(false);
+      }
+    } else {
+      if (!page) setLoader(false);
+      else setPageRe(false);
+      if (refresh) setIsRefreshing(false);
+      Alert.alert('error in pagination');
+    }
+  };
+
+  const ActionHandler = async item => {
+    const url = constants.endPoint.actionItemAction;
+    const params = {
+      ids: item.id,
+      action: state.action,
+      percent: state.percent,
+    };
+
+    console.log('params', params);
+    setLoader(true);
+
+    // return;
     try {
-      const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result.data?.data);
-      setListState(result?.data?.data);
-      setIsRefreshing(false);
-      return;
+      const ActionRes = await ApiMethod.postData(url, params, token);
+      if (ActionRes) {
+        Alert.alert('Action item Action Update Successfully');
+      }
+      setLoader(false);
     } catch (error) {
       console.log('error', error);
     }
   };
 
-  //   const ActionHandler = async id => {
-  //     const url = constants.endPoint.actionItemAction + '/' + id;
-  //     const params = {
-  //       ids: [id],
-  //       action: checked,
-  //     };
-  //     try {
-  //       const ActionRes = await ApiMethod.postData(url, params, token);
-  //       if (ActionRes) {
-  //         Alert.alert('Action item Action Update Successfully');
-  //       }
-  //       setChecked(false);
-  //       setActionModal(false);
-  //       handleActionList();
-  //     } catch (error) {
-  //       console.log('error', error);
-  //     }
-  //   };
-
   useEffect(() => {
     handleActionList();
-  }, [page]);
+  }, []);
 
+  if (loader) return <ActivityIndicator />;
   return (
     <>
       <Header
@@ -84,7 +119,7 @@ const ActionList = props => {
         rightIcon={true}
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
-        onPressSort={() => setFilterModal(!filterModal)}
+        onPressSort={() => setActionModal(true)}
         userProfile={true}
       />
 
@@ -101,25 +136,195 @@ const ActionList = props => {
           />
         }
         renderItem={({item, index}) => {
+          //   console.log('item', item);
           return (
             <>
               <View
                 style={{
-                  backgroundColor: COLORS.light,
+                  backgroundColor: COLORS.support3_08,
                   margin: 10,
+                  borderRadius: SIZES.radius,
+
+                  borderLeftWidth: 5,
+                  borderLeftColor: COLORS.secondary,
                 }}
               >
-                <View style={{backgroundColor: COLORS.primary}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    backgroundColor: COLORS.secondary,
+                    padding: 15,
+                    borderTopLeftRadius: SIZES.radius,
+                  }}
+                >
+                  <Text
+                    style={{
+                      width: '85%',
+                      color: COLORS.primary,
+                      textTransform: 'uppercase',
+                      fontWeight: '600',
+                      ...FONTS.font1,
+                    }}
+                  >
+                    {item.meeting.meeting_title}
+                  </Text>
+                  <TouchableOpacity>
+                    <Entypo
+                      name="dots-three-vertical"
+                      size={20}
+                      color={COLORS.dark}
+                      onPress={() => setNewModal(index)}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                  style={{padding: SIZES.padding}}
+                  //   onPress={() => navigation.navigate('ViewMeeting', item)}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color:
+                          item.priority === 'high'
+                            ? COLORS.error
+                            : COLORS.error20,
+                        fontWeight: '500',
+                        fontSize: 16,
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {item.priority}
+                    </Text>
+                    <Text
+                      style={{
+                        ...FONTS.font1,
+                        fontWeight: '600',
+                        color: 'black',
+                        marginTop: 5,
+                      }}
+                    >
+                      {item.date_opened}
+                    </Text>
+                  </View>
+
+                  <Text
+                    style={{
+                      ...FONTS.base,
+                      fontWeight: '500',
+                      fontSize: 16,
+                      textTransform: 'capitalize',
+                      marginTop: 5,
+                    }}
+                  >
+                    {item.task}
+                  </Text>
+                  {/* <View style={{marginTop: 5}}>
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        ...FONTS.body4,
+                        fontWeight: '500',
+                        height: 60,
+                        // textAlign: 'center',
+                        marginTop: 5,
+                      }}
+                    >
+                      {item.comment}
+                    </Text>
+                  </View> */}
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}
+                  >
+                    <Text style={{fontWeight: '600'}}>
+                      {item.complete_percentage} %
+                    </Text>
+
+                    <View
+                      style={{
+                        alignItems: 'flex-end',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          // width: '50%',
+                          backgroundColor: COLORS.secondary,
+                          color:
+                            item.status === 'in_progress'
+                              ? COLORS.primary
+                              : item.status === 'on_hold'
+                              ? COLORS.success
+                              : item.status === 'cancelled'
+                              ? COLORS.error
+                              : item.status === 'completed' && 'green',
+
+                          padding: 5,
+                          borderRadius: SIZES.padding,
+                          backgroundColor:
+                            item.status === 'in_progress'
+                              ? COLORS.primary20
+                              : item.status === 'on_hold'
+                              ? COLORS.dark20
+                              : item.status === 'cancelled'
+                              ? COLORS.error20
+                              : item.status === 'completed' &&
+                                COLORS.support4_08,
+                        }}
+                      >
+                        {item.status}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+                {newModal === index ? (
                   <View
                     style={{
                       padding: 10,
                       flexDirection: 'row',
-                      alignSelf: 'flex-end',
-                      width: '50%',
-                      justifyContent: 'space-between',
+                      width: '100%',
                       paddingHorizontal: 20,
+                      justifyContent: 'space-between',
+                      position: 'absolute',
+                      backgroundColor: COLORS.primary,
+                      //   marginTop: 60,
+                      //   height: 145,
+                      height: '100%',
+                      borderRadius: SIZES.radius,
+                      alignItems: 'center',
                     }}
                   >
+                    <TouchableOpacity style={{}}>
+                      <AntDesign
+                        name="close"
+                        size={25}
+                        color={COLORS.light}
+                        onPress={() => setNewModal(false)}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{}}>
+                      <MaterialCommunityIcons
+                        name="list-status"
+                        size={25}
+                        color={COLORS.error}
+                        onPress={() => {
+                          setMoveById(true, item);
+                          setActionData(item);
+                          setNewModal(false);
+                        }}
+                      />
+                    </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('ViewActionItem', item)
@@ -133,80 +338,14 @@ const ActionList = props => {
                     >
                       <AntDesign name="edit" size={25} color={COLORS.success} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setActionModal(true)}>
-                      <MaterialCommunityIcons
-                        name="list-status"
-                        size={25}
-                        color={COLORS.error}
-                      />
-                    </TouchableOpacity>
                   </View>
-                </View>
-
-                <View style={{padding: SIZES.padding}}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text
-                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
-                    >
-                      Task:{' '}
-                    </Text>
-                    <Text numberOfLines={2} style={{width: '50%'}}>
-                      {item.task}
-                    </Text>
-                  </View>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text
-                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
-                    >
-                      Comment:{' '}
-                    </Text>
-                    <Text numberOfLines={2} style={{width: '50%'}}>
-                      {item.comment}
-                    </Text>
-                  </View>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text
-                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
-                    >
-                      Date:{' '}
-                    </Text>
-                    <Text style={{width: '50%'}}>
-                      {moment(item.date_opened).format('LLL')}
-                    </Text>
-                  </View>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text
-                      style={{width: '50%', ...FONTS.base, fontWeight: '700'}}
-                    >
-                      Percentage:{' '}
-                    </Text>
-                    <Text style={{width: '50%'}}>
-                      {item.complete_percentage} %
-                    </Text>
-                  </View>
-                  <View style={{alignItems: 'flex-end'}}>
-                    <Text
-                      style={{
-                        // width: '50%',
-                        backgroundColor: COLORS.primary20,
-                        textAlign: 'center',
-                        // marginHorizontal: 50,
-                        padding: 5,
-                        borderRadius: SIZES.padding,
-                      }}
-                    >
-                      {item.status}
-                    </Text>
-                  </View>
-                </View>
+                ) : null}
               </View>
             </>
           );
         }}
         onEndReached={() => {
-          //   console.log('load more');
-          //   setPage(page + 1);
-          handleActionList(page + 1);
+          handleActionList(page + 1, null, true);
         }}
         onEndReachedThreshold={0.1}
         ListFooterComponent={() => (
@@ -222,32 +361,35 @@ const ActionList = props => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={filterModal}
+        visible={moveById}
         onRequestClose={() => {
           //   Alert.alert('Modal has been closed.');
-          setFilterModal(!filterModal);
+          setMoveById(!moveById);
         }}
       >
         <View
           style={{
             flex: 1,
-            width: '100%',
             padding: SIZES.padding,
             borderRadius: SIZES.radius,
             backgroundColor: COLORS.gray,
+            justifyContent: 'center',
+            // marginHorizontal: 50,
           }}
         >
           <View
             style={{
-              marginBottom: 20,
+              //   width: '70%',
               backgroundColor: COLORS.support1,
               padding: SIZES.padding,
               borderRadius: SIZES.radius,
             }}
           >
-            <ActionFilter
-              filterModal={filterModal}
-              setFilterModal={setFilterModal}
+            <ActionById
+              moveById={moveById}
+              setMoveById={setMoveById}
+              actionData={actionData}
+              setActionData={setActionData}
             />
           </View>
         </View>
@@ -283,6 +425,42 @@ const ActionList = props => {
 export default ActionList;
 
 const styles = StyleSheet.create({
+  dropdown: {
+    marginVertical: 10,
+    // height: 54,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    paddingHorizontal: 5,
+    shadowColor: '#000',
+    marginLeft: 5,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  item: {
+    // padding: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  textItem: {
+    flex: 1,
+    fontSize: 16,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    // width: 20,
+    // height: 20,
+  },
+  inputSearchStyle: {
+    // height: 20,
+    // fontSize: 16,
+  },
   fab: {
     position: 'absolute',
     margin: 16,

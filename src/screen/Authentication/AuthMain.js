@@ -96,23 +96,24 @@ const AuthMain = ({navigation}) => {
     const params = {
       email,
       password,
-      //   logout_from_all_devices: enableCheck === true && 'yes',
-      logout_from_all_devices: 'yes',
+      logout_from_all_devices: enableCheck && 'yes',
+      //   logout_from_all_devices: 'yes',
     };
     await ApiMethod.postData(url, params, null)
       .then(function (res) {
-        console.log('login result', res.data.message);
+        // console.log('login result', res.data.message);
         // setEmail('');
         setPassword('');
         setEnableCheck('');
         setOtpState('');
-        if (res.data.message) {
+        if (res?.data?.message) {
           setLoginOtpModal(true);
         }
       })
       .catch(function (error) {
         if (error) {
           setLogged(error.response?.data?.data?.is_logged_in);
+
           Alert.alert(
             `something went wrong`,
             `${error.response?.data?.message}`,
@@ -204,14 +205,13 @@ const AuthMain = ({navigation}) => {
     let url = constants.endPoint.verifyOtp;
     let params = {
       email,
-      //   otp:
-      //     otpState.one +
-      //     otpState.two +
-      //     otpState.three +
-      //     otpState.four +
-      //     otpState.five +
-      //     otpState.six,
-      otp: '963852',
+      otp:
+        otpState.one +
+        otpState.two +
+        otpState.three +
+        otpState.four +
+        otpState.five +
+        otpState.six,
     };
     try {
       const otpResult = await ApiMethod.postData(url, params, null);
@@ -265,7 +265,7 @@ const AuthMain = ({navigation}) => {
     return (
       <View style={{marginTop: SIZES.padding, height: SIZES.height / 2}}>
         <View style={styles.authContainer}>
-          {/* {!logged && (
+          {!logged && (
             <Text
               style={{
                 ...FONTS.font1,
@@ -279,30 +279,22 @@ const AuthMain = ({navigation}) => {
             >
               Too many fail login attempt your ip has restricted for 15 minutes.
             </Text>
-          )} */}
+          )}
           <Text
             style={{
-              width: '60%',
-              lineHeight: 45,
+              width: '100%',
+              //   lineHeight: 5,
               color: COLORS.dark,
               ...FONTS.dark,
               fontSize: SIZES.h1,
               paddingHorizontal: 10,
-              marginBottom: 30,
+              marginBottom: 20,
+              marginVertical: 10,
             }}
           >
             Sign in to continue
           </Text>
-          <KeyboardAwareScrollView
-          // enableOnAndroid={true}
-          // keyboardDismissMode="on-drag"
-          // keyboardShouldPersistTaps={'handled'}
-          // extraScrollHeight={-300}
-          // contentContainerStyle={{
-          //   flexGrow: 1,
-          //   justifyContent: 'center',
-          // }}
-          >
+          <KeyboardAwareScrollView>
             <FormInput
               containerStyle={{
                 borderRadius: SIZES.radius,
@@ -374,16 +366,16 @@ const AuthMain = ({navigation}) => {
               <Text></Text>
             )}
             <View style={{marginHorizontal: 12}}>
-              {logged && (
-                <CheckBox
-                  CheckBoxText={'logout from all devices'}
-                  containerStyle={{backgroundColor: '', lineHeight: 20}}
-                  isSelected={enableCheck}
-                  onPress={() => {
-                    setEnableCheck(!enableCheck);
-                  }}
-                />
-              )}
+              {/* {logged && ( */}
+              <CheckBox
+                CheckBoxText={'logout from all devices'}
+                containerStyle={{backgroundColor: '', lineHeight: 20}}
+                isSelected={enableCheck}
+                onPress={() => {
+                  setEnableCheck(!enableCheck);
+                }}
+              />
+              {/* //   )} */}
             </View>
 
             <View style={{alignItems: 'flex-end'}}>

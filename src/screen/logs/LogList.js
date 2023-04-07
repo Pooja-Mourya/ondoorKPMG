@@ -25,32 +25,64 @@ const LogList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
   const [listState, setListState] = useState([]);
+  const [filterModal, setFilterModal] = useState(false);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
-  const [filterModal, setFilterModal] = useState(false);
-  //   const [pageRe, setPageRe] = useState(false);
+  const [pageRe, setPageRe] = useState(false);
+  const [loader, setLoader] = useState(false);
 
-  const userListApi = async () => {
+  //   const userListApi = async () => {
+  //     const url = constants.endPoint.logsList;
+  //     const params = {
+  //       page: page + 1 ?? page,
+  //       per_page_record: '20',
+  //     };
+  //     setIsRefreshing(true);
+  //     try {
+  //       const result = await ApiMethod.postData(url, params, token);
+  //       //   console.log('result', result?.data?.data?.data, 'url', url);
+  //       setListState(result?.data?.data?.data);
+  //       setIsRefreshing(false);
+  //       return;
+  //     } catch (error) {
+  //       console.log('error', error);
+  //     }
+  //   };
+
+  const userListApi = async (page, refresh) => {
     const url = constants.endPoint.logsList;
     const params = {
-      page: page + 1 ?? page,
+      page: page ? page : 1,
       per_page_record: '20',
     };
-    setIsRefreshing(true);
-    try {
-      const result = await ApiMethod.postData(url, params, token);
-      //   console.log('result', result?.data?.data?.data, 'url', url);
-      setListState(result?.data?.data?.data);
-      setIsRefreshing(false);
-      return;
-    } catch (error) {
-      console.log('error', error);
+    const result = await ApiMethod.postData(url, params, token);
+    //   console.log('result', result?.data?.data, 'url', url);
+
+    if (result) {
+      if (!page) {
+        setPage(1);
+        setListState(result?.data?.data?.data);
+        setLoader(false);
+        if (refresh) setIsRefreshing(false);
+      } else {
+        let temp = [...listState];
+        temp = temp.concat(result?.data?.data?.data);
+        setPage(page);
+        setListState([...temp]);
+        setPageRe(false);
+      }
+    } else {
+      if (!page) setLoader(false);
+      else setPageRe(false);
+      if (refresh) setIsRefreshing(false);
+      Alert.alert('error in pagination');
     }
   };
 
   useEffect(() => {
-    userListApi(null, true);
-  }, [page + 1]);
+    userListApi();
+  }, []);
 
   //   console.log('listState', listState);
   //   if (isRefreshing === true) return <ActivityIndicator />;
@@ -93,8 +125,7 @@ const LogList = ({navigation}) => {
               <RefreshControl
                 refreshing={isRefreshing}
                 onRefresh={() => {
-                  console.log('loading...');
-                  userListApi(true);
+                  userListApi(null, true);
                 }}
               />
             }
@@ -135,8 +166,7 @@ const LogList = ({navigation}) => {
               );
             }}
             onEndReached={() => {
-              setPage(page + 1);
-              userListApi(page + 1);
+              userListApi(page + 1, null, true);
             }}
             onEndReachedThreshold={0.1}
             ListFooterComponent={() => (

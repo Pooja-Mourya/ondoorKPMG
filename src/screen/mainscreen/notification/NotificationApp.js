@@ -50,7 +50,7 @@ const NotificationApp = props => {
     }
   };
 
-  const readId = Object.assign({}, listState.shift());
+  const readId = Object.assign({}, listState?.shift());
 
   const handleReadById = async () => {
     try {
