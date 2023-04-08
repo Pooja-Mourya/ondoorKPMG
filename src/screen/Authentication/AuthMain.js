@@ -43,7 +43,7 @@ const AuthMain = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
   //   console.log('token', token);
-
+  const [changeModal, setChangeModal] = useState(false);
   const [enableCheck, setEnableCheck] = useState('');
   const [mode, setMode] = useState(false);
   const [name, setName] = useState('');
@@ -96,13 +96,13 @@ const AuthMain = ({navigation}) => {
     const params = {
       email,
       password,
-      logout_from_all_devices: enableCheck && 'yes',
-      //   logout_from_all_devices: 'yes',
+      logout_from_all_devices: 'yes',
     };
+
+    console.log('params', params);
+    // return;
     await ApiMethod.postData(url, params, null)
       .then(function (res) {
-        // console.log('login result', res.data.message);
-        // setEmail('');
         setPassword('');
         setEnableCheck('');
         setOtpState('');
@@ -113,6 +113,7 @@ const AuthMain = ({navigation}) => {
       .catch(function (error) {
         if (error) {
           setLogged(error.response?.data?.data?.is_logged_in);
+          console.log('error = ', error.response?.data?.data?.is_logged_in);
 
           Alert.alert(
             `something went wrong`,
@@ -206,12 +207,13 @@ const AuthMain = ({navigation}) => {
     let params = {
       email,
       otp:
-        otpState.one +
-        otpState.two +
-        otpState.three +
-        otpState.four +
-        otpState.five +
-        otpState.six,
+        // otpState.one +
+        // otpState.two +
+        // otpState.three +
+        // otpState.four +
+        // otpState.five +
+        // otpState.six,
+        '963852',
     };
     try {
       const otpResult = await ApiMethod.postData(url, params, null);
@@ -239,16 +241,13 @@ const AuthMain = ({navigation}) => {
     }, 30000);
   }, []);
 
-  // useEffect(() => {
-  //   if (verifyOtp()) {
-  //     setTimeout(() => {
-  //       <View style={{backgroundColor: COLORS.light}}>
-  //         <Changepassword />
-  //         <Text>up</Text>
-  //       </View>;
-  //     }, 1000);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (token) {
+      setTimeout(() => {
+        setChangeModal(true);
+      }, 1000);
+    }
+  }, [token]);
 
   function SignInFunction() {
     if (load)
@@ -265,7 +264,7 @@ const AuthMain = ({navigation}) => {
     return (
       <View style={{marginTop: SIZES.padding, height: SIZES.height / 2}}>
         <View style={styles.authContainer}>
-          {!logged && (
+          {logged === true && (
             <Text
               style={{
                 ...FONTS.font1,
@@ -280,6 +279,7 @@ const AuthMain = ({navigation}) => {
               Too many fail login attempt your ip has restricted for 15 minutes.
             </Text>
           )}
+
           <Text
             style={{
               width: '100%',
@@ -366,16 +366,16 @@ const AuthMain = ({navigation}) => {
               <Text></Text>
             )}
             <View style={{marginHorizontal: 12}}>
-              {/* {logged && ( */}
-              <CheckBox
-                CheckBoxText={'logout from all devices'}
-                containerStyle={{backgroundColor: '', lineHeight: 20}}
-                isSelected={enableCheck}
-                onPress={() => {
-                  setEnableCheck(!enableCheck);
-                }}
-              />
-              {/* //   )} */}
+              {logged === true && (
+                <CheckBox
+                  CheckBoxText={'logout from all devices'}
+                  containerStyle={{backgroundColor: '', lineHeight: 20}}
+                  isSelected={enableCheck}
+                  onPress={() => {
+                    setEnableCheck(!enableCheck);
+                  }}
+                />
+              )}
             </View>
 
             <View style={{alignItems: 'flex-end'}}>
@@ -414,7 +414,6 @@ const AuthMain = ({navigation}) => {
                 var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
                 //   if (password.match(passW) && email) {
                 if (email) {
-                  //   setLoginOtpModal(true);
                   submitHandle();
                 } else {
                   Alert.alert(
@@ -428,10 +427,7 @@ const AuthMain = ({navigation}) => {
                     ],
                   );
                 }
-                // navigation.navigate('MyTab');
               }}
-
-              //   onPress={() => submitHandle()}
             />
           </KeyboardAwareScrollView>
         </View>
@@ -864,9 +860,9 @@ const AuthMain = ({navigation}) => {
                 counterclockwise={true}
                 colorsTime={[60, 50, 40, 30, 20, 10, 0]}
                 size={150}
+                strokeWidth={2}
               >
                 {({remainingTime}) => {
-                  //   console.log('remainingTime', remainingTime);
                   setTimer(remainingTime);
                   return (
                     <View
@@ -1072,6 +1068,38 @@ const AuthMain = ({navigation}) => {
                 }
               }}
             />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={changeModal}
+        onRequestClose={() => {
+          //   Alert.alert('Modal has been closed.');
+          setChangeModal(!changeModal);
+        }}
+      >
+        <View
+          style={{
+            justifyContent: 'center',
+            flex: 1,
+            alignItems: 'center',
+            backgroundColor: COLORS.primary,
+          }}
+        >
+          <View
+            style={{
+              justifyContent: 'space-between',
+              marginBottom: 20,
+              backgroundColor: COLORS.light,
+              borderRadius: SIZES.radius,
+              borderWidth: 5,
+              borderColor: COLORS.secondary,
+            }}
+          >
+            <Changepassword setChangeModal={setChangeModal} />
           </View>
         </View>
       </Modal>

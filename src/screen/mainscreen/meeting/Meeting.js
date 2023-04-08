@@ -73,12 +73,7 @@ const Meeting = props => {
 
   return (
     <>
-      <Header
-        textHeader={'Meeting List '}
-        // rightIcon={true}
-        leftIcon={true}
-        onPressArrow={() => navigation.goBack()}
-      />
+      <Header textHeader={'Meeting List '} />
       <View
         style={{
           justifyContent: 'space-between',

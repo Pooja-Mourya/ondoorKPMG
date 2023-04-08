@@ -16,6 +16,7 @@ import ApiMethod from '../../../Services/APIService';
 import {COLORS, constants, FONTS, SIZES} from '../../../constants';
 import TextButton from '../../../components/TextButton';
 import FormInput from '../../../components/FormInput';
+import CheckBox from '../../../components/CheckBox';
 
 const DESIGNATION = [
   {
@@ -46,13 +47,15 @@ const AddRole = props => {
   const editRole = props.route.params;
 
   const token = useSelector(state => state?.user?.user?.access_token);
-
+  const [enableCheck, setEnableCheck] = useState('');
   const [se_name, setSe_name] = useState([]);
+
   const [checkUser, setCheckUser] = useState([]);
   const [checkRole, setCheckRole] = useState([]);
   const [checkMeeting, setCheckMeeting] = useState([]);
   const [checkAction, setCheckAction] = useState([]);
   const [checkNotification, setCheckNotification] = useState([]);
+  const [allCheck, setAllCheck] = useState([]);
 
   const [listState, setListState] = useState();
   const [role, setRole] = useState();
@@ -61,7 +64,8 @@ const AddRole = props => {
   const [notification, setNotification] = useState();
   const [loader, setLoader] = useState(false);
 
-  const handleRoles = async ({navigation}) => {
+  //   console.log('allCheck', allCheck);
+  const handleRoles = async () => {
     const url = constants.endPoint.permissions;
     const params = {};
     try {
@@ -75,6 +79,7 @@ const AddRole = props => {
           obj[item.group_name] = [item];
         }
       });
+      //   setAllCheck(obj)
       setListState(obj.user);
       setRole(obj.role);
       setMeeting(obj.meeting);
@@ -98,7 +103,7 @@ const AddRole = props => {
         checkRole.map(n => ({name: n.se_name})),
       ],
     };
-    console.log('params', params);
+    // console.log('params', params);
     // return;
     try {
       const preResult = await ApiMethod.postData(url, params, token);
@@ -189,8 +194,6 @@ const AddRole = props => {
       setSe_name(editRole.se_name);
     }
   }, []);
-
-  if (loader === true) return <ActivityIndicator />;
   return (
     <>
       <Header
@@ -218,6 +221,18 @@ const AddRole = props => {
               <AntDesign name="user" size={25} color={COLORS.grey} />
             }
           />
+          {/* <TouchableOpacity>
+            <CheckBox
+              CheckBoxText={'SELECT ALL'}
+              containerStyle={{backgroundColor: '', lineHeight: 20}}
+              isSelected={enableCheck}
+              onPress={() => {
+                setEnableCheck(!enableCheck);
+              }}
+            />
+          </TouchableOpacity> */}
+
+          {loader ? <ActivityIndicator /> : null}
           <FlatList
             data={DESIGNATION}
             keyExtractor={item => item.id}

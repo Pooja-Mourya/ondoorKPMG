@@ -22,6 +22,7 @@ import {
   ActionItemAction,
   ViewPermission,
   AddPermission,
+  Changepassword,
 } from '../screen/index';
 
 const Stack = createStackNavigator();
@@ -66,6 +67,7 @@ const MyStack = () => {
         <Stack.Screen name="ActionItemAction" component={ActionItemAction} />
         <Stack.Screen name="ViewPermission" component={ViewPermission} />
         <Stack.Screen name="AddPermission" component={AddPermission} />
+        <Stack.Screen name="Changepassword" component={Changepassword} />
       </Stack.Navigator>
     </NavigationContainer>
   );
