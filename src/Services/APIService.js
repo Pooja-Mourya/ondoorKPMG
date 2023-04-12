@@ -4,6 +4,7 @@ import {Alert} from 'react-native';
 import {constants} from '../constants';
 import {handleNavigation} from '../../src/navigation/MyStack';
 import {ToastAndroid} from 'react-native';
+import {Popup} from 'popup-ui';
 
 const ApiMethod = {
   getData: async (endPoint, token) => {
@@ -25,7 +26,14 @@ const ApiMethod = {
       return response;
     } catch (error) {
       if (error.response.data.code === 401) {
-        Alert.alert(error.response.data.message);
+        Popup.show({
+          type: 'Success',
+          title: 'Services Error',
+          // button: false,
+          textBody: `${error.response.data.message}`,
+          buttonText: 'Ok',
+          callback: () => Popup.hide(),
+        });
         AsyncStorage.removeItem('@user');
         handleNavigation();
         // dispatch(userLoginFun({}));
@@ -86,12 +94,19 @@ const ApiMethod = {
       return response;
     } catch (error) {
       if (error.response.data.code === 401) {
-        Alert.alert(error.response.data.message);
+        Popup.show({
+          type: 'Success',
+          title: 'Services Error',
+          // button: false,
+          textBody: `${error.response.data.message}`,
+          buttonText: 'Ok',
+          callback: () => Popup.hide(),
+        });
         AsyncStorage.removeItem('@user');
         handleNavigation();
         // dispatch(userLoginFun({}));
       } else {
-        Alert.alert(`Api ${error}`);
+        ToastAndroid.show(`Api ${error}`, ToastAndroid.SHORT);
       }
 
       //   return error;
@@ -123,7 +138,14 @@ const ApiMethod = {
       return response;
     } catch (error) {
       if (error.response.data.code === 401) {
-        Alert.alert(error.response.data.message);
+        Popup.show({
+          type: 'Success',
+          title: 'Services Error',
+          // button: false,
+          textBody: `${error.response.data.message}`,
+          buttonText: 'Ok',
+          callback: () => Popup.hide(),
+        });
         AsyncStorage.removeItem('@user');
         handleNavigation();
         // dispatch(userLoginFun({}));
@@ -158,7 +180,14 @@ const ApiMethod = {
       return response;
     } catch (error) {
       if (error.response.data.code === 401) {
-        Alert.alert(error.response.data.message);
+        Popup.show({
+          type: 'Success',
+          title: 'Services Error',
+          // button: false,
+          textBody: `${error.response.data.message}`,
+          buttonText: 'Ok',
+          callback: () => Popup.hide(),
+        });
         AsyncStorage.removeItem('@user');
         handleNavigation();
         // dispatch(userLoginFun({}));

@@ -139,7 +139,7 @@ const AddMeeting = props => {
       },
     });
     ToastAndroid.show('Record successfully created', ToastAndroid.SHORT);
-    console.log('create api response ...', res);
+    // console.log('create api response ...', res);
     setIsLoading(false);
     setAddNotesModal(false);
   };
@@ -170,6 +170,7 @@ const AddMeeting = props => {
       setAddNotesModal(false);
     } catch (error) {
       console.log('error', error);
+      setIsLoading(false);
     }
   };
 
@@ -209,7 +210,6 @@ const AddMeeting = props => {
     }
   }, []);
 
-  console.log('listState', listState);
   //   if (isLoading) return <ActivityIndicator />
   return (
     <>
@@ -390,8 +390,17 @@ const AddMeeting = props => {
           />
         </View>
       </View>
+      {/* editable ? 'Update' : 'Save' */}
       <TextButton
-        label={editable ? 'Update' : 'Save'}
+        label={
+          isLoading ? (
+            <ActivityIndicator size={'large'} color={COLORS.light} />
+          ) : editable ? (
+            'Update'
+          ) : (
+            'Save'
+          )
+        }
         contentContainerStyle={{
           height: 55,
           borderRadius: SIZES.radius,

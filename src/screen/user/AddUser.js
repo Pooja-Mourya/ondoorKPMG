@@ -102,6 +102,7 @@ const AddUser = props => {
   };
 
   const submitHandle = async () => {
+    setLoad(true);
     const url = constants.endPoint.user;
     const params = {
       role_id: input.role_id.id,
@@ -125,10 +126,12 @@ const AddUser = props => {
       }
     } catch (error) {
       console.log('error', error);
+      setLoad(false);
     }
   };
 
   const EditUserHandler = async () => {
+    setLoad(true);
     const url = constants.endPoint.user + '/' + userEdit.id;
     const params = {
       role_id: data.id,
@@ -146,17 +149,16 @@ const AddUser = props => {
         ToastAndroid.show('user added successfully', ToastAndroid.SHORT);
         navigation.navigate('User');
       }
+      setLoad(false);
     } catch (error) {
       console.log('error', error);
+      setLoad(false);
     }
   };
 
   const handleRoles = async () => {
     const url = constants.endPoint.roles;
-    const params = {
-      //   page: 1,
-      //   per_page_record: '10',
-    };
+    const params = {};
     setLoad(true);
     try {
       const result = await ApiMethod.postData(url, params, token);
@@ -177,14 +179,19 @@ const AddUser = props => {
         role_id: userEdit.role_id,
         name: userEdit.name,
         email: userEdit.email,
-        mobile_number: +userEdit.mobile_number,
+        mobile_number: '' + userEdit.mobile_number,
         designation: userEdit.designation,
-        password: userEdit.password,
-        confirm_password: userEdit.confirm_password,
+        password: '' + userEdit.password,
+        confirm_password: '' + userEdit.confirm_password,
       });
     }
   }, []);
-  //   if (load === true) return <ActivityIndicator />;
+  //   if (load)
+  //     return (
+  //       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+  //         <ActivityIndicator />
+  //       </View>
+  //     );
   return (
     <>
       <KeyboardAwareScrollView>
@@ -301,7 +308,7 @@ const AddUser = props => {
               marginTop: 10,
             }}
             placeholder="Password *"
-            secureTextEntry={true}
+            secureTextEntry={click}
             value={input.password}
             onChange={p => handleOnChangeState('password', p)}
             error={errors.password}
@@ -309,10 +316,19 @@ const AddUser = props => {
             prependComponent={
               <AntDesign
                 style={{marginHorizontal: 5}}
-                name="eye"
+                name="eyeo"
                 size={25}
                 color={COLORS.grey}
               />
+            }
+            appendComponent={
+              <TouchableOpacity onPress={() => setClick(!click)}>
+                <AntDesign
+                  name={click == true ? 'eye' : 'eyeo'}
+                  size={25}
+                  color={COLORS.grey}
+                />
+              </TouchableOpacity>
             }
           />
           <FormInput
@@ -367,8 +383,17 @@ const AddUser = props => {
               />
             }
           />
+          {/* userEdit ? ' Edit User' : 'Add User' */}
           <TextButton
-            label={userEdit ? ' Edit User' : 'Add User'}
+            label={
+              load ? (
+                <ActivityIndicator color={COLORS.light} size="large" />
+              ) : userEdit ? (
+                ' Edit User'
+              ) : (
+                'Add User'
+              )
+            }
             contentContainerStyle={{
               height: 55,
               borderRadius: SIZES.radius,

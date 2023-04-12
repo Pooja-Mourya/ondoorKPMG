@@ -58,7 +58,7 @@ const ActionList = props => {
     const url = constants.endPoint.actionList;
     const params = {
       page: page ? page : 1,
-      per_page_record: '1',
+      per_page_record: '10',
     };
     const result = await ApiMethod.postData(url, params, token);
     if (result) {
@@ -192,7 +192,9 @@ const ActionList = props => {
                       style={{
                         color:
                           item.priority === 'high'
-                            ? COLORS.error
+                            ? // ? item.priority === 'medium'
+                              // : COLORS.success
+                              COLORS.error
                             : COLORS.error20,
                         fontWeight: '500',
                         fontSize: 16,
@@ -267,6 +269,8 @@ const ActionList = props => {
                               ? COLORS.primary
                               : item.status === 'on_hold'
                               ? COLORS.success
+                              : item.status === 'pending'
+                              ? COLORS.support1
                               : item.status === 'cancelled'
                               ? COLORS.error
                               : item.status === 'completed' && 'green',
@@ -280,6 +284,8 @@ const ActionList = props => {
                               ? COLORS.dark20
                               : item.status === 'cancelled'
                               ? COLORS.error20
+                              : item.status === 'pending'
+                              ? COLORS.success20
                               : item.status === 'completed' &&
                                 COLORS.support4_08,
                         }}

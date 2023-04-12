@@ -56,14 +56,13 @@ const AuthMain = ({navigation}) => {
   const [designation, setDesignation] = useState('');
   const [errors, setErrors] = useState(false);
   const [click, setClick] = useState(false);
-  const [load, setLoad] = useState(false);
   const [forgetModal, setForgetModal] = useState(false);
   const [forgetPassword, setForgetPassword] = useState('');
   const [loader, setLoader] = useState(false);
   const [loginOtpModal, setLoginOtpModal] = useState(false);
   const [check, setCheck] = useState(false);
   const [logged, setLogged] = useState(false);
-  const [timer, setTimer] = useState('');
+  const [otp, setOtp] = useState('');
   const [otpState, setOtpState] = useState({
     one: '',
     two: '',
@@ -220,7 +219,7 @@ const AuthMain = ({navigation}) => {
       ToastAndroid.show(`${otpResult.data.message}`, ToastAndroid.SHORT);
       AsyncStorage.setItem('@user', otpResult.data.data.access_token);
       dispatch(userLoginFun(otpResult?.data.data));
-      setLoad(false);
+      setLoader(false);
       setLoginOtpModal(false);
       setEmail('');
       navigation.navigate('MyTab');
@@ -236,35 +235,17 @@ const AuthMain = ({navigation}) => {
       });
       AsyncStorage.removeItem('@user');
     }
+    setLoader(false);
   };
 
   useEffect(() => {
     setTimeout(() => {
       setLoginOtpModal(false);
       setOtpState('');
-    }, 30000);
-  }, []);
-
-  //   useEffect(() => {
-  //     if (token) {
-  //       setTimeout(() => {
-  //         setChangeModal(true);
-  //       }, 1000);
-  //     }
-  //   }, [token]);
+    }, 180000);
+  }, [loginOtpModal]);
 
   function SignInFunction() {
-    if (load)
-      return (
-        <ActivityIndicator
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 50,
-          }}
-        />
-      );
     return (
       <KeyboardAwareScrollView>
         <View
@@ -316,6 +297,7 @@ const AuthMain = ({navigation}) => {
               value={email}
               onChange={e => handleEmailCheck(e)}
               onFocus={() => setCheck()}
+              keyboardType={'email-address'}
               prependComponent={
                 <Image
                   source={require('../../assets/icons/email.png')}
@@ -406,13 +388,7 @@ const AuthMain = ({navigation}) => {
               />
             </View>
             <TextButton
-              label={
-                !loginOtpModal ? (
-                  'Log In'
-                ) : (
-                  <ActivityIndicator color={COLORS.light} />
-                )
-              }
+              label={'Log In'}
               contentContainerStyle={{
                 height: 55,
                 borderRadius: SIZES.radius,
@@ -425,10 +401,12 @@ const AuthMain = ({navigation}) => {
               onPress={() => {
                 var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
                 //   if (password.match(passW) && email) {
-                <ActivityIndicator />;
+
                 if (email) {
+                  setLoader(true);
                   submitHandle();
                 } else {
+                  setLoader(false);
                   Alert.alert(
                     'validation failed',
                     'Password must be at least 8 characters and contain at least 1 uppercase character, 1 number, and 1 special character',
@@ -636,8 +614,6 @@ const AuthMain = ({navigation}) => {
       return SignInFunction();
     }
   };
-
-  //   if (loader || !token) return <LoaderFile />;
 
   return (
     <View
@@ -872,7 +848,7 @@ const AuthMain = ({navigation}) => {
                 strokeWidth={2}
               >
                 {({remainingTime}) => {
-                  setTimer(remainingTime);
+                  remainingTime;
                   return (
                     <View
                       style={{
@@ -910,7 +886,7 @@ const AuthMain = ({navigation}) => {
             </Text>
             <TextButton
               label={
-                !load ? (
+                loader ? (
                   'Resend OTP'
                 ) : (
                   <ActivityIndicator size={'large'} color={'white'} />
@@ -942,6 +918,31 @@ const AuthMain = ({navigation}) => {
                 justifyContent: 'space-around',
               }}
             >
+              {/* {Array(6)
+                .fill()
+                .map((_, index) => {
+                  return (
+                    <TextInput
+                      style={{
+                        width: '15%',
+                        borderRadius: SIZES.radius,
+                        borderColor: COLORS.light,
+                        backgroundColor: COLORS.light,
+                        borderWidth: 1,
+                        elevation: 2,
+                        fontSize: SIZES.h2,
+                        textAlign: 'center',
+                      }}
+                      autoComplete={'sms-otp'}
+                      keyboardType={'numeric'}
+                      maxLength={1}
+                      placeholder={'0'}
+                      value={otp[index]}
+                      onChangeText={o => onChangeOtp('one', o)}
+                    />
+                  );
+                })} */}
+
               <TextInput
                 style={{
                   width: '15%',

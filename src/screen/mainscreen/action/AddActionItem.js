@@ -30,6 +30,7 @@ import axios from 'axios';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ToastAndroid} from 'react-native';
 
 const PRIORITY = [
   {id: '1', priority: 'Low'},
@@ -137,17 +138,48 @@ const AddActionItem = props => {
 
   const handleUpdateData = async () => {
     let url = constants.endPoint.action + '/' + editData.id;
-    let param = {};
+    let param = {
+      meeting_id: state.meeting_id.id,
+      note_id: state.note_id.id,
+      owner_id: state?.owner_id?.id,
+      date_opened: state.date_opened,
+      task: state.task,
+      priority: String(state.priority?.priority).toLowerCase(),
+      due_date: state.due_date,
+      complete_percentage: state.complete_percentage,
+      //   image: formData.append(
+      //     'image',
+      //     filePath.map(e => ({
+      //       uri: e.uri,
+      //     })),
+      //   ),
+      image: '',
+      comment: state.comment,
+      documents: [
+        // {
+        //   file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+        //   file_extension: '',
+        //   file_name: '',
+        //   uploading_file_name: '',
+        // },
+      ],
+    };
 
+    console.log('params', param);
     try {
       setIsLoading(true);
       const updateRes = await ApiMethod.putData(url, param, token);
       if (updateRes) {
         setIsLoading(false);
         navigation.navigate('ActionList');
+        ToastAndroid.show('record updated successfully', ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show('something went wrong', ToastAndroid.SHORT);
       }
     } catch (error) {
       console.log('error', error);
+      ToastAndroid.show(`${error}`, ToastAndroid.SHORT);
+      setIsLoading(false);
     }
   };
 
@@ -341,7 +373,7 @@ const AddActionItem = props => {
     // console.log('firstData', data);
     try {
       await ApiMethod.postData(url, data, token);
-      Alert.alert('Record successfully created.');
+      ToastAndroid.show('Record successfully created.', ToastAndroid.SHORT);
       navigation.navigate('ActionList');
     } catch (error) {
       console.log('error', error);
@@ -359,20 +391,22 @@ const AddActionItem = props => {
     // }
   }, []);
 
+  console.log('editData', editData);
   useEffect(() => {
     if (editData) {
       setState({
         ...state,
-        // meeting_id: editData.meeting_id,
+        meeting_id: editData.meeting_id,
         note_id: editData.note_id,
-        owner_id: editData?.owner_id?.id,
+        owner_id: editData?.owner_id,
         date_opened: editData.date_opened,
-        task: 'editData.task',
+        task: editData.task,
         priority: String(editData.priority?.priority).toLowerCase(),
         due_date: editData.due_date,
         complete_percentage: editData.complete_percentage,
         image: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
         comment: editData.comment,
+        status: editData.status,
         // documents: [
         //   {
         //     file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
@@ -748,7 +782,15 @@ const AddActionItem = props => {
           ) : null}
         </View>
         <TextButton
-          label={editData ? 'Edit' : 'Save'}
+          label={
+            isLoading ? (
+              <ActivityIndicator size={'large'} color={COLORS.light} />
+            ) : editData ? (
+              'Edit'
+            ) : (
+              'Save'
+            )
+          }
           contentContainerStyle={{
             height: 55,
             borderRadius: SIZES.radius,
@@ -767,7 +809,7 @@ const AddActionItem = props => {
             if (validate()) {
               handleActionSubmit();
             } else {
-              Alert.alert('validation failed');
+              ToastAndroid.show('validation failed', ToastAndroid.SHORT);
             }
           }}
         />

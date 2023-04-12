@@ -48,7 +48,7 @@ const Notes = ({navigation}) => {
     const url = constants.endPoint.notes;
     const params = {
       page: page ? page : 1,
-      per_page_record: '1',
+      per_page_record: '10',
     };
     const result = await ApiMethod.postData(url, params, token);
     //   console.log('result', result?.data?.data, 'url', url);
