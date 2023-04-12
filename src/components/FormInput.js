@@ -28,6 +28,7 @@ const FormInput = ({
   onFocus = () => {},
 }) => {
   const [isFocused, setIsFocused] = React.useState(false);
+  //   console.log('error', error);
   return (
     <>
       <View style={{...containerStyle}}>
@@ -40,11 +41,12 @@ const FormInput = ({
             alignItems: 'center',
             backgroundColor: COLORS.lightGrey,
             ...inputContainerStyle,
-            borderColor: COLORS.error
-              ? COLORS.error
-              : isFocused
-              ? COLORS.primary
-              : COLORS.light,
+            // borderColor: error
+            //   ? COLORS.error
+            //   : isFocused
+            //   ? COLORS.grey
+            //   : COLORS.light,
+            // borderWidth: 2,
             alignItems: 'center',
           }}
         >
@@ -82,7 +84,7 @@ const FormInput = ({
           {appendComponent}
         </View>
       </View>
-      <View>
+      <View style={{flexDirection: 'row'}}>
         {error && (
           <Text
             style={{

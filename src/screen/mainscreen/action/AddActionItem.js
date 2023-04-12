@@ -61,6 +61,7 @@ const AddActionItem = props => {
   const [listState, setListState] = useState([]);
   const [noteList, setNoteList] = useState([]);
   const [filePath, setFilePath] = useState([]);
+  const [dPValues, setDPValues] = useState({mode: 'date', key: ''});
   const [state, setState] = useState({
     meeting_id: '',
     note_id: '',
@@ -80,58 +81,58 @@ const AddActionItem = props => {
       //     uploading_file_name: '',
       //   },
     ],
+    status: '',
   });
-  const [stateError, setStateError] = useState('');
+  const [stateError, setStateError] = useState(false);
 
   const validate = () => {
     Keyboard.dismiss();
-    if (state.email) {
-      handleError('please input email');
+    let isValid = true;
+    if (!state.meeting_id.id) {
+      handleError('please input meeting_id', 'meeting_id');
+      isValid = false;
+    }
+    if (!state.note_id) {
+      handleError('please input note_id', 'note_id');
+      isValid = false;
+    }
+    if (!state.owner_id.id) {
+      handleError('please input owner_id', 'owner_id');
+      isValid = false;
+    }
+    if (!state.priority) {
+      handleError('please input priority', 'priority');
+      isValid = false;
+    }
+    if (!state.date_opened) {
+      handleError('please input date_opened', 'date_opened');
+      isValid = false;
+    }
+    if (!state.due_date) {
+      handleError('please input due_date', 'due_date');
+      isValid = false;
+    }
+
+    if (!state.complete_percentage) {
+      handleError('please input complete_percentage', 'complete_percentage');
+      isValid = false;
+    }
+
+    if (!state.task) {
+      handleError('please input task', 'task');
+      isValid = false;
+    }
+    if (!state.comment) {
+      handleError('please input comment', 'comment');
+      isValid = false;
+    }
+    if (isValid) {
+      return isValid;
     }
   };
 
   const handleError = (errorMessage, input) => {
-    setStateError({...stateError, [errorMessage]: input});
-  };
-
-  const submitHandle = async () => {
-    try {
-      setIsLoading(true);
-      await axios({
-        method: 'post',
-        url: 'https://meeting-api.gofactz.com/api/action-item',
-        headers: {
-          authorization: 'Bearer ' + token,
-        },
-        data: {
-          meeting_id: state.meeting_id.id,
-          note_id: state.note_id,
-          owner_id: state?.owner_id?.id,
-          date_opened: state.date_opened,
-          task: state.task,
-          priority: String(state.priority?.priority).toLowerCase(),
-          due_date: state.due_date,
-          complete_percentage: state.complete_percentage,
-          image: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
-          comment: state.comment,
-          // documents: [
-          //   {
-          //     file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
-          //     file_extension: '',
-          //     file_name: '',
-          //     uploading_file_name: '',
-          //   },
-          // ],
-        },
-      });
-      setIsLoading(false);
-      Alert.alert('Record successfully created');
-      navigation.navigate('ActionList');
-      //   console.log('create api response ...', res);
-    } catch (error) {
-      Alert.alert(error);
-      console.log('error', error);
-    }
+    setStateError({...stateError, [input]: errorMessage});
   };
 
   const handleUpdateData = async () => {
@@ -299,8 +300,14 @@ const AddActionItem = props => {
     });
   };
 
-  const meeting = listState.map(e => ({e: e.id}));
-  const notes = noteList.map(e => ({e: e.notes}));
+  //   const meeting = Object.key(listState);
+  //   const notes = Object.key(noteList);
+
+  //   const meeting = listState.map(e => ({e: e.id}));
+  //   const notes = noteList.map(e => ({e: e.notes}));
+
+  console.log('meeting', listState);
+  console.log('notes', noteList);
 
   const handleActionSubmit = async () => {
     let url = constants.endPoint.action;
@@ -331,7 +338,7 @@ const AddActionItem = props => {
       ],
     };
 
-    console.log('firstData', data);
+    // console.log('firstData', data);
     try {
       await ApiMethod.postData(url, data, token);
       Alert.alert('Record successfully created.');
@@ -346,12 +353,12 @@ const AddActionItem = props => {
   useEffect(() => {
     ListUser();
     handleMeetingList();
-    if (meeting == notes) {
-      handleNoteList();
-    }
+    handleNoteList();
+    // if (state.note_id) {
+    //   handleNoteList();
+    // }
   }, []);
 
-  //   console.log('editDataAction', editData);
   useEffect(() => {
     if (editData) {
       setState({
@@ -420,7 +427,15 @@ const AddActionItem = props => {
                 size={20}
               />
             )}
+            onFocus={e => handleError(e, 'meeting_id')}
           />
+
+          {!stateError == state.meeting_id ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              select meeting
+            </Text>
+          ) : null}
+
           <Dropdown
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
@@ -434,9 +449,9 @@ const AddActionItem = props => {
             valueField="id"
             placeholder="Select Notes id"
             searchPlaceholder="Search..."
-            value={state.meeting_id}
+            value={state.note_id}
             onChange={item => {
-              onchangeState('meeting_id', item);
+              onchangeState('note_id', item);
             }}
             renderLeftIcon={() => (
               <AntDesign
@@ -446,7 +461,13 @@ const AddActionItem = props => {
                 size={20}
               />
             )}
+            onFocus={e => handleError(e, 'notes')}
           />
+          {!stateError == state.note_id ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              select note
+            </Text>
+          ) : null}
           <Dropdown
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
@@ -472,7 +493,13 @@ const AddActionItem = props => {
                 size={20}
               />
             )}
+            onFocus={e => handleError(e, 'owner_id')}
           />
+          {!stateError == state.owner_id ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              select owner id
+            </Text>
+          ) : null}
           <Dropdown
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
@@ -498,89 +525,117 @@ const AddActionItem = props => {
                 size={20}
               />
             )}
+            onFocus={e => handleError(e, 'priority')}
           />
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-                marginTop: 10,
-                width: '48%',
-              }}
-              placeholder="Open Date"
-              autoFocus={false}
-              value={state.date_opened}
-              onChange={d => {
-                //   console.log('date', d);
-                onchangeState('date_opened', d);
-              }}
-              appendComponent={
-                <TouchableOpacity onPress={() => setOpen(true)}>
-                  <Fontisto name={'date'} size={25} color={COLORS.primary} />
-                </TouchableOpacity>
-              }
-            />
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                marginTop: 10,
-                width: '48%',
-              }}
-              placeholder="Due Date"
-              value={state.due_date}
-              onChange={t => {
-                // console.log('due_date', t);
-                onchangeState('due_date', t);
-              }}
-              appendComponent={
-                <TouchableOpacity onPress={() => setOpenTime(true)}>
-                  <Fontisto name={'date'} size={25} color={COLORS.primary} />
-                </TouchableOpacity>
-              }
-            />
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Dropdown
-              style={[styles.dropdown, {width: '50%'}]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={STATUS}
-              search
-              maxHeight={300}
-              labelField="status"
-              valueField="id"
-              placeholder="Select Status"
-              searchPlaceholder="Search..."
-              value={state.meeting_id}
-              onChange={item => {
-                onchangeState('status', item);
-              }}
-              renderLeftIcon={() => (
-                <AntDesign
-                  style={styles.icon}
-                  color="black"
-                  name="Safety"
-                  size={20}
-                />
-              )}
-            />
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                marginTop: 10,
-                width: '48%',
-              }}
-              placeholder="Complete (%)"
-              value={state.complete_percentage}
-              onChange={t => {
-                onchangeState('complete_percentage', t);
-              }}
-              keyboardType="numeric"
-            />
-          </View>
+          {!stateError == state.priority ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              select priority
+            </Text>
+          ) : null}
+
           <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+              //   width: '48%',
+            }}
+            placeholder="Open Date *"
+            autoFocus={false}
+            value={state.date_opened}
+            onChange={d => {
+              //   console.log('date', d);
+              onchangeState('date_opened', d);
+            }}
+            onFocus={e => handleError(e, 'date_opened')}
+            error={stateError.date_opened}
+            editable={false}
+            appendComponent={
+              <TouchableOpacity
+                onPress={() => {
+                  setDPValues({mode: 'date', key: 'date_opened'});
+                  setOpen(true);
+                }}
+              >
+                <Fontisto name={'date'} size={25} color={COLORS.primary} />
+              </TouchableOpacity>
+            }
+          />
+
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              marginTop: 10,
+              //   width: '48%',
+            }}
+            placeholder="Due Date *"
+            value={state.due_date}
+            onChange={t => {
+              onchangeState('due_date', t);
+            }}
+            onFocus={e => handleError(e, 'due_date')}
+            error={stateError.due_date}
+            appendComponent={
+              <TouchableOpacity
+                onPress={() => {
+                  setDPValues({mode: 'date', key: 'due_date'});
+                  setOpen(true);
+                }}
+              >
+                <Fontisto name={'date'} size={25} color={COLORS.primary} />
+              </TouchableOpacity>
+            }
+            editable={false}
+          />
+          <Dropdown
+            style={[styles.dropdown]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={STATUS}
+            search
+            maxHeight={300}
+            labelField="status"
+            valueField="id"
+            placeholder="Select Status *"
+            searchPlaceholder="Search..."
+            value={state.meeting_id}
+            onChange={item => {
+              onchangeState('status', item);
+            }}
+            renderLeftIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color="black"
+                name="Safety"
+                size={20}
+              />
+            )}
+            onFocus={e => handleError(e, 'status')}
+          />
+          {!stateError == state.status ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              select status
+            </Text>
+          ) : null}
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              marginTop: 10,
+              // width: '48%',
+            }}
+            placeholder="Complete (%)"
+            value={state.complete_percentage}
+            onChange={t => {
+              onchangeState('complete_percentage', t);
+            }}
+            keyboardType="numeric"
+            onFocus={e => handleError(e, 'complete_percentage')}
+            error={stateError.complete_percentage}
+          />
+
+          {/* <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
@@ -589,7 +644,7 @@ const AddActionItem = props => {
             placeholder="Meeting reference no."
             value={state.meeting_ref_no}
             onChange={r => onchangeState('meeting_ref_no', r)}
-          />
+          /> */}
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -600,6 +655,8 @@ const AddActionItem = props => {
             value={state.task}
             numberOfLines={10}
             onChange={o => onchangeState('task', o)}
+            onFocus={e => handleError(e, 'task')}
+            error={stateError.task}
           />
           <FormInput
             containerStyle={{
@@ -611,8 +668,10 @@ const AddActionItem = props => {
             value={state.comment}
             numberOfLines={10}
             onChange={o => onchangeState('comment', o)}
+            onFocus={e => handleError(e, 'comment')}
+            error={stateError.comment}
           />
-          <FormInput
+          {/* <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
@@ -629,84 +688,89 @@ const AddActionItem = props => {
                 onPress={() => selectFile()}
               />
             }
-          />
-          <View>
-            <FlatList
-              data={selectImage}
-              keyExtractor={(item, index) =>
-                (item?.filename ?? item?.path) + index
-              }
-              renderItem={({item}) => {
-                // console.log('item', item);
-                return (
-                  <View style={{}}>
-                    {/* {} */}
-                    <Image
-                      width={250}
-                      source={{uri: item.uri}}
-                      style={{
-                        width: 100,
-                        height: 100,
-                        flex: 1,
-                        borderRadius: SIZES.radius,
-                      }}
-                    />
-                    <TouchableOpacity
-                      activeOpacity={0.9}
-                      style={{position: 'absolute', padding: 5}}
-                    >
-                      <Text style={{}}>
-                        <AntDesign name="delete" color={'red'} size={20} />
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              }}
-              numColumns={3}
-              style={{
-                height: selectImage != '' ? 200 : 1,
-                borderWidth: 1,
-                backgroundColor: COLORS.light,
-                marginVertical: 10,
-                borderRadius: SIZES.radius,
-                padding: 10,
-                display: !selectImage ? 'none' : 'flex',
-              }}
-            />
-            {selectImage ? (
-              <TextButton
-                label={'upload Image'}
-                contentContainerStyle={{
-                  backgroundColor: 'none',
-                  margin: 10,
-                }}
-                labelStyle={{
-                  color: COLORS.primary,
-                }}
-                onPress={() => uploadFile(selectImage)}
-              />
-            ) : null}
-          </View>
-          <TextButton
-            label={editData ? 'Edit' : 'Save'}
-            contentContainerStyle={{
-              height: 55,
-              borderRadius: SIZES.radius,
-              marginTop: 10,
-            }}
-            labelStyle={{
-              color: COLORS.light,
-              ...FONTS.h4,
-            }}
-            onPress={() => {
-              if (editData) {
-                handleUpdateData();
-              } else {
-                handleActionSubmit();
-              }
-            }}
-          />
+          /> */}
         </KeyboardAwareScrollView>
+        <View>
+          <FlatList
+            data={selectImage}
+            keyExtractor={(item, index) =>
+              (item?.filename ?? item?.path) + index
+            }
+            renderItem={({item}) => {
+              // console.log('item', item);
+              return (
+                <View style={{}}>
+                  {/* {} */}
+                  <Image
+                    width={250}
+                    source={{uri: item.uri}}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      flex: 1,
+                      borderRadius: SIZES.radius,
+                    }}
+                  />
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    style={{position: 'absolute', padding: 5}}
+                  >
+                    <Text style={{}}>
+                      <AntDesign name="delete" color={'red'} size={20} />
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+            numColumns={3}
+            style={{
+              height: selectImage != '' ? 200 : 1,
+              borderWidth: 1,
+              backgroundColor: COLORS.light,
+              marginVertical: 10,
+              borderRadius: SIZES.radius,
+              padding: 10,
+              display: !selectImage ? 'none' : 'flex',
+            }}
+          />
+          {selectImage ? (
+            <TextButton
+              label={'upload Image'}
+              contentContainerStyle={{
+                backgroundColor: 'none',
+                margin: 10,
+              }}
+              labelStyle={{
+                color: COLORS.primary,
+              }}
+              onPress={() => uploadFile(selectImage)}
+            />
+          ) : null}
+        </View>
+        <TextButton
+          label={editData ? 'Edit' : 'Save'}
+          contentContainerStyle={{
+            height: 55,
+            borderRadius: SIZES.radius,
+            marginBottom: 5,
+            marginTop: 15,
+          }}
+          labelStyle={{
+            color: COLORS.light,
+            ...FONTS.h4,
+          }}
+          onPress={() => {
+            if (editData) {
+              handleUpdateData();
+              return;
+            }
+            if (validate()) {
+              handleActionSubmit();
+            } else {
+              Alert.alert('validation failed');
+            }
+          }}
+        />
       </View>
 
       {open && (
@@ -714,34 +778,18 @@ const AddActionItem = props => {
           modal
           open={open}
           date={date}
-          mode={'date'}
+          mode={dPValues.mode}
           onConfirm={date => {
             console.log('date', date);
             setOpen(false);
             setDate(date);
-            onchangeState('date_opened', moment(date).format('YYYY-MM-DD'));
+            onchangeState(dPValues.key, moment(date).format('YYYY-MM-DD'));
           }}
           onCancel={() => {
             setOpen(false);
           }}
         />
       )}
-      {openTime ? (
-        <DatePicker
-          modal
-          open={openTime}
-          date={date}
-          mode={'date'}
-          onConfirm={date => {
-            setOpenTime(false);
-            setDate(date);
-            onchangeState('due_date', moment(date).format('YYYY-MM-DD'));
-          }}
-          onCancel={() => {
-            setOpenTime(false);
-          }}
-        />
-      ) : null}
     </>
   );
 };

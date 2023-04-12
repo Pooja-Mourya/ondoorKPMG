@@ -36,8 +36,10 @@ import {
   useCountdown,
   counterclockwise,
 } from 'react-native-countdown-circle-timer';
-import Toast from 'react-native-toast-message';
 import Changepassword from './Changepassword';
+import axios from 'axios';
+import {Root, Popup, Toast} from 'popup-ui';
+import {ToastAndroid} from 'react-native';
 
 const AuthMain = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -62,7 +64,6 @@ const AuthMain = ({navigation}) => {
   const [check, setCheck] = useState(false);
   const [logged, setLogged] = useState(false);
   const [timer, setTimer] = useState('');
-  const [popModal, setPopModal] = useState(false);
   const [otpState, setOtpState] = useState({
     one: '',
     two: '',
@@ -92,40 +93,38 @@ const AuthMain = ({navigation}) => {
   const dispatch = useDispatch();
 
   const submitHandle = async () => {
-    const url = constants.endPoint.login;
-    const params = {
-      email,
-      password,
-      logout_from_all_devices: 'yes',
-    };
-
-    console.log('params', params);
-    // return;
-    await ApiMethod.postData(url, params, null)
-      .then(function (res) {
+    await axios
+      .post(`https://meeting-api.gofactz.com/public/api/login`, {
+        email,
+        password,
+        logout_from_all_devices: enableCheck && 'yes',
+      })
+      .then(res => {
+        console.log(res);
+        // Alert.alert(res.data.message);
+        ToastAndroid.show(`${res.data.message}`, ToastAndroid.SHORT);
         setPassword('');
         setEnableCheck('');
         setOtpState('');
-        if (res?.data?.message) {
+        if (res.data.message) {
           setLoginOtpModal(true);
         }
       })
-      .catch(function (error) {
-        if (error) {
-          setLogged(error.response?.data?.data?.is_logged_in);
-          console.log('error = ', error.response?.data?.data?.is_logged_in);
-
-          Alert.alert(
-            `something went wrong`,
-            `${error.response?.data?.message}`,
-
-            [{text: 'ok'}],
-          );
-          console.log('error*', error.message);
+      .catch(error => {
+        console.log(' 4', error.response.data.message);
+        if (error.response.data.message) {
+          //   Alert.alert('login error response', `${error.response.data.message}`);
+          Popup.show({
+            title: 'login error code',
+            textBody: `${error.response.data.message}`,
+            type: 'Warning',
+            buttonText: 'Ok',
+            callback: () => Popup.hide(),
+          });
+          setLogged(error.response.data.message);
         }
       });
   };
-
   const HandleSignUp = async () => {
     const url = constants.endPoint.registerForm;
     const params = {
@@ -207,29 +206,34 @@ const AuthMain = ({navigation}) => {
     let params = {
       email,
       otp:
-        // otpState.one +
-        // otpState.two +
-        // otpState.three +
-        // otpState.four +
-        // otpState.five +
-        // otpState.six,
-        '963852',
+        otpState.one +
+        otpState.two +
+        otpState.three +
+        otpState.four +
+        otpState.five +
+        otpState.six,
     };
-    try {
-      const otpResult = await ApiMethod.postData(url, params, null);
-      console.log('otpResult', otpResult.data.data);
-      if (otpResult) {
-        Alert.alert(`${otpResult.data.message}`);
-        AsyncStorage.setItem('@user', otpResult.data.data.access_token);
-        dispatch(userLoginFun(otpResult?.data.data));
-        setLoad(false);
-        setLoginOtpModal(false);
-        setEmail('');
-        navigation.navigate('MyTab');
-      }
-    } catch (error) {
-      Alert.alert('enter correct otp', 'Unauthenticated');
-      console.log('error', error);
+
+    const otpResult = await ApiMethod.postData(url, params, null);
+    console.log('otpResult', otpResult.data.data);
+    if (otpResult) {
+      ToastAndroid.show(`${otpResult.data.message}`, ToastAndroid.SHORT);
+      AsyncStorage.setItem('@user', otpResult.data.data.access_token);
+      dispatch(userLoginFun(otpResult?.data.data));
+      setLoad(false);
+      setLoginOtpModal(false);
+      setEmail('');
+      navigation.navigate('MyTab');
+    } else {
+      //   Alert.alert('enter correct otp', 'Unauthenticated');
+      Popup.show({
+        type: 'Error',
+        title: 'Enter correct otp',
+        button: false,
+        textBody: 'Unauthenticated',
+        buttonText: 'Ok',
+        callback: () => Popup.hide(),
+      });
       AsyncStorage.removeItem('@user');
     }
   };
@@ -241,13 +245,13 @@ const AuthMain = ({navigation}) => {
     }, 30000);
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      setTimeout(() => {
-        setChangeModal(true);
-      }, 1000);
-    }
-  }, [token]);
+  //   useEffect(() => {
+  //     if (token) {
+  //       setTimeout(() => {
+  //         setChangeModal(true);
+  //       }, 1000);
+  //     }
+  //   }, [token]);
 
   function SignInFunction() {
     if (load)
@@ -262,39 +266,47 @@ const AuthMain = ({navigation}) => {
         />
       );
     return (
-      <View style={{marginTop: SIZES.padding, height: SIZES.height / 2}}>
-        <View style={styles.authContainer}>
-          {logged === true && (
+      <KeyboardAwareScrollView>
+        <View
+          style={{
+            marginTop: SIZES.padding,
+            // height: 400,
+            // backgroundColor: 'red',
+          }}
+        >
+          <View style={styles.authContainer}>
+            {/* {logged && (
+              <Text
+                style={{
+                  ...FONTS.font1,
+                  color: COLORS.error,
+                  backgroundColor: COLORS.support4_08,
+                  fontWeight: '500',
+                  borderRadius: SIZES.radius,
+                  margin: 10,
+                  passing: 10,
+                }}
+              >
+                Too many fail login attempt your ip has restricted for 15
+                minutes.
+              </Text>
+            )} */}
+
             <Text
               style={{
-                ...FONTS.font1,
-                color: COLORS.error,
-                backgroundColor: COLORS.support4_08,
-                fontWeight: '500',
-                borderRadius: SIZES.radius,
-                margin: 10,
-                passing: 10,
+                width: '60%',
+                //   lineHeight: 5,
+                color: COLORS.dark,
+                ...FONTS.dark,
+                fontSize: SIZES.h1,
+                paddingHorizontal: 10,
+                marginBottom: 20,
+                marginVertical: 20,
               }}
             >
-              Too many fail login attempt your ip has restricted for 15 minutes.
+              Sign in to continue !...
             </Text>
-          )}
 
-          <Text
-            style={{
-              width: '100%',
-              //   lineHeight: 5,
-              color: COLORS.dark,
-              ...FONTS.dark,
-              fontSize: SIZES.h1,
-              paddingHorizontal: 10,
-              marginBottom: 20,
-              marginVertical: 10,
-            }}
-          >
-            Sign in to continue
-          </Text>
-          <KeyboardAwareScrollView>
             <FormInput
               containerStyle={{
                 borderRadius: SIZES.radius,
@@ -366,7 +378,7 @@ const AuthMain = ({navigation}) => {
               <Text></Text>
             )}
             <View style={{marginHorizontal: 12}}>
-              {logged === true && (
+              {logged && (
                 <CheckBox
                   CheckBoxText={'logout from all devices'}
                   containerStyle={{backgroundColor: '', lineHeight: 20}}
@@ -413,6 +425,7 @@ const AuthMain = ({navigation}) => {
               onPress={() => {
                 var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
                 //   if (password.match(passW) && email) {
+                <ActivityIndicator />;
                 if (email) {
                   submitHandle();
                 } else {
@@ -429,193 +442,189 @@ const AuthMain = ({navigation}) => {
                 }
               }}
             />
-          </KeyboardAwareScrollView>
+          </View>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     );
   }
 
   function SignUpFunction() {
     return (
       <KeyboardAwareScrollView>
-        <View style={styles.authContainer}>
-          <Text
-            style={{
-              width: '60%',
-              lineHeight: 45,
-              color: COLORS.dark,
-              ...FONTS.dark,
-              fontSize: SIZES.h1,
-              paddingHorizontal: 10,
-            }}
-          >
-            Sign up
-          </Text>
+        <Text
+          style={{
+            width: '60%',
+            lineHeight: 45,
+            color: COLORS.dark,
+            ...FONTS.dark,
+            fontSize: SIZES.h1,
+            paddingHorizontal: 10,
+          }}
+        >
+          Sign up
+        </Text>
 
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Name"
-            value={name}
-            onChange={() => setName()}
-            error={errors}
-            onFocus={() => setErrors()}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/person.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e)}
-            error={errors}
-            onFocus={() => setErrors()}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/email.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-          />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+          }}
+          placeholder="Name"
+          value={name}
+          onChange={() => setName()}
+          error={errors}
+          onFocus={() => setErrors()}
+          prependComponent={
+            <Image
+              source={require('../../assets/icons/person.png')}
+              style={{
+                width: 25,
+                height: 25,
+                marginRight: SIZES.base,
+              }}
+            />
+          }
+        />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+          }}
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e)}
+          error={errors}
+          onFocus={() => setErrors()}
+          prependComponent={
+            <Image
+              source={require('../../assets/icons/email.png')}
+              style={{
+                width: 25,
+                height: 25,
+                marginRight: SIZES.base,
+              }}
+            />
+          }
+        />
 
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Number"
-            value={number}
-            onChange={u => setNumber(u)}
-            error={errors}
-            onFocus={() => setErrors()}
-            prependComponent={
-              <Entypo
-                style={{marginHorizontal: 5}}
-                name="old-phone"
-                size={22}
-                color={COLORS.grey}
-              />
-            }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Password"
-            secureTextEntry={true}
-            value={password}
-            onChange={p => setPassword(p)}
-            error={errors}
-            onFocus={() => setErrors()}
-            prependComponent={
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+          }}
+          placeholder="Number"
+          value={number}
+          onChange={u => setNumber(u)}
+          error={errors}
+          onFocus={() => setErrors()}
+          prependComponent={
+            <Entypo
+              style={{marginHorizontal: 5}}
+              name="old-phone"
+              size={22}
+              color={COLORS.grey}
+            />
+          }
+        />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+          }}
+          placeholder="Password"
+          secureTextEntry={true}
+          value={password}
+          onChange={p => setPassword(p)}
+          error={errors}
+          onFocus={() => setErrors()}
+          prependComponent={
+            <Image
+              source={require('../../assets/icons/lock.png')}
+              style={{
+                width: 25,
+                height: 25,
+                marginRight: SIZES.base,
+              }}
+            />
+          }
+        />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+          }}
+          placeholder="Confirm Password"
+          secureTextEntry={!click}
+          value={confirmPassword}
+          onChange={p => setConfirmPassword(p)}
+          error={errors}
+          onFocus={() => setErrors()}
+          prependComponent={
+            <Image
+              source={require('../../assets/icons/lock.png')}
+              style={{
+                width: 25,
+                height: 25,
+                marginRight: SIZES.base,
+              }}
+            />
+          }
+          appendComponent={
+            <TouchableOpacity onPress={() => setClick(!click)}>
               <Image
-                source={require('../../assets/icons/lock.png')}
+                source={
+                  !click
+                    ? require('../../assets/icons/eye-off.png')
+                    : require('../../assets/icons/eye.png')
+                }
                 style={{
                   width: 25,
                   height: 25,
                   marginRight: SIZES.base,
                 }}
               />
+            </TouchableOpacity>
+          }
+        />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+          }}
+          placeholder="Designation"
+          value={designation}
+          onChange={d => setDesignation(d)}
+          error={errors}
+          onFocus={() => setErrors()}
+          prependComponent={
+            <MaterialIcons
+              style={{marginHorizontal: 5}}
+              name={'design-services'}
+              size={24}
+              color={COLORS.grey}
+            />
+          }
+        />
+        <TextButton
+          label={'Sign Up'}
+          contentContainerStyle={{
+            height: 55,
+            borderRadius: SIZES.radius,
+            margin: 10,
+          }}
+          labelStyle={{
+            color: COLORS.light,
+            ...FONTS.h4,
+          }}
+          onPress={() => {
+            if ((email, password, confirmPassword, name, number, designation)) {
+              HandleSignUp();
+              Alert.alert('locally form submitted');
+            } else {
+              Alert.alert('validation failed');
             }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Confirm Password"
-            secureTextEntry={!click}
-            value={confirmPassword}
-            onChange={p => setConfirmPassword(p)}
-            error={errors}
-            onFocus={() => setErrors()}
-            prependComponent={
-              <Image
-                source={require('../../assets/icons/lock.png')}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: SIZES.base,
-                }}
-              />
-            }
-            appendComponent={
-              <TouchableOpacity onPress={() => setClick(!click)}>
-                <Image
-                  source={
-                    !click
-                      ? require('../../assets/icons/eye-off.png')
-                      : require('../../assets/icons/eye.png')
-                  }
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              </TouchableOpacity>
-            }
-          />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-            }}
-            placeholder="Designation"
-            value={designation}
-            onChange={d => setDesignation(d)}
-            error={errors}
-            onFocus={() => setErrors()}
-            prependComponent={
-              <MaterialIcons
-                style={{marginHorizontal: 5}}
-                name={'design-services'}
-                size={24}
-                color={COLORS.grey}
-              />
-            }
-          />
-          <TextButton
-            label={'Sign Up'}
-            contentContainerStyle={{
-              height: 55,
-              borderRadius: SIZES.radius,
-              margin: 10,
-            }}
-            labelStyle={{
-              color: COLORS.light,
-              ...FONTS.h4,
-            }}
-            onPress={() => {
-              if (
-                (email, password, confirmPassword, name, number, designation)
-              ) {
-                HandleSignUp();
-                Alert.alert('locally form submitted');
-              } else {
-                Alert.alert('validation failed');
-              }
-            }}
-          />
-        </View>
+          }}
+        />
       </KeyboardAwareScrollView>
     );
   }
@@ -633,7 +642,7 @@ const AuthMain = ({navigation}) => {
   return (
     <View
       style={{
-        flex: 1,
+        // flex: 1,
         paddingHorizontal: SIZES.padding,
         backgroundColor: COLORS.lightGrey,
       }}
@@ -744,7 +753,7 @@ const AuthMain = ({navigation}) => {
         transparent={true}
         visible={forgetModal}
         onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
+          //   Alert.alert('Modal has been closed.');
           setForgetModal(!forgetModal);
         }}
       >
@@ -944,6 +953,8 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                autoComplete={'sms-otp'}
+                keyboardType={'numeric'}
                 maxLength={1}
                 placeholder={'0'}
                 value={otpState.one}
@@ -960,6 +971,8 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                autoComplete={'sms-otp'}
+                keyboardType={'number-pad'}
                 maxLength={1}
                 placeholder={'0'}
                 value={otpState.two}
@@ -976,6 +989,8 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                autoComplete={'sms-otp'}
+                keyboardType={'numeric'}
                 maxLength={1}
                 placeholder={'0'}
                 value={otpState.three}
@@ -992,6 +1007,8 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                autoComplete={'sms-otp'}
+                keyboardType={'numeric'}
                 maxLength={1}
                 placeholder={'0'}
                 value={otpState.four}
@@ -1008,6 +1025,8 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                autoComplete={'sms-otp'}
+                keyboardType={'numeric'}
                 maxLength={1}
                 placeholder={'0'}
                 value={otpState.five}
@@ -1024,6 +1043,8 @@ const AuthMain = ({navigation}) => {
                   fontSize: SIZES.h2,
                   textAlign: 'center',
                 }}
+                autoComplete={'sms-otp'}
+                keyboardType={'numeric'}
                 maxLength={1}
                 placeholder={'0'}
                 value={otpState.six}
@@ -1111,7 +1132,7 @@ export default AuthMain;
 
 const styles = StyleSheet.create({
   authContainer: {
-    flex: 1,
+    // flex: 1,
     width: SIZES.width - SIZES.padding * 2,
     borderRadius: SIZES.radius,
     backgroundColor: COLORS.light,

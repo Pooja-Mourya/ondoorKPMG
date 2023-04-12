@@ -27,6 +27,7 @@ import moment from 'moment';
 import DocumentPicker, {types} from 'react-native-document-picker';
 import axios from 'axios';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {ToastAndroid} from 'react-native';
 
 const data = [
   {id: '1', duration: 'Every day'},
@@ -41,6 +42,7 @@ const AddMeeting = props => {
 
   const token = useSelector(state => state?.user?.user?.access_token);
 
+  const [dPValues, setDPValues] = useState({mode: 'date', key: ''});
   const [enableCheck, setEnableCheck] = useState(false);
   const [selectImage, setSelectImage] = useState(null);
   const [uploadFiles, setUploadFiles] = useState([]);
@@ -67,10 +69,10 @@ const AddMeeting = props => {
     meeting_time_start: '',
     meeting_link: '',
   });
+  const [inputRecode, setInputRecode] = useState(false);
 
   const uniEmail = invitation => {
     const flag = user.find(i => i.email === invitation);
-    console.log('flag', flag);
     return flag;
   };
 
@@ -88,9 +90,8 @@ const AddMeeting = props => {
         });
         setUser([...u]);
       } else {
-        Alert.alert('email already exist');
+        ToastAndroid.show('email already exist');
       }
-      console.log('added');
     } else {
       Alert.alert('invalid');
     }
@@ -120,9 +121,6 @@ const AddMeeting = props => {
       ],
       //   documents: uploadFiles,
     };
-
-    // console.log('meeting params', params);
-    // return;
     try {
       const result = await ApiMethod.postData(url, params, token);
       //   return;
@@ -131,7 +129,7 @@ const AddMeeting = props => {
       }
       navigation.navigate('Meeting');
     } catch (error) {
-      console.log('error', error);
+      Alert.alert('error', error);
     }
   };
 
@@ -145,7 +143,7 @@ const AddMeeting = props => {
       setUser(result?.data?.data);
       return;
     } catch (error) {
-      console.log('error', error);
+      Alert.alert('error', error);
     }
   };
 
@@ -172,11 +170,53 @@ const AddMeeting = props => {
     });
   };
 
+  const onErrorChange = (name, value) => {
+    setInputRecode(error => ({
+      ...error,
+      [value]: name,
+    }));
+  };
+
+  const validate = () => {
+    Keyboard.dismiss();
+    let isValid = true;
+    if (!state.meeting_title) {
+      onErrorChange('this field is required ', 'meeting_title');
+      isValid = false;
+    }
+    if (!state.meeting_date) {
+      onErrorChange('this field is required', 'meeting_date');
+      isValid = false;
+    }
+    if (!state.meeting_time_end) {
+      onErrorChange('this field is required', 'meeting_time_end');
+      isValid = false;
+    }
+    if (!state.meeting_time_start) {
+      onErrorChange('this field is required', 'meeting_time_start');
+      isValid = false;
+    }
+    if (!state.attendees) {
+      onErrorChange('this field is required', 'attendees');
+      isValid = false;
+    }
+    // if (!state.meeting_link) {
+    //   onErrorChange('this field is required', 'meeting_link');
+    //   isValid = false;
+    // } else if (state.meeting_link == state.meeting_link.includes('https://')) {
+    //   isValid = false;
+    // } else {
+    //   Alert.alert('incorrect meeting url');
+    // }
+    if (isValid) {
+      return isValid;
+    }
+  };
+
   const uploadFile = async imagePath => {
     let url = constants.base_url + constants.endPoint.uploadFile;
     let formDataRes = new FormData();
     formDataRes.append('is_multiple', 1);
-    console.log('sadsadsadsa', imagePath);
     imagePath?.map((e, i) => {
       let obj = e;
       if (!obj.size) {
@@ -291,83 +331,22 @@ const AddMeeting = props => {
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
-            placeholder="Meeting Title"
+            placeholder="Meeting Title *"
             value={state.meeting_title}
+            error={inputRecode.meeting_title}
             onChange={m => onchangeState('meeting_title', m)}
+            onFocus={m => onErrorChange(m, 'meeting_title')}
           />
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
               marginTop: 10,
-              color: COLORS.dark,
             }}
-            placeholderTextColor={COLORS.dark}
-            placeholder="Meeting Date"
-            value={state.meeting_date}
-            onChange={d => {
-              onchangeState('meeting_date', d);
-            }}
-            editable={false}
-            appendComponent={
-              <TouchableOpacity onPress={() => setOpen(true)}>
-                <Fontisto name={'date'} size={25} color={COLORS.primary} />
-              </TouchableOpacity>
-            }
-          />
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-                marginTop: 10,
-                width: '48%',
-              }}
-              placeholder="time start"
-              editable={false}
-              value={state.meeting_time_start}
-              onChange={d => {
-                onchangeState('meeting_time_start', d);
-              }}
-              appendComponent={
-                <TouchableOpacity onPress={() => setOpenStart(true)}>
-                  <AntDesign
-                    name={'clockcircleo'}
-                    size={25}
-                    color={COLORS.primary}
-                  />
-                </TouchableOpacity>
-              }
-            />
-            <FormInput
-              containerStyle={{
-                borderRadius: SIZES.radius,
-                backgroundColor: COLORS.error,
-                marginTop: 10,
-                width: '48%',
-              }}
-              placeholder="time end"
-              value={state.meeting_time_end}
-              editable={false}
-              onChange={t => {
-                onchangeState('meeting_time_end', t);
-              }}
-              appendComponent={
-                <TouchableOpacity onPress={() => setOpenTime(true)}>
-                  <Entypo name={'clock'} size={28} color={COLORS.primary} />
-                </TouchableOpacity>
-              }
-            />
-          </View>
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-              marginTop: 10,
-            }}
-            placeholder="Meeting reference no."
-            value={state.meeting_ref_no}
-            onChange={r => onchangeState('meeting_ref_no', r)}
+            placeholder="Agenda of meeting"
+            value={state.agenda_of_meeting}
+            numberOfLines={10}
+            onChange={o => onchangeState('agenda_of_meeting', o)}
           />
           <FormInput
             containerStyle={{
@@ -384,13 +363,97 @@ const AddMeeting = props => {
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
               marginTop: 10,
+              color: COLORS.dark,
             }}
-            placeholder="Agenda of meeting"
-            value={state.agenda_of_meeting}
-            numberOfLines={10}
-            onChange={o => onchangeState('agenda_of_meeting', o)}
+            placeholderTextColor={COLORS.dark}
+            placeholder="mm/dd/yyyy *"
+            value={state.meeting_date}
+            error={inputRecode.meeting_date}
+            onChange={d => {
+              onchangeState('meeting_date', d);
+            }}
+            onFocus={f => onErrorChange(f, 'meeting_date')}
+            editable={false}
+            appendComponent={
+              <TouchableOpacity
+                onPress={() => {
+                  setDPValues({mode: 'date', key: 'meeting_date'});
+                  setOpen(true);
+                }}
+              >
+                <Fontisto name={'date'} size={25} color={COLORS.primary} />
+              </TouchableOpacity>
+            }
           />
-          <View style={{marginHorizontal: 12}}>
+          {/* <View style={{flexDirection: 'row', justifyContent: 'space-between'}}> */}
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+              //   width: '48%',
+            }}
+            placeholder="time start * "
+            editable={false}
+            value={state.meeting_time_start}
+            onChange={d => {
+              onchangeState('meeting_time_start', d);
+            }}
+            onFocus={f => onErrorChange(f, 'meeting_time_start')}
+            error={inputRecode.meeting_time_start}
+            appendComponent={
+              <TouchableOpacity
+                onPress={() => {
+                  setDPValues({mode: 'time', key: 'meeting_time_start'});
+                  setOpen(true);
+                }}
+              >
+                <AntDesign
+                  name={'clockcircleo'}
+                  size={25}
+                  color={COLORS.primary}
+                />
+              </TouchableOpacity>
+            }
+          />
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+              //   width: '48%',
+            }}
+            placeholder="time end * "
+            editable={false}
+            value={state.meeting_time_end}
+            onChange={d => {
+              onchangeState('meeting_time_end', d);
+            }}
+            error={inputRecode.meeting_time_end}
+            onFocus={f => onErrorChange(f, 'meeting_time_end')}
+            appendComponent={
+              <TouchableOpacity
+                onPress={() => {
+                  setDPValues({mode: 'time', key: 'meeting_time_end'});
+                  setOpen(true);
+                }}
+              >
+                <Entypo name={'clock'} size={28} color={COLORS.primary} />
+              </TouchableOpacity>
+            }
+          />
+          {/* </View> */}
+          {/* <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            placeholder="Meeting reference no."
+            value={state.meeting_ref_no}
+            onChange={r => onchangeState('meeting_ref_no', r)}
+          /> */}
+          {/* <View style={{marginHorizontal: 12}}>
             <CheckBox
               CheckBoxText={'Enable Repeat'}
               containerStyle={{backgroundColor: '', lineHeight: 20}}
@@ -438,15 +501,6 @@ const AddMeeting = props => {
                 value={state.eventNumber}
                 onChange={a => onchangeState('eventNumber', a)}
               />
-              {/* {state.eventNumber === Number ? null : (
-                  <Text
-                    style={{
-                      color: state.eventNumber === Number ? COLORS.error : 'grey',
-                    }}
-                  >
-                    this field is required
-                  </Text>
-                )} */}
               <Text
                 style={{
                   ...FONTS.body3,
@@ -460,7 +514,7 @@ const AddMeeting = props => {
                 The meeting will be repeated for {state.eventNumber} Days
               </Text>
             </View>
-          ) : null}
+          ) : null} */}
           <MultiSelect
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
@@ -471,14 +525,20 @@ const AddMeeting = props => {
             data={user}
             labelField="email"
             valueField="email"
-            placeholder="Select attendees"
+            placeholder={`Select attendees *`}
             searchPlaceholder="Search..."
             value={state.attendees}
             onChange={item => {
               //   console.log('asasasas', item);
               onchangeState('attendees', item);
             }}
+            onFocus={f => onErrorChange(f, 'attendees')}
           />
+          {!inputRecode == state.attendees ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              please select any one option
+            </Text>
+          ) : null}
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -497,8 +557,9 @@ const AddMeeting = props => {
               !state.inviteEmail ? (
                 <TouchableOpacity
                   onPress={() =>
-                    Alert.alert(
+                    ToastAndroid.show(
                       'if you want to add new attendees, enter his email',
+                      ToastAndroid.SHORT,
                     )
                   }
                 >
@@ -537,95 +598,118 @@ const AddMeeting = props => {
               />
             }
           />
-          <View>
-            <FlatList
-              data={selectImage}
-              keyExtractor={(item, index) =>
-                (item?.filename ?? item?.path) + index
-              }
-              renderItem={({item}) => {
-                console.log('item', item.uri);
-                return (
-                  <View style={{}}>
-                    <Image
-                      source={{uri: item.uri}}
-                      style={{
-                        width: 100,
-                        height: 100,
-                        flex: 1,
-                        borderRadius: SIZES.radius,
-                      }}
-                    />
-                    {/* <Text>{item.name}</Text> */}
-                    <TouchableOpacity
-                      //   onPress={() => onDelete(item)}
-                      activeOpacity={0.9}
-                      style={{position: 'absolute', padding: 5}}
-                    >
-                      <Text style={{}}>
-                        <AntDesign name="delete" color={'red'} size={20} />
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              }}
-              numColumns={3}
-              style={{
-                height: selectImage != '' ? 200 : 1,
-                borderWidth: 1,
-                backgroundColor: COLORS.light,
-                marginVertical: 10,
-                borderRadius: SIZES.radius,
-                padding: 10,
-                display: !selectImage ? 'none' : 'flex',
-              }}
-            />
-            {selectImage ? (
-              <TextButton
-                label={'upload Image'}
-                contentContainerStyle={{
-                  backgroundColor: 'none',
-                  margin: 10,
-                }}
-                labelStyle={{
-                  color: COLORS.primary,
-                }}
-                onPress={() => uploadFile(selectImage)}
-              />
-            ) : null}
-          </View>
-          <TextButton
-            label={editMeeting ? 'Edit' : 'Save'}
-            contentContainerStyle={{
-              height: 55,
-              borderRadius: SIZES.radius,
-              margin: 10,
-            }}
-            labelStyle={{
-              color: COLORS.light,
-              ...FONTS.h4,
-            }}
-            onPress={() => (editMeeting ? updateMeeting() : submitHandle())}
-          />
         </KeyboardAwareScrollView>
-      </View>
-      {open && (
-        <DatePicker
-          modal
-          open={open}
-          date={date}
-          mode={'date'}
-          onConfirm={date => {
-            setOpen(false);
-            setDate(date);
-            onchangeState('meeting_date', moment(date).format('L'));
+        <View>
+          <FlatList
+            data={selectImage}
+            keyExtractor={(item, index) =>
+              (item?.filename ?? item?.path) + index
+            }
+            renderItem={({item}) => {
+              console.log('item', item.uri);
+              return (
+                <View style={{}}>
+                  <Image
+                    source={{uri: item.uri}}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      flex: 1,
+                      borderRadius: SIZES.radius,
+                    }}
+                  />
+                  {/* <Text>{item.name}</Text> */}
+                  <TouchableOpacity
+                    //   onPress={() => onDelete(item)}
+                    activeOpacity={0.9}
+                    style={{position: 'absolute', padding: 5}}
+                  >
+                    <Text style={{}}>
+                      <AntDesign name="delete" color={'red'} size={20} />
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+            numColumns={3}
+            style={{
+              height: selectImage != '' ? 200 : 1,
+              borderWidth: 1,
+              backgroundColor: COLORS.light,
+              marginVertical: 10,
+              borderRadius: SIZES.radius,
+              padding: 10,
+              display: !selectImage ? 'none' : 'flex',
+            }}
+          />
+          {selectImage ? (
+            <TextButton
+              label={'upload Image'}
+              contentContainerStyle={{
+                backgroundColor: 'none',
+                margin: 10,
+              }}
+              labelStyle={{
+                color: COLORS.primary,
+              }}
+              onPress={() => uploadFile(selectImage)}
+            />
+          ) : null}
+        </View>
+        <TextButton
+          label={editMeeting ? 'Edit' : 'Save'}
+          contentContainerStyle={{
+            height: 55,
+            borderRadius: SIZES.radius,
+            marginTop: 10,
           }}
-          onCancel={() => {
-            setOpen(false);
+          labelStyle={{
+            color: COLORS.light,
+            ...FONTS.h4,
+          }}
+          onPress={() => {
+            // editMeeting ? updateMeeting() : submitHandle();
+            // validate()  ? submitHandle() : updateMeeting();
+
+            if (editMeeting) {
+              updateMeeting();
+              return;
+            }
+            if (validate()) {
+              submitHandle();
+              ToastAndroid.show('successfully submit form', ToastAndroid.SHORT);
+            } else {
+              ToastAndroid.show('validation failed', ToastAndroid.SHORT);
+            }
           }}
         />
-      )}
-      {openStart ? (
+      </View>
+      {/* {open && ( */}
+      <DatePicker
+        modal
+        open={open}
+        date={date}
+        mode={dPValues?.mode}
+        onConfirm={date => {
+          if (dPValues.key) {
+            if (dPValues.mode === 'date') {
+              onchangeState(dPValues.key, moment(date).format('L'));
+            } else {
+              onchangeState(dPValues.key, moment(date).format('LTS'));
+            }
+            setInputRecode({...inputRecode, [dPValues.key]: false});
+          } else {
+            console.log('KEY IS NOT FOUND !');
+          }
+          setOpen(false);
+          setDate(date);
+        }}
+        onCancel={() => {
+          setOpen(false);
+        }}
+      />
+      {/* )} */}
+      {/* {openStart ? (
         <DatePicker
           modal
           open={openStart}
@@ -656,7 +740,7 @@ const AddMeeting = props => {
             setOpenTime(false);
           }}
         />
-      ) : null}
+      ) : null} */}
     </>
   );
 };

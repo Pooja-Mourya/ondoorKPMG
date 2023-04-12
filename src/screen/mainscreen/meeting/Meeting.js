@@ -21,6 +21,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 import TextButton from '../../../components/TextButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ToastAndroid} from 'react-native';
 
 const Meeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -47,11 +48,12 @@ const Meeting = props => {
     //   console.log('result', result?.data?.data, 'url', url);
 
     if (result) {
+      setLoader(true);
       if (!page) {
         setPage(1);
         setListState(result?.data?.data?.data);
         setLoader(false);
-        if (refresh) setIsRefreshing(false);
+        if (!refresh) setIsRefreshing(false);
       } else {
         let temp = [...listState];
         temp = temp.concat(result?.data?.data?.data);
@@ -63,7 +65,7 @@ const Meeting = props => {
       if (!page) setLoader(false);
       else setPageRe(false);
       if (refresh) setIsRefreshing(false);
-      Alert.alert('error in pagination');
+      ToastAndroid.show('error in pagination', ToastAndroid.SHORT);
     }
   };
 
@@ -218,15 +220,16 @@ const Meeting = props => {
           );
         }}
         onEndReached={() => {
-          //   console.log('load more');
           handleMeetingList(page + 1, null, true);
         }}
         onEndReachedThreshold={0.1}
-        ListFooterComponent={() => (
-          <View style={{marginTop: 22}}>
-            <ActivityIndicator size={'large'} color={'rosybrown'} />
-          </View>
-        )}
+        ListFooterComponent={() => {
+          return (
+            <View style={{marginTop: 22}}>
+              <ActivityIndicator size={'large'} color={'rosybrown'} />
+            </View>
+          );
+        }}
       />
       <FAB
         icon="plus"

@@ -162,7 +162,7 @@ const ImageUpload = () => {
 
       <MyImage />
 
-      {/* <ValidationForm /> */}
+      <ValidationForm />
     </View>
   );
 };

@@ -61,7 +61,7 @@ export default function MyTab() {
         component={Notes}
       />
 
-      <Tab.Screen
+      {/* <Tab.Screen
         options={() => ({
           tabBarIcon: () => {
             return (
@@ -80,7 +80,7 @@ export default function MyTab() {
         })}
         name="Upload"
         component={ImageUpload}
-      />
+      /> */}
 
       <Tab.Screen
         options={() => ({

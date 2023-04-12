@@ -8,8 +8,9 @@ import FormInput from '../../components/FormInput';
 import {COLORS, constants, FONTS, SIZES} from '../../constants';
 import ApiMethod from '../../Services/APIService';
 import {useSelector} from 'react-redux';
+import Header from '../../components/layout/Header';
 
-const Changepassword = ({setChnagePasswordModal, changePasswordModal}) => {
+const Changepassword = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
   const [old_password, setOld_password] = useState('');
@@ -47,69 +48,79 @@ const Changepassword = ({setChnagePasswordModal, changePasswordModal}) => {
 
       console.log('chnagePassword', result);
       if (result) {
-        setChnagePasswordModal(false);
+        setTimeout(() => {
+          navigation.goBack();
+        }, 1000);
       }
     } catch (error) {
       console.log('error', error);
     }
   };
   return (
-    <View>
-      <TouchableOpacity
-        style={{alignItems: 'flex-end'}}
-        onPress={() => setChnagePasswordModal(false)}
+    <View
+      style={{
+        justifyContent: 'center',
+        flex: 1,
+        alignItems: 'center',
+        backgroundColor: COLORS.lightGrey80,
+      }}
+    >
+      <View
+        style={{
+          width: '90%',
+          backgroundColor: COLORS.secondary,
+          padding: SIZES.padding,
+          borderRadius: SIZES.radius,
+        }}
       >
-        <AntDesign
-          style={{
-            backgroundColor: 'white',
-            borderRadius: 50,
-            elevation: 2,
-            margin: 10,
-            padding: 5,
-          }}
-          name="close"
-          size={25}
-          color={COLORS.dark}
+        <Header
+          textHeader={'Change Password'}
+          leftIcon={true}
+          onPressArrow={() => navigation.goBack()}
         />
-      </TouchableOpacity>
 
-      <FormInput
-        containerStyle={{
-          borderRadius: SIZES.radius,
-          backgroundColor: COLORS.error,
-          marginTop: 10,
-        }}
-        placeholder="old password"
-        value={old_password}
-        onChange={e => setOld_password(e)}
-        prependComponent={<Fontisto name="eye" size={25} color={COLORS.grey} />}
-      />
-      <FormInput
-        containerStyle={{
-          borderRadius: SIZES.radius,
-          backgroundColor: COLORS.error,
-          marginTop: 10,
-        }}
-        placeholder="password"
-        value={password}
-        onChange={e => setPassword(e)}
-        prependComponent={<Fontisto name="eye" size={25} color={COLORS.grey} />}
-      />
-      <TextButton
-        label={'Submit'}
-        contentContainerStyle={{
-          height: 55,
-          borderRadius: SIZES.radius,
-          marginTop: 10,
-        }}
-        labelStyle={{
-          color: COLORS.light,
-          ...FONTS.h4,
-        }}
-        onPress={() => {
-          chnagePasswordHandler();
-        }}
-      />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+            marginTop: 10,
+          }}
+          placeholder="old password"
+          value={old_password}
+          onChange={e => setOld_password(e)}
+          prependComponent={
+            <Fontisto name="eye" size={25} color={COLORS.grey} />
+          }
+        />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+            marginTop: 10,
+          }}
+          placeholder="password"
+          value={password}
+          onChange={e => setPassword(e)}
+          prependComponent={
+            <Fontisto name="eye" size={25} color={COLORS.grey} />
+          }
+        />
+        <TextButton
+          label={'Submit'}
+          contentContainerStyle={{
+            height: 55,
+            borderRadius: SIZES.radius,
+            marginTop: 10,
+          }}
+          labelStyle={{
+            color: COLORS.light,
+            ...FONTS.h4,
+          }}
+          onPress={() => {
+            chnagePasswordHandler();
+          }}
+        />
+      </View>
     </View>
   );
 };

@@ -2,12 +2,16 @@ import React from 'react';
 import MyStack from './src/navigation/MyStack';
 import {store} from './src/redux/store';
 import {Provider} from 'react-redux';
+import {Root} from 'popup-ui';
+import {COLORS} from './src/constants';
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <MyStack />
-    </Provider>
+    <Root>
+      <Provider store={store}>
+        <MyStack />
+      </Provider>
+    </Root>
   );
 };
 

@@ -4,7 +4,7 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
+  ToastAndroid,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../../components/layout/Header';
@@ -53,20 +53,21 @@ const AddUser = props => {
     confirm_password: '',
   });
 
-  const handleError = (error, name) => {
-    setErrors({...errors, [error]: name});
+  const handleError = (error, value) => {
+    setErrors(errors => ({...errors, [value]: error}));
   };
 
   const handleOnChangeState = (name, value) => {
-    setInput({
+    setInput(input => ({
       ...input,
       [name]: value,
-    });
+    }));
   };
 
   const validate = () => {
     Keyboard.dismiss();
     let isValid = true;
+
     if (!input.role_id.id) {
       handleError('please select role id', 'role_id');
       isValid = false;
@@ -79,14 +80,6 @@ const AddUser = props => {
       handleError('please enter email', 'email');
       isValid = false;
     }
-    if (!input.password) {
-      handleError('please enter password', 'password');
-      isValid = false;
-    }
-    if (!input.confirm_password) {
-      handleError('please enter confirm Password', 'confirm_password');
-      isValid = false;
-    }
     if (!input.mobile_number) {
       handleError('please enter number', 'mobile_number');
       isValid = false;
@@ -95,8 +88,16 @@ const AddUser = props => {
       handleError('please enter designation', 'designation');
       isValid = false;
     }
+    if (!input.password) {
+      handleError('please enter password', 'password');
+      isValid = false;
+    }
+    if (!input.confirm_password && input.password === input.confirm_password) {
+      handleError('please enter confirm_password', 'confirm_password');
+      isValid = false;
+    }
     if (isValid) {
-      return;
+      return isValid;
     }
   };
 
@@ -119,7 +120,7 @@ const AddUser = props => {
       setLoad(true);
       const result = await ApiMethod.postData(url, params, token);
       if (result) {
-        Alert.alert('user added successfully');
+        ToastAndroid.show('user added successfully', ToastAndroid.SHORT);
         navigation.navigate('User');
       }
     } catch (error) {
@@ -142,7 +143,7 @@ const AddUser = props => {
       setLoad(true);
       const result = await ApiMethod.putData(url, params, token);
       if (result) {
-        Alert.alert('user added successfully');
+        ToastAndroid.show('user added successfully', ToastAndroid.SHORT);
         navigation.navigate('User');
       }
     } catch (error) {
@@ -162,7 +163,6 @@ const AddUser = props => {
       console.log('result', result?.data?.data, 'url', url);
       setData(result?.data?.data);
       setLoad(false);
-      return;
     } catch (error) {
       console.log('error', error);
     }
@@ -184,7 +184,7 @@ const AddUser = props => {
       });
     }
   }, []);
-  if (load === true) return <ActivityIndicator />;
+  //   if (load === true) return <ActivityIndicator />;
   return (
     <>
       <KeyboardAwareScrollView>
@@ -213,13 +213,13 @@ const AddUser = props => {
             maxHeight={300}
             labelField="name"
             valueField="id"
-            placeholder="Select role"
+            placeholder="Select role *"
             searchPlaceholder="Search..."
             value={input.role_id}
             onChange={item => {
               handleOnChangeState('role_id', item);
             }}
-            // onFocus={e => }
+            onFocus={e => handleError(e, 'role_id')}
             renderLeftIcon={() => (
               <AntDesign
                 style={styles.icon}
@@ -229,22 +229,22 @@ const AddUser = props => {
               />
             )}
           />
-          {!errors ? (
+          {!errors == input.role_id ? (
             <Text style={{color: COLORS.error, marginHorizontal: 10}}>
               please select any one option
             </Text>
-          ) : (
-            <Text></Text>
-          )}
+          ) : null}
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
             }}
-            placeholder="Name"
+            placeholder="Name *"
             value={input.name}
             error={errors.name}
-            onFocus={e => handleError(e, 'name')}
+            onFocus={e => {
+              handleError(e, 'name');
+            }}
             onChange={n => handleOnChangeState('name', n)}
             prependComponent={
               <AntDesign name="user" size={25} color={COLORS.grey} />
@@ -256,11 +256,13 @@ const AddUser = props => {
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
-            placeholder="Email"
+            placeholder="Email *"
             value={input.email}
             onChange={e => handleOnChangeState('email', e)}
             error={errors.email}
-            onFocus={e => handleError(e, 'email')}
+            onFocus={e => {
+              handleError(e, 'email');
+            }}
             prependComponent={
               <Fontisto
                 style={{marginHorizontal: 5}}
@@ -277,8 +279,9 @@ const AddUser = props => {
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
-            placeholder="mobile number"
+            placeholder="mobile number *"
             value={input.mobile_number}
+            maxLength={10}
             onChange={u => handleOnChangeState('mobile_number', u)}
             error={errors.mobile_number}
             onFocus={e => handleError(e, 'mobile_number')}
@@ -297,7 +300,7 @@ const AddUser = props => {
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
-            placeholder="Password"
+            placeholder="Password *"
             secureTextEntry={true}
             value={input.password}
             onChange={p => handleOnChangeState('password', p)}
@@ -318,7 +321,7 @@ const AddUser = props => {
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
-            placeholder="Confirm Password"
+            placeholder="Confirm Password *"
             secureTextEntry={click}
             value={input.confirm_password}
             onChange={p => handleOnChangeState('confirm_password', p)}
@@ -348,11 +351,13 @@ const AddUser = props => {
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
-            placeholder="Designation"
+            placeholder="Designation *"
             value={input.designation}
             onChange={d => handleOnChangeState('designation', d)}
             error={errors.designation}
-            onFocus={e => handleError(e, 'designation')}
+            onFocus={e => {
+              handleError(e, 'designation');
+            }}
             prependComponent={
               <Feather
                 style={{marginHorizontal: 5}}
@@ -362,11 +367,6 @@ const AddUser = props => {
               />
             }
           />
-          {/* <CheckBox
-            containerStyle={{backgroundColor: '', lineHeight: 20}}
-            isSelected={termChecked}
-            onPress={() => setTermChecked(!termChecked)}
-          /> */}
           <TextButton
             label={userEdit ? ' Edit User' : 'Add User'}
             contentContainerStyle={{
@@ -379,20 +379,18 @@ const AddUser = props => {
               ...FONTS.h4,
             }}
             onPress={() => {
-              //   userEdit ? EditUserHandler() : submitHandle();
-              //   if (userEdit) {
-              //     EditUserHandler();
-              //   } else if (validate()) {
-              //     submitHandle();
-              //   } else {
-              //     Alert.alert('validation failed');
-              //   }
-              //   if (validate()) {
-              //     submitHandle();
-              //   } else {
-              //     Alert.alert('validation failed');
-              //   }
-              submitHandle();
+              validate()
+                ? submitHandle()
+                : ToastAndroid.show('validation failed', ToastAndroid.SHORT);
+              if (userEdit) {
+                EditUserHandler();
+                return;
+              }
+              if (validate()) {
+                submitHandle();
+              } else {
+                ToastAndroid.show('validation failed', ToastAndroid.SHORT);
+              }
             }}
           />
         </View>

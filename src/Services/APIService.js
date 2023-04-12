@@ -3,8 +3,7 @@ import axios from 'axios';
 import {Alert} from 'react-native';
 import {constants} from '../constants';
 import {handleNavigation} from '../../src/navigation/MyStack';
-import {userLoginFun} from '../redux/slice/UserSlice';
-import {useDispatch} from 'react-redux';
+import {ToastAndroid} from 'react-native';
 
 const ApiMethod = {
   getData: async (endPoint, token) => {
@@ -60,7 +59,7 @@ const ApiMethod = {
       //   console.log('response', response);
       return response;
     } catch (error) {
-      Alert.alert('Unauthenticated');
+      ToastAndroid.show('Unauthenticated', ToastAndroid.SHORT);
       console.log('error', error);
     }
   },
@@ -84,7 +83,6 @@ const ApiMethod = {
     // console.log('body--', body);
     try {
       let response = await axios.post(url, body, config);
-      //   console.log('response', response);
       return response;
     } catch (error) {
       if (error.response.data.code === 401) {
@@ -92,7 +90,11 @@ const ApiMethod = {
         AsyncStorage.removeItem('@user');
         handleNavigation();
         // dispatch(userLoginFun({}));
+      } else {
+        Alert.alert(`Api ${error}`);
       }
+
+      //   return error;
       //   console.log(error.response.data.code, 'c');
     }
   },

@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
+  ToastAndroid,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
@@ -44,25 +45,26 @@ const AddMeeting = props => {
     decision: '',
   });
   const [selectImage, setSelectImage] = useState([]);
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState(false);
 
   const validate = () => {
     let valid = true;
     Keyboard.dismiss();
-    if (state.notes) {
-      handleError('this field is required');
+    if (!state.meeting_id.id) {
+      handleError('this field is required', 'meeting_id');
       valid = false;
     }
-    // else if(state.email.match('this string')){
-    //     handleError('invalid email formate')
-    // }
+    if (!state.notes) {
+      handleError('this field is required', 'notes');
+      valid = false;
+    }
     if (valid) {
-      AddMeeting();
+      return valid;
     }
   };
 
   const handleError = (errorMessage, input) => {
-    setErrors({...errors, [errorMessage]: input});
+    setErrors({...errors, [input]: errorMessage});
   };
 
   const handleImagePiker = async () => {
@@ -136,7 +138,7 @@ const AddMeeting = props => {
         ],
       },
     });
-    Alert.alert('Record successfully created');
+    ToastAndroid.show('Record successfully created', ToastAndroid.SHORT);
     console.log('create api response ...', res);
     setIsLoading(false);
     setAddNotesModal(false);
@@ -162,7 +164,7 @@ const AddMeeting = props => {
 
     try {
       const response = await ApiMethod.putData(url, params, token);
-      Alert.alert(' note update successfully');
+      ToastAndroid.show(' note update successfully', ToastAndroid.SHORT);
       setIsLoading(false);
       console.log('response', response);
       setAddNotesModal(false);
@@ -208,7 +210,7 @@ const AddMeeting = props => {
   }, []);
 
   console.log('listState', listState);
-  if (isLoading) return <ActivityIndicator />;
+  //   if (isLoading) return <ActivityIndicator />
   return (
     <>
       <Header
@@ -248,7 +250,7 @@ const AddMeeting = props => {
           />
         </TouchableOpacity>
         <Text style={{...FONTS.body2, fontSize: SIZES.h2}}>Basic Details</Text>
-        <Text>Enter basic details of the meeting</Text>
+        <Text>Enter basic details of the notes</Text>
         <KeyboardAwareScrollView>
           <Dropdown
             style={styles.dropdown}
@@ -267,6 +269,7 @@ const AddMeeting = props => {
             onChange={item => {
               onchangeState('meeting_id', item);
             }}
+            onFocus={m => handleError(m, 'meeting_id')}
             renderLeftIcon={() => (
               <AntDesign
                 style={styles.icon}
@@ -276,19 +279,25 @@ const AddMeeting = props => {
               />
             )}
           />
-          {/* <FormInput
+          {!errors == state.meeting_id ? (
+            <Text style={{color: COLORS.error, marginHorizontal: 10}}>
+              please set meeting id
+            </Text>
+          ) : null}
+          <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
               backgroundColor: COLORS.error,
               marginTop: 10,
             }}
-            placeholder="meeting_id"
-            value={state.meeting_id}
-            onChange={d => onchangeState('meeting_id', d)}
-            error={errors.meeting_id}
-            onFocus={() => handleError(null, 'meeting_id')}
-            keyboardType="numeric"
-          /> */}
+            placeholder="Notes *"
+            value={state.notes}
+            error={errors.notes}
+            onChange={n => onchangeState('notes', n)}
+            onFocus={m => handleError(m, 'notes')}
+            multiline={true}
+            numberOfLines={4}
+          />
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -298,22 +307,9 @@ const AddMeeting = props => {
             placeholder="Duration"
             value={state.duration}
             onChange={d => onchangeState('duration', d)}
-            error={errors.duration}
-            onFocus={() => handleError(null, 'duration')}
             keyboardType="numeric"
           />
-          <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-              marginTop: 10,
-            }}
-            placeholder="Notes"
-            value={state.notes}
-            onChange={n => onchangeState('notes', n)}
-            multiline={true}
-            numberOfLines={4}
-          />
+
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -344,38 +340,6 @@ const AddMeeting = props => {
           {/* <Text>{editable.documents[0].document}</Text>
           {editable ? <Text>{editable.duration}</Text> : null} */}
 
-          <View>
-            <FlatList
-              data={selectImage}
-              keyExtractor={(item, index) =>
-                (item?.filename ?? item?.path) + index
-              }
-              renderItem={({item}) => {
-                // console.log('item', item);
-                return (
-                  <View style={{flexDirection: 'column', width: '100%'}}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <View>
-                        <Text>{item.name}</Text>
-                      </View>
-                      <TouchableOpacity
-                        onPress={() => setSelectImage(selectImage.splice(0, 1))}
-                      >
-                        <AntDesign name="delete" size={20} color={'red'} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              }}
-              numColumns={3}
-            />
-          </View>
           {selectImage.length > 0 ? (
             <TextButton
               label={'Upload Image'}
@@ -392,29 +356,65 @@ const AddMeeting = props => {
               }}
             />
           ) : null}
-          <TextButton
-            label={editable ? 'Update' : 'Save'}
-            contentContainerStyle={{
-              height: 55,
-              borderRadius: SIZES.radius,
-              marginVertical: 15,
-              width: '100%',
-            }}
-            labelStyle={{
-              color: COLORS.light,
-              ...FONTS.h4,
-            }}
-            onPress={() => {
-              editable ? handleUpdate() : submitHandle();
-              //   if (validate()) {
-              //     submitHandle();
-              //   } else {
-              //     Alert.alert('invalid input');
-              //   }
-            }}
-          />
         </KeyboardAwareScrollView>
+        <View>
+          <FlatList
+            data={selectImage}
+            keyExtractor={(item, index) =>
+              (item?.filename ?? item?.path) + index
+            }
+            renderItem={({item}) => {
+              // console.log('item', item);
+              return (
+                <View style={{flexDirection: 'column', width: '100%'}}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      paddingVertical: 10,
+                    }}
+                  >
+                    <View>
+                      <Text>{item.name}</Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => setSelectImage(selectImage.splice(0, 1))}
+                    >
+                      <AntDesign name="delete" size={20} color={'red'} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            }}
+            numColumns={3}
+          />
+        </View>
       </View>
+      <TextButton
+        label={editable ? 'Update' : 'Save'}
+        contentContainerStyle={{
+          height: 55,
+          borderRadius: SIZES.radius,
+          marginVertical: 15,
+          width: '100%',
+        }}
+        labelStyle={{
+          color: COLORS.light,
+          ...FONTS.h4,
+        }}
+        onPress={() => {
+          if (editable) {
+            handleUpdate();
+            return;
+          }
+          if (validate()) {
+            submitHandle();
+            // Alert.alert('note submited successfully');
+          } else {
+            ToastAndroid.show('validation failed', ToastAndroid.SHORT);
+          }
+        }}
+      />
     </>
   );
 };

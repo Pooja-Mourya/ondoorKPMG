@@ -59,7 +59,7 @@ const ValidationForm = () => {
   };
 
   const onSubmit = () => {
-    if ((inputs.name && inputs.email) || validate()) {
+    if (validate()) {
       Alert.alert('submit');
     } else {
       Alert.alert('validation failed');
@@ -112,7 +112,7 @@ const ValidationForm = () => {
   return (
     <>
       <Timer />
-      {/* <View
+      <View
         style={{
           margin: SIZES.padding,
           padding: 10,
@@ -144,7 +144,7 @@ const ValidationForm = () => {
           }}
           placeholder="name"
           value={inputs.name}
-          onChange={e => handleOnchange(e, 'name')}
+          onChange={e => handleOnchange('name', e)}
           onFocus={t => handleError(t, 'name')}
           error={errors.name}
         />
@@ -156,7 +156,7 @@ const ValidationForm = () => {
           }}
           placeholder="password"
           value={inputs.password}
-          onChange={e => handleOnchange(e, 'password')}
+          onChange={e => handleOnchange('password', e)}
           onFocus={t => handleError(t, 'password')}
           error={errors.password}
         />
@@ -215,8 +215,6 @@ const ValidationForm = () => {
           <Text style={{backgroundColor: 'deepskyblue'}}>click Move</Text>
         </TouchableOpacity>
       </View>
-      <Text>{time < 0 ? '0' : time}</Text>
-       */}
     </>
   );
 };

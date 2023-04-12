@@ -120,7 +120,6 @@ const Meeting = ({navigation}) => {
                     <AntDesign name="eyeo" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
                 </View>
-
                 <Text
                   style={{
                     padding: 8,
@@ -138,7 +137,7 @@ const Meeting = ({navigation}) => {
                   renderItem={({item, index}) => {
                     return (
                       <View style={{flexDirection: 'row'}}>
-                        <Text>{index} : </Text>
+                        <Text>{index + 1} : </Text>
                         <Text style={{...FONTS.base, color: COLORS.primary}}>
                           {item.name}
                         </Text>

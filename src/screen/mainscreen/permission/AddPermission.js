@@ -12,9 +12,6 @@ const AddPermission = props => {
   const {navigation} = props;
 
   const editPre = props.route.params;
-
-  console.log('permissionRoutesfsf', editPre);
-
   const token = useSelector(state => state?.user?.user?.access_token);
 
   const [state, setState] = useState({

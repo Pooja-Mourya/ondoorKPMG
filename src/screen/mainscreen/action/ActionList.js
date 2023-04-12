@@ -217,10 +217,12 @@ const ActionList = props => {
                     style={{
                       ...FONTS.base,
                       fontWeight: '500',
-                      fontSize: 16,
+                      fontSize: 14,
                       textTransform: 'capitalize',
                       marginTop: 5,
+                      height: 40,
                     }}
+                    numberOfLines={2}
                   >
                     {item.task}
                   </Text>
