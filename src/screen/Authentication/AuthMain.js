@@ -12,7 +12,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FormInput from '../../components/FormInput';
@@ -40,6 +40,7 @@ import Changepassword from './Changepassword';
 import axios from 'axios';
 import {Root, Popup, Toast} from 'popup-ui';
 import {ToastAndroid} from 'react-native';
+import OtpInputs from 'react-native-otp-inputs';
 
 const AuthMain = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -62,15 +63,7 @@ const AuthMain = ({navigation}) => {
   const [loginOtpModal, setLoginOtpModal] = useState(false);
   const [check, setCheck] = useState(false);
   const [logged, setLogged] = useState(false);
-  const [otp, setOtp] = useState('');
-  const [otpState, setOtpState] = useState({
-    one: '',
-    two: '',
-    three: '',
-    four: '',
-    five: '',
-    six: '',
-  });
+  const [otpState, setOtpState] = useState('');
 
   const handleEmailCheck = e => {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -82,16 +75,10 @@ const AuthMain = ({navigation}) => {
     }
   };
 
-  const onChangeOtp = (name, value) => {
-    setOtpState({
-      ...otpState,
-      [name]: value,
-    });
-  };
-
   const dispatch = useDispatch();
 
   const submitHandle = async () => {
+    setLoader(true);
     await axios
       .post(`https://meeting-api.gofactz.com/public/api/login`, {
         email,
@@ -108,6 +95,7 @@ const AuthMain = ({navigation}) => {
         if (res.data.message) {
           setLoginOtpModal(true);
         }
+        setLoader(false);
       })
       .catch(error => {
         console.log(' 4', error.response.data.message);
@@ -121,6 +109,7 @@ const AuthMain = ({navigation}) => {
             callback: () => Popup.hide(),
           });
           setLogged(error.response.data.message);
+          setLoader(false);
         }
       });
   };
@@ -134,14 +123,6 @@ const AuthMain = ({navigation}) => {
       'confirm-password': confirmPassword,
       mobile_number: number,
       designation: designation,
-
-      //   role_id: '2',
-      //   name: 'user8',
-      //   email: 'user8@gmail.com',
-      //   password: '12345678',
-      //   'confirm-password': '12345678',
-      //   mobile_number: '8103099592',
-      //   designation: 'project Manager',
     };
     try {
       const result = await ApiMethod.postData(url, params, token);
@@ -204,17 +185,10 @@ const AuthMain = ({navigation}) => {
     let url = constants.endPoint.verifyOtp;
     let params = {
       email,
-      otp:
-        otpState.one +
-        otpState.two +
-        otpState.three +
-        otpState.four +
-        otpState.five +
-        otpState.six,
+      otp: otpState,
     };
 
     const otpResult = await ApiMethod.postData(url, params, null);
-    console.log('otpResult', otpResult.data.data);
     if (otpResult) {
       ToastAndroid.show(`${otpResult.data.message}`, ToastAndroid.SHORT);
       AsyncStorage.setItem('@user', otpResult.data.data.access_token);
@@ -224,11 +198,9 @@ const AuthMain = ({navigation}) => {
       setEmail('');
       navigation.navigate('MyTab');
     } else {
-      //   Alert.alert('enter correct otp', 'Unauthenticated');
       Popup.show({
-        type: 'Error',
+        type: 'Warning',
         title: 'Enter correct otp',
-        button: false,
         textBody: 'Unauthenticated',
         buttonText: 'Ok',
         callback: () => Popup.hide(),
@@ -251,6 +223,7 @@ const AuthMain = ({navigation}) => {
         <View
           style={{
             marginTop: SIZES.padding,
+            padding: 10,
             // height: 400,
             // backgroundColor: 'red',
           }}
@@ -297,7 +270,6 @@ const AuthMain = ({navigation}) => {
               value={email}
               onChange={e => handleEmailCheck(e)}
               onFocus={() => setCheck()}
-              keyboardType={'email-address'}
               prependComponent={
                 <Image
                   source={require('../../assets/icons/email.png')}
@@ -388,7 +360,13 @@ const AuthMain = ({navigation}) => {
               />
             </View>
             <TextButton
-              label={'Log In'}
+              label={
+                loader ? (
+                  'Log In'
+                ) : (
+                  <ActivityIndicator size={'large'} color={COLORS.light} />
+                )
+              }
               contentContainerStyle={{
                 height: 55,
                 borderRadius: SIZES.radius,
@@ -916,140 +894,22 @@ const AuthMain = ({navigation}) => {
                 margin: SIZES.padding,
                 flexDirection: 'row',
                 justifyContent: 'space-around',
+                width: '80%',
               }}
             >
-              {/* {Array(6)
-                .fill()
-                .map((_, index) => {
-                  return (
-                    <TextInput
-                      style={{
-                        width: '15%',
-                        borderRadius: SIZES.radius,
-                        borderColor: COLORS.light,
-                        backgroundColor: COLORS.light,
-                        borderWidth: 1,
-                        elevation: 2,
-                        fontSize: SIZES.h2,
-                        textAlign: 'center',
-                      }}
-                      autoComplete={'sms-otp'}
-                      keyboardType={'numeric'}
-                      maxLength={1}
-                      placeholder={'0'}
-                      value={otp[index]}
-                      onChangeText={o => onChangeOtp('one', o)}
-                    />
-                  );
-                })} */}
-
-              <TextInput
-                style={{
-                  width: '15%',
+              <OtpInputs
+                inputStyles={{
+                  width: '100%',
                   borderRadius: SIZES.radius,
-                  borderColor: COLORS.light,
-                  backgroundColor: COLORS.light,
+                  borderColor: COLORS.grey,
+                  backgroundColor: COLORS.light20,
                   borderWidth: 1,
-                  elevation: 2,
                   fontSize: SIZES.h2,
                   textAlign: 'center',
+                  paddingHorizontal: 12,
                 }}
-                autoComplete={'sms-otp'}
-                keyboardType={'numeric'}
-                maxLength={1}
-                placeholder={'0'}
-                value={otpState.one}
-                onChangeText={o => onChangeOtp('one', o)}
-              />
-              <TextInput
-                style={{
-                  width: '15%',
-                  borderRadius: SIZES.radius,
-                  borderColor: COLORS.light,
-                  backgroundColor: COLORS.light,
-                  borderWidth: 1,
-                  elevation: 2,
-                  fontSize: SIZES.h2,
-                  textAlign: 'center',
-                }}
-                autoComplete={'sms-otp'}
-                keyboardType={'number-pad'}
-                maxLength={1}
-                placeholder={'0'}
-                value={otpState.two}
-                onChangeText={t => onChangeOtp('two', t)}
-              />
-              <TextInput
-                style={{
-                  width: '15%',
-                  borderRadius: SIZES.radius,
-                  borderColor: COLORS.light,
-                  backgroundColor: COLORS.light,
-                  borderWidth: 1,
-                  elevation: 2,
-                  fontSize: SIZES.h2,
-                  textAlign: 'center',
-                }}
-                autoComplete={'sms-otp'}
-                keyboardType={'numeric'}
-                maxLength={1}
-                placeholder={'0'}
-                value={otpState.three}
-                onChangeText={t => onChangeOtp('three', t)}
-              />
-              <TextInput
-                style={{
-                  width: '15%',
-                  borderRadius: SIZES.radius,
-                  borderColor: COLORS.light,
-                  backgroundColor: COLORS.light,
-                  borderWidth: 1,
-                  elevation: 2,
-                  fontSize: SIZES.h2,
-                  textAlign: 'center',
-                }}
-                autoComplete={'sms-otp'}
-                keyboardType={'numeric'}
-                maxLength={1}
-                placeholder={'0'}
-                value={otpState.four}
-                onChangeText={f => onChangeOtp('four', f)}
-              />
-              <TextInput
-                style={{
-                  width: '15%',
-                  borderRadius: SIZES.radius,
-                  borderColor: COLORS.light,
-                  backgroundColor: COLORS.light,
-                  borderWidth: 1,
-                  elevation: 2,
-                  fontSize: SIZES.h2,
-                  textAlign: 'center',
-                }}
-                autoComplete={'sms-otp'}
-                keyboardType={'numeric'}
-                maxLength={1}
-                placeholder={'0'}
-                value={otpState.five}
-                onChangeText={f => onChangeOtp('five', f)}
-              />
-              <TextInput
-                style={{
-                  width: '15%',
-                  borderRadius: SIZES.radius,
-                  borderColor: COLORS.light,
-                  backgroundColor: COLORS.light,
-                  borderWidth: 1,
-                  elevation: 2,
-                  fontSize: SIZES.h2,
-                  textAlign: 'center',
-                }}
-                autoComplete={'sms-otp'}
-                keyboardType={'numeric'}
-                maxLength={1}
-                placeholder={'0'}
-                value={otpState.six}
-                onChangeText={f => onChangeOtp('six', f)}
+                handleChange={code => setOtpState(code)}
+                numberOfInputs={6}
               />
             </View>
 

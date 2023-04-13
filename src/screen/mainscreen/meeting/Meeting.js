@@ -78,10 +78,10 @@ const Meeting = props => {
       <Header textHeader={'Meeting List '} />
       <View
         style={{
-          justifyContent: 'space-between',
           flexDirection: 'row',
           padding: 10,
-          width: '100%',
+          justifyContent: 'space-evenly',
+          //   borderWidth: 1,
         }}
       >
         <TextButton
@@ -92,6 +92,7 @@ const Meeting = props => {
               activeStatus == '1' ? COLORS.primary : COLORS.grey80,
             paddingHorizontal: 50,
             borderRadius: 50,
+            width: '40%',
           }}
           labelStyle={{
             color: activeStatus == '1' ? COLORS.light : COLORS.primary,
@@ -108,8 +109,9 @@ const Meeting = props => {
             height: 45,
             backgroundColor:
               activeStatus == '2' ? COLORS.secondary : COLORS.grey80,
-            paddingHorizontal: 50,
+            // paddingHorizontal: 50,
             borderRadius: 50,
+            width: '40%',
           }}
           labelStyle={{
             color: activeStatus == '2' ? COLORS.light : COLORS.secondary,
@@ -123,9 +125,11 @@ const Meeting = props => {
           onPress={() => setFilterModal(!filterModal)}
           style={{
             height: 45,
-            backgroundColor: COLORS.light20,
-            paddingHorizontal: 15,
-            borderRadius: 25,
+            backgroundColor: COLORS.light,
+            paddingHorizontal: 10,
+            borderRadius: 18,
+            width: '15%',
+            alignItems: 'center',
           }}
         >
           <Ionicons
