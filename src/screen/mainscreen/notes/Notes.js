@@ -24,9 +24,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useCallback} from 'react';
 import ViewNotes from './ViewNotes';
 import TextButton from '../../../components/TextButton';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const Notes = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
+
+  const {dark} = useCustomHook();
 
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -125,14 +128,15 @@ const Notes = ({navigation}) => {
         userName={true}
         userTitle={true}
         textHeader={'Note List'}
-        rightIcon={true}
+        // rightIcon={true}
         leftIcon={true}
         onPressArrow={() => navigation.goBack()}
-        onPressSort={() => setFilterModal(!filterModal)}
+        // onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
 
       <FlatList
+        style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={listState}
         keyExtractor={item => item.id}
         refreshControl={
@@ -148,17 +152,17 @@ const Notes = ({navigation}) => {
             <>
               <View
                 style={{
-                  backgroundColor: COLORS.support3_08,
+                  backgroundColor: dark ? COLORS.secondary20 : COLORS.secondary,
                   margin: 10,
                   borderRadius: SIZES.radius,
-                  borderRightWidth: 5,
-                  borderRightColor: COLORS.primary,
+                  borderLeftWidth: 5,
+                  borderLeftColor: COLORS.primary,
                 }}
               >
                 <View
                   style={{
-                    backgroundColor: COLORS.secondary,
-                    borderTopRightRadius: SIZES.radius,
+                    backgroundColor: dark ? COLORS.secondary : COLORS.grey,
+                    borderTopLeftRadius: SIZES.radius,
                     padding: 12,
                   }}
                 >
@@ -478,6 +482,8 @@ const Notes = ({navigation}) => {
               backgroundColor: COLORS.support1,
               padding: SIZES.padding,
               borderRadius: SIZES.radius,
+              borderWidth: 5,
+              borderColor: dark ? COLORS.secondary : COLORS.light,
             }}
           >
             <MeetingFilter

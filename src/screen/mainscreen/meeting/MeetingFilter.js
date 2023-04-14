@@ -166,7 +166,7 @@ const MeetingFilter = ({setFilterModal}) => {
           size={25}
           fillColor={COLORS.dark}
           unfillColor="#FFFFFF"
-          text={state.status ? 'Active' : 'Inactive'}
+          text={state.status ? 'Inactive' : 'Active'}
           iconStyle={{borderColor: COLORS.support1}}
           innerIconStyle={{borderWidth: 2}}
           textStyle={{fontFamily: 'JosefinSans-Regular'}}

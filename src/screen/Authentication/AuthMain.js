@@ -41,9 +41,12 @@ import axios from 'axios';
 import {Root, Popup, Toast} from 'popup-ui';
 import {ToastAndroid} from 'react-native';
 import OtpInputs from 'react-native-otp-inputs';
+import {useCustomHook} from '../theme/ThemeContext';
 
 const AuthMain = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
+
+  const {dark} = useCustomHook();
 
   //   console.log('token', token);
   const [changeModal, setChangeModal] = useState(false);
@@ -78,7 +81,6 @@ const AuthMain = ({navigation}) => {
   const dispatch = useDispatch();
 
   const submitHandle = async () => {
-    setLoader(true);
     await axios
       .post(`https://meeting-api.gofactz.com/public/api/login`, {
         email,
@@ -109,8 +111,8 @@ const AuthMain = ({navigation}) => {
             callback: () => Popup.hide(),
           });
           setLogged(error.response.data.message);
-          setLoader(false);
         }
+        setLoader(false);
       });
   };
   const HandleSignUp = async () => {
@@ -182,6 +184,7 @@ const AuthMain = ({navigation}) => {
   }, [token]);
 
   const verifyOtp = async () => {
+    setLoader(true);
     let url = constants.endPoint.verifyOtp;
     let params = {
       email,
@@ -361,30 +364,26 @@ const AuthMain = ({navigation}) => {
             </View>
             <TextButton
               label={
-                loader ? (
-                  'Log In'
-                ) : (
-                  <ActivityIndicator size={'large'} color={COLORS.light} />
-                )
+                !loader ? <ActivityIndicator color={COLORS.light} /> : 'Log In'
               }
               contentContainerStyle={{
                 height: 55,
                 borderRadius: SIZES.radius,
-                margin: 10,
+                // margin: 10,
+                width: '95%',
               }}
               labelStyle={{
                 color: COLORS.light,
                 ...FONTS.h4,
               }}
               onPress={() => {
+                setLoader(false);
                 var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
                 //   if (password.match(passW) && email) {
 
                 if (email) {
-                  setLoader(true);
                   submitHandle();
                 } else {
-                  setLoader(false);
                   Alert.alert(
                     'validation failed',
                     'Password must be at least 8 characters and contain at least 1 uppercase character, 1 number, and 1 special character',
@@ -596,9 +595,9 @@ const AuthMain = ({navigation}) => {
   return (
     <View
       style={{
-        // flex: 1,
+        flex: 1,
         paddingHorizontal: SIZES.padding,
-        backgroundColor: COLORS.lightGrey,
+        backgroundColor: dark ? COLORS.lightGrey : COLORS.dark,
       }}
     >
       <Image
@@ -611,7 +610,9 @@ const AuthMain = ({navigation}) => {
         }}
       />
 
-      <View style={styles.authContainer}>{AuthContainer()}</View>
+      <KeyboardAwareScrollView>
+        <View style={styles.authContainer}>{AuthContainer()}</View>
+      </KeyboardAwareScrollView>
 
       <View
         style={{
@@ -622,11 +623,16 @@ const AuthMain = ({navigation}) => {
         }}
       >
         <TextButton
-          label={mode == false ? 'new user registration' : null}
+          label={
+            mode == false
+              ? 'new user registration'
+              : 'if you are already register so login '
+          }
           contentContainerStyle={{
-            marginTop: SIZES.radius,
-            backgroundColor: 'null',
-            // fontSize: 35,
+            marginTop: 80,
+            backgroundColor: !dark ? COLORS.light : COLORS.primary,
+            borderRadius: SIZES.radius,
+            padding: 10,
           }}
           labelStyle={{
             color: COLORS.support1,
@@ -634,73 +640,25 @@ const AuthMain = ({navigation}) => {
             paddingHorizontal: SIZES.padding,
           }}
           onPress={() => {
-            setMode(true);
+            mode == false ? setMode(true) : setMode(false);
           }}
         />
       </View>
-      {mode == false ? (
-        <View style={{flex: 2, marginTop: 400, alignItems: 'center'}}>
-          <Text style={{fontWeight: '700', ...FONTS.font1}}>OR login with</Text>
-          <View style={{flexDirection: 'row', marginVertical: 20}}>
-            <TouchableHighlight
-              activeOpacity={0.6}
-              underlayColor={COLORS.primary}
-              style={{
-                borderRadius: SIZES.radius,
-                padding: 10,
-              }}
-              onPress={() => {}}
-            >
-              <Image
-                source={require('../../assets/icons/google.png')}
-                style={{width: 40, height: 40, marginHorizontal: 10}}
-              />
-            </TouchableHighlight>
-
-            <TouchableHighlight
-              activeOpacity={0.6}
-              underlayColor={COLORS.primary}
-              style={{
-                borderRadius: SIZES.radius,
-                padding: 10,
-              }}
-              onPress={() => {}}
-            >
-              <Image
-                source={require('../../assets/icons/twitter.png')}
-                style={{width: 40, height: 40, marginHorizontal: 10}}
-              />
-            </TouchableHighlight>
-
-            <TouchableHighlight
-              activeOpacity={0.6}
-              underlayColor={COLORS.primary}
-              style={{
-                borderRadius: SIZES.radius,
-                padding: 10,
-              }}
-              onPress={() => {}}
-            >
-              <Image
-                source={require('../../assets/icons/linkedin.png')}
-                style={{width: 40, height: 40, marginHorizontal: 10}}
-              />
-            </TouchableHighlight>
-          </View>
-        </View>
-      ) : (
+      {/* {mode == true ? (
         <TouchableOpacity
           onPress={() => setMode(false)}
           style={{
-            marginBottom: 20,
+            marginBottom: 15,
             alignSelf: 'center',
-            backgroundColor: COLORS.support3_08,
+            backgroundColor: !dark ? COLORS.light : COLORS.support3_08,
             padding: SIZES.padding,
+            borderRadius: SIZES.radius,
           }}
         >
           <Text>if you are already register so login </Text>
         </TouchableOpacity>
-      )}
+      ) : // <AntDesign name="user" color="blue" size={130} />
+      null} */}
 
       <Modal
         animationType="slide"
@@ -863,13 +821,7 @@ const AuthMain = ({navigation}) => {
               otp time 3 minutes
             </Text>
             <TextButton
-              label={
-                loader ? (
-                  'Resend OTP'
-                ) : (
-                  <ActivityIndicator size={'large'} color={'white'} />
-                )
-              }
+              label={'Resend OTP'}
               contentContainerStyle={{
                 marginTop: 15,
                 backgroundColor: COLORS.grey,
@@ -916,20 +868,27 @@ const AuthMain = ({navigation}) => {
             <TextButton
               label={
                 <View style={{marginTop: 20}}>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      backgroundColor: {...(otpState != '')}
-                        ? COLORS.primary
-                        : COLORS.primary20,
-                      borderRadius: SIZES.radius,
-                      padding: 12,
-                    }}
-                    // onPress={() => show()}
-                  >
-                    Verify OTP...
-                    <Feather name="arrow-right" size={20} color={COLORS.dark} />
-                  </Text>
+                  {loader ? (
+                    <ActivityIndicator color={COLORS.dark} />
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        backgroundColor: COLORS.primary,
+                        borderRadius: SIZES.radius,
+                        padding: 12,
+                        color: COLORS.light,
+                      }}
+                      // onPress={() => show()}
+                    >
+                      Verify OTP...
+                      <Feather
+                        name="arrow-right"
+                        size={20}
+                        color={COLORS.light}
+                      />
+                    </Text>
+                  )}
                 </View>
               }
               contentContainerStyle={{
@@ -942,7 +901,6 @@ const AuthMain = ({navigation}) => {
                 margin: 15,
               }}
               onPress={() => {
-                // show();
                 if ({...otpState}) {
                   setTimeout(() => {
                     verifyOtp();
@@ -993,9 +951,10 @@ export default AuthMain;
 
 const styles = StyleSheet.create({
   authContainer: {
-    // flex: 1,
+    // flex: 2,
     width: SIZES.width - SIZES.padding * 2,
     borderRadius: SIZES.radius,
     backgroundColor: COLORS.light,
+    marginTop: 30,
   },
 });

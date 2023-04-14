@@ -7,10 +7,14 @@ import MyDrawer from './MyDrawer';
 import Meeting from '../screen/mainscreen/meeting/Meeting';
 import Notes from '../screen/mainscreen/notes/Notes';
 import {ImageUpload} from '../screen';
+import {useCustomHook} from '../screen/theme/ThemeContext';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const Tab = createBottomTabNavigator();
 
 export default function MyTab() {
+  const {dark} = useCustomHook();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -25,15 +29,11 @@ export default function MyTab() {
         options={() => ({
           tabBarIcon: () => {
             return (
-              <View>
-                <Image
-                  source={require('../assets/icons/person.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                  }}
-                />
-              </View>
+              <AntDesign
+                name="user"
+                size={23}
+                color={dark ? COLORS.dark : COLORS.light}
+              />
             );
           },
         })}
@@ -44,16 +44,11 @@ export default function MyTab() {
         options={() => ({
           tabBarIcon: () => {
             return (
-              <View>
-                <Image
-                  source={require('../assets/icons/call.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              </View>
+              <AntDesign
+                name="edit"
+                size={23}
+                color={dark ? COLORS.dark : COLORS.light}
+              />
             );
           },
         })}
@@ -86,16 +81,11 @@ export default function MyTab() {
         options={() => ({
           tabBarIcon: () => {
             return (
-              <View>
-                <Image
-                  source={require('../assets/icons/contact.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: SIZES.base,
-                  }}
-                />
-              </View>
+              <MaterialIcons
+                name="read-more"
+                size={25}
+                color={dark ? COLORS.dark : COLORS.light}
+              />
             );
           },
         })}

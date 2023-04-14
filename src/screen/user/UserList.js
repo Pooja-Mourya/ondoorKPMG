@@ -19,9 +19,11 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import UserFilter from './UserFilter';
 import TextButton from '../../components/TextButton';
+import {useCustomHook} from '../theme/ThemeContext';
 
 const UserList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
+  const {dark} = useCustomHook();
 
   const [listState, setListState] = useState([]);
   const [filterData, setFilterData] = useState({}); //filter data
@@ -127,14 +129,15 @@ const UserList = ({navigation}) => {
       <Header
         userName={true}
         userTitle={true}
-        textHeader={'Role List'}
-        rightIcon={true}
+        textHeader={'User List'}
+        // rightIcon={true}
         leftIcon={true}
-        onPressArrow={() => navigation.goBack()}
-        onPressSort={() => setFilterModal(!filterModal)}
+        onPressArrow={() => navigation.toggleDrawer()}
+        // onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
       <FlatList
+        style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={listState}
         keyExtractor={item => item.id}
         refreshControl={
@@ -294,7 +297,12 @@ const UserList = ({navigation}) => {
                 </Modal>
                 {/* <Text>Id: {item.id}</Text> */}
 
-                <View style={{padding: SIZES.padding, marginTop: -20}}>
+                <View
+                  style={{
+                    padding: SIZES.padding,
+                    marginTop: -20,
+                  }}
+                >
                   <Text
                     style={{
                       fontWeight: '600',
@@ -380,7 +388,7 @@ const UserList = ({navigation}) => {
         onPress={() => navigation.navigate('AddUser')}
       />
 
-      <Modal
+      {/* <Modal
         animationType="slide"
         transparent={true}
         visible={filterModal}
@@ -404,6 +412,8 @@ const UserList = ({navigation}) => {
               backgroundColor: COLORS.support1,
               padding: SIZES.padding,
               borderRadius: SIZES.radius,
+              borderWidth: 5,
+              borderColor: dark ? COLORS.secondary : COLORS.secondary20,
             }}
           >
             <UserFilter
@@ -413,7 +423,7 @@ const UserList = ({navigation}) => {
             />
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

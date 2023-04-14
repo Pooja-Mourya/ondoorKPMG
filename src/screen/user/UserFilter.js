@@ -89,7 +89,7 @@ const UserFilter = ({navigation, filterModal, setFilterModal, filterData}) => {
         value={state.number}
         onChange={M => onChangeTextHandle('number', M)}
       />
-      <View style={{marginTop: 10}}>
+      {/* <View style={{marginTop: 10}}>
         <BouncyCheckbox
           size={25}
           fillColor={COLORS.dark}
@@ -100,7 +100,7 @@ const UserFilter = ({navigation, filterModal, setFilterModal, filterData}) => {
           textStyle={{fontFamily: 'JosefinSans-Regular'}}
           onPress={s => onChangeTextHandle('status', s)}
         />
-      </View>
+      </View> */}
 
       <TextButton
         label={'Filter User'}

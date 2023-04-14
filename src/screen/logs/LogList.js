@@ -20,9 +20,11 @@ import ApiMethod from '../../Services/APIService';
 import Header from '../../components/layout/Header';
 import TextButton from '../../components/TextButton';
 import moment from 'moment';
+import {useCustomHook} from '../theme/ThemeContext';
 
 const LogList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
+  const {dark} = useCustomHook();
 
   const [listState, setListState] = useState([]);
   const [filterModal, setFilterModal] = useState(false);
@@ -94,89 +96,162 @@ const LogList = ({navigation}) => {
         textHeader={'Logs'}
         // rightIcon={true}
         leftIcon={true}
-        onPressArrow={() => navigation.goBack()}
+        onPressArrow={() => navigation.toggleDrawer()}
         onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={true}
-        style={{margin: SIZES.padding}}
+      <View
+        style={{
+          backgroundColor: dark ? COLORS.light : COLORS.dark,
+          //   borderWidth: !dark ? 1 : 1,
+          //   borderColor: !dark ? COLORS.dark : COLORS.light,
+        }}
       >
-        <View style={{flexDirection: 'column'}}>
-          <View style={{flexDirection: 'row', backgroundColor: COLORS.primary}}>
-            <Text style={styles.titleStyle}>S.No</Text>
-            <Text style={styles.titleStyle}>User</Text>
-            <Text style={styles.titleStyle}>Event</Text>
-            <Text style={styles.titleStyle}>Type</Text>
-            <Text style={styles.titleStyle}>Ip Address</Text>
-            <Text style={styles.titleStyle}>Status</Text>
-            <Text style={[styles.titleStyle, {width: 200}]}>
-              Failure Reason
-            </Text>
-            <Text style={[styles.titleStyle, {width: 200}]}>Create Date</Text>
-          </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={true}
+          style={{
+            margin: SIZES.padding,
+          }}
+        >
+          <View style={{flexDirection: 'column'}}>
+            <View
+              style={{flexDirection: 'row', backgroundColor: COLORS.primary}}
+            >
+              <Text style={styles.titleStyle}>S.No</Text>
+              <Text style={styles.titleStyle}>User</Text>
+              <Text style={styles.titleStyle}>Event</Text>
+              <Text style={styles.titleStyle}>Type</Text>
+              <Text style={styles.titleStyle}>Ip Address</Text>
+              <Text style={styles.titleStyle}>Status</Text>
+              <Text style={[styles.titleStyle, {width: 200}]}>
+                Failure Reason
+              </Text>
+              <Text style={[styles.titleStyle, {width: 200}]}>Create Date</Text>
+            </View>
 
-          <FlatList
-            style={{marginTop: 20}}
-            data={Array.isArray(listState) ? listState : null}
-            keyExtractor={item => item.id}
-            refreshControl={
-              <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={() => {
-                  userListApi(null, true);
+            <View>
+              <FlatList
+                style={{marginTop: 20}}
+                data={Array.isArray(listState) ? listState : null}
+                keyExtractor={item => item.id}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={() => {
+                      userListApi(null, true);
+                    }}
+                  />
+                }
+                renderItem={({item, index}) => {
+                  return (
+                    <>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          borderWidth: dark ? 0 : 1,
+                          borderColor: dark ? COLORS.dark : COLORS.light,
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {
+                              color: dark ? COLORS.dark : COLORS.secondary,
+                            },
+                          ]}
+                        >
+                          {index + 1}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {color: dark ? COLORS.dark : COLORS.secondary},
+                          ]}
+                        >
+                          {item.created_by.name}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {color: dark ? COLORS.dark : COLORS.secondary},
+                          ]}
+                        >
+                          {item.event}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {color: dark ? COLORS.dark : COLORS.secondary},
+                          ]}
+                        >
+                          {item.type}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {color: dark ? COLORS.dark : COLORS.secondary},
+                          ]}
+                        >
+                          {item.ip_address}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {
+                              color:
+                                item.status === 'success'
+                                  ? 'green'
+                                  : COLORS.error,
+                              backgroundColor:
+                                item.status === 'success'
+                                  ? COLORS.support3_08
+                                  : COLORS.support4_08,
+                            },
+                          ]}
+                        >
+                          {item.status}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {
+                              width: 200,
+                              color: dark ? COLORS.light : COLORS.secondary,
+                            },
+                          ]}
+                        >
+                          {item.failure_reason ? item.failure_reason : 'NA'}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.contentStyle,
+                            {
+                              width: 200,
+                              color: dark ? COLORS.light : COLORS.secondary,
+                            },
+                          ]}
+                        >
+                          {moment(item.created_at).format('LLL')}
+                        </Text>
+                      </View>
+                    </>
+                  );
                 }}
-              />
-            }
-            renderItem={({item, index}) => {
-              return (
-                <>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.contentStyle}>{index}</Text>
-                    <Text style={styles.contentStyle}>
-                      {item.created_by.name}
-                    </Text>
-                    <Text style={styles.contentStyle}>{item.event}</Text>
-                    <Text style={styles.contentStyle}>{item.type}</Text>
-                    <Text style={styles.contentStyle}>{item.ip_address}</Text>
-                    <Text
-                      style={[
-                        styles.contentStyle,
-                        {
-                          color:
-                            item.status === 'success' ? 'green' : COLORS.error,
-                          backgroundColor:
-                            item.status === 'success'
-                              ? COLORS.support3_08
-                              : COLORS.support4_08,
-                        },
-                      ]}
-                    >
-                      {item.status}
-                    </Text>
-                    <Text style={[styles.contentStyle, {width: 200}]}>
-                      {item.failure_reason ? item.failure_reason : 'NA'}
-                    </Text>
-                    <Text style={[styles.contentStyle, {width: 200}]}>
-                      {moment(item.created_at).format('LLL')}
-                    </Text>
+                onEndReached={() => {
+                  userListApi(page + 1, null, true);
+                }}
+                onEndReachedThreshold={0.1}
+                ListFooterComponent={() => (
+                  <View style={{marginRight: 900, marginTop: 10}}>
+                    <ActivityIndicator size={'large'} color={'rosybrown'} />
                   </View>
-                </>
-              );
-            }}
-            onEndReached={() => {
-              userListApi(page + 1, null, true);
-            }}
-            onEndReachedThreshold={0.1}
-            ListFooterComponent={() => (
-              <View style={{marginRight: 900, marginTop: 10}}>
-                <ActivityIndicator size={'large'} color={'rosybrown'} />
-              </View>
-            )}
-          />
-        </View>
-      </ScrollView>
+                )}
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </>
   );
 };

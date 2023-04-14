@@ -22,9 +22,11 @@ import ApiMethod from '../Services/APIService';
 import {TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {userLoginFun} from '../redux/slice/UserSlice';
+import {useCustomHook} from '../screen/theme/ThemeContext';
 
 function CustomDrawerContent(props) {
   const token = useSelector(state => state?.user?.user);
+  const {dark} = useCustomHook();
 
   //   console.log('user', token.name);
   const dispatch = useDispatch();

@@ -13,9 +13,12 @@ import React, {useState, useEffect} from 'react';
 import {COLORS, constants, FONTS, SIZES} from '../constants';
 import ApiMethod from '../Services/APIService';
 import {useSelector} from 'react-redux';
+import {useCustomHook} from './theme/ThemeContext';
+import Header from '../components/layout/Header';
 
 const UserList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
+  const {dark} = useCustomHook();
 
   //   console.log('token', token);
   const [listState, setListState] = useState({});
@@ -42,59 +45,73 @@ const UserList = ({navigation}) => {
 
   if (isRefreshing === true) return <ActivityIndicator />;
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text
+    <>
+      <Header
+        textHeader={'DASHBOARD'}
+        leftIcon={true}
+        onPressArrow={() => navigation.toggleDrawer()}
+      />
+      <View
         style={{
-          backgroundColor: COLORS.primary,
-          width: '80%',
-          padding: SIZES.padding,
-          borderRadius: SIZES.radius,
-          elevation: 2,
-          textAlign: 'center',
-          height: '25%',
-          fontSize: 36,
-          color: COLORS.light,
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: dark ? COLORS.light : COLORS.dark,
         }}
       >
-        USER COUNT : {listState?.userCount ? listState?.userCount : '0'}
-      </Text>
-      <Text
-        style={{
-          backgroundColor: COLORS.primary,
-          width: '80%',
-          padding: SIZES.padding,
-          borderRadius: SIZES.radius,
-          marginTop: 20,
-          elevation: 2,
-          textAlign: 'center',
-          height: '25%',
-          fontSize: 36,
-          color: COLORS.light,
-          //   paddingTop: 20,
-        }}
-      >
-        MEETING COUNT :{' '}
-        {listState?.meetingCount ? listState?.meetingCount : '0'}
-      </Text>
-      <Text
-        style={{
-          backgroundColor: COLORS.primary,
-          width: '80%',
-          padding: SIZES.padding,
-          borderRadius: SIZES.radius,
-          marginTop: 20,
-          elevation: 2,
-          textAlign: 'center',
-          height: '25%',
-          fontSize: 36,
-          color: COLORS.light,
-          //   paddingTop: 20,
-        }}
-      >
-        TODAY MEETING COUNT :
-        {listState?.todayMeetingCount ? listState?.todayMeetingCount : '0'}
-      </Text>
-    </View>
+        <Text
+          style={{
+            backgroundColor: COLORS.primary,
+            width: '80%',
+            padding: SIZES.padding,
+            borderRadius: SIZES.radius,
+            elevation: 2,
+            textAlign: 'center',
+            height: '25%',
+            fontSize: 36,
+            color: COLORS.light,
+          }}
+        >
+          USER COUNT : {listState?.userCount ? listState?.userCount : '0'}
+        </Text>
+        <Text
+          style={{
+            backgroundColor: COLORS.primary,
+            width: '80%',
+            padding: SIZES.padding,
+            borderRadius: SIZES.radius,
+            marginTop: 20,
+            elevation: 2,
+            textAlign: 'center',
+            height: '25%',
+            fontSize: 36,
+            color: COLORS.light,
+            //   paddingTop: 20,
+          }}
+        >
+          MEETING COUNT :{' '}
+          {listState?.meetingCount ? listState?.meetingCount : '0'}
+        </Text>
+        <Text
+          style={{
+            backgroundColor: COLORS.primary,
+            width: '80%',
+            padding: SIZES.padding,
+            borderRadius: SIZES.radius,
+            marginTop: 20,
+            elevation: 2,
+            textAlign: 'center',
+            height: '25%',
+            fontSize: 36,
+            color: COLORS.light,
+            //   paddingTop: 20,
+          }}
+        >
+          TODAY MEETING COUNT :
+          {listState?.todayMeetingCount ? listState?.todayMeetingCount : '0'}
+        </Text>
+      </View>
+    </>
   );
 };
 

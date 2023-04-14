@@ -59,8 +59,9 @@ const AddRole = props => {
       se_name: se_name,
       permissions: [checkUser.map(n => ({name: n.se_name}))],
     };
+
     console.log('params', params);
-    // return;
+    return;
     try {
       const preResult = await ApiMethod.postData(url, params, token);
       if (preResult) {
@@ -239,7 +240,7 @@ const AddRole = props => {
                             }}
                           >
                             <TouchableOpacity
-                              onPress={() => handleCheck(item)}
+                              onPress={() => handleCheck(item, enableCheck)}
                               style={{
                                 width: 20,
                                 height: 20,

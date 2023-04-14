@@ -19,10 +19,11 @@ import {Modal} from 'react-native';
 // import MeetingFilter from './MeetingFilter';
 import MeetingFilter from '../meeting/MeetingFilter';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const Meeting = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
-
+  const {dark} = useCustomHook();
   const [listState, setListState] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -69,12 +70,13 @@ const Meeting = ({navigation}) => {
         textHeader={'Roles List'}
         // rightIcon={true}
         leftIcon={true}
-        onPressArrow={() => navigation.goBack()}
+        onPressArrow={() => navigation.toggleDrawer()}
         // onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
 
       <FlatList
+        style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={listState}
         keyExtractor={item => item.id}
         horizontal={true}
@@ -137,8 +139,17 @@ const Meeting = ({navigation}) => {
                   renderItem={({item, index}) => {
                     return (
                       <View style={{flexDirection: 'row'}}>
-                        <Text>{index + 1} : </Text>
-                        <Text style={{...FONTS.base, color: COLORS.primary}}>
+                        <Text
+                          style={{color: !dark ? COLORS.light : COLORS.dark}}
+                        >
+                          {index + 1} :{' '}
+                        </Text>
+                        <Text
+                          style={{
+                            ...FONTS.base,
+                            color: dark ? COLORS.primary : COLORS.light,
+                          }}
+                        >
                           {item.name}
                         </Text>
                       </View>

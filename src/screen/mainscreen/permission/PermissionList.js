@@ -14,9 +14,12 @@ import ApiMethod from '../../../Services/APIService';
 import moment from 'moment';
 import {FAB} from 'react-native-paper';
 import AddPermission from './AddPermission';
+import {useCustomHook} from '../../theme/ThemeContext';
+import Header from '../../../components/layout/Header';
 
 const PermissionList = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
+  const {dark} = useCustomHook();
 
   //   console.log('token', token);
 
@@ -51,14 +54,22 @@ const PermissionList = props => {
     PermissionListFunction();
   }, [page]);
   return (
-    <View>
+    <>
+      <Header
+        textHeader={'DASHBOARD'}
+        leftIcon={true}
+        onPressArrow={() => navigation.toggleDrawer()}
+      />
       <FlatList
         // data={
         //   Array.isArray(listState)
         //     ? listState.filter(e => e.status == activeStatus)
         //     : []
         // }
-        style={{marginBottom: 30}}
+        style={{
+          marginBottom: 30,
+          backgroundColor: dark ? COLORS.light : COLORS.dark,
+        }}
         data={listState}
         keyExtractor={item => item.id}
         refreshControl={
@@ -76,7 +87,7 @@ const PermissionList = props => {
             <>
               <TouchableOpacity
                 style={{
-                  backgroundColor: COLORS.support3_08,
+                  backgroundColor: dark ? COLORS.secondary : COLORS.support1,
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
@@ -203,7 +214,7 @@ const PermissionList = props => {
           </View>
         </View>
       </Modal>
-    </View>
+    </>
   );
 };
 

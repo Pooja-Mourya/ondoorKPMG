@@ -1,6 +1,10 @@
 import React, {createRef, useRef} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {CommonActions, NavigationContainer} from '@react-navigation/native';
+import {
+  CommonActions,
+  NavigationContainer,
+  DarkTheme,
+} from '@react-navigation/native';
 import {
   Welcome,
   Walkthrough,
@@ -24,6 +28,8 @@ import {
   AddPermission,
   Changepassword,
 } from '../screen/index';
+import {useCustomHook} from '../screen/theme/ThemeContext';
+import {colors} from 'react-native-elements';
 
 const Stack = createStackNavigator();
 
@@ -39,8 +45,12 @@ export function handleNavigation() {
 }
 
 const MyStack = () => {
+  const {dark, color} = useCustomHook();
   return (
-    <NavigationContainer ref={navigationUseRef}>
+    <NavigationContainer
+      ref={navigationUseRef}
+      theme={!dark ? DarkTheme : colors.background}
+    >
       <Stack.Navigator
         screenOptions={{
           headerShown: false,

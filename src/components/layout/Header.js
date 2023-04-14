@@ -31,12 +31,11 @@ const Header = ({
   return (
     <View
       style={{
-        backgroundColor: COLORS.support1,
+        backgroundColor: COLORS.primary,
         padding: 5,
         // height: (SIZES.height * 1) / 12,
       }}
     >
-     
       {/* 122 */}
       <View
         style={{
@@ -105,7 +104,7 @@ const Header = ({
               textAlign: 'center',
               alignSelf: 'center',
               paddingVertical: 10,
-              color: COLORS.primary,
+              color: COLORS.secondary,
             }}
           >
             {textHeader}
@@ -122,7 +121,7 @@ const Header = ({
               padding: 10,
             }}
           >
-            <Ionicons name="filter-sharp" size={27} color={COLORS.primary} />
+            <Ionicons name="filter-sharp" size={27} color={COLORS.dark} />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -133,9 +132,6 @@ const Header = ({
 export default Header;
 
 const styles = StyleSheet.create({});
-
-
-
 
 // <View style={{flexDirection: 'row'}}>
 // {userProfile ? (

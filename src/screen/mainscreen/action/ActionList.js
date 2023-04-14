@@ -25,9 +25,11 @@ import ActionItemAction from './ActionItemAction';
 import ActionById from './ActionById';
 import Entypo from 'react-native-vector-icons/Entypo';
 import * as Progress from 'react-native-progress';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const ActionList = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
+  const {dark} = useCustomHook();
 
   const {navigation} = props;
   const [listState, setListState] = useState([]);
@@ -118,12 +120,13 @@ const ActionList = props => {
         textHeader={'Action List '}
         rightIcon={true}
         leftIcon={true}
-        onPressArrow={() => navigation.goBack()}
+        onPressArrow={() => navigation.toggleDrawer()}
         onPressSort={() => setActionModal(true)}
         userProfile={true}
       />
 
       <FlatList
+        style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={listState}
         // data={Array.isArray(listState) ? listState : []}
         keyExtractor={item => item.id}
@@ -141,7 +144,7 @@ const ActionList = props => {
             <>
               <View
                 style={{
-                  backgroundColor: COLORS.support3_08,
+                  backgroundColor: dark ? COLORS.support3_08 : COLORS.secondary,
                   margin: 10,
                   borderRadius: SIZES.radius,
 
@@ -153,9 +156,10 @@ const ActionList = props => {
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    backgroundColor: COLORS.secondary,
+                    backgroundColor: dark ? COLORS.secondary : COLORS.light,
                     padding: 15,
                     borderTopLeftRadius: SIZES.radius,
+                    borderTopRightRadius: SIZES.radius,
                   }}
                 >
                   <Text

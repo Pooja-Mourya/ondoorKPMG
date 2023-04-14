@@ -19,6 +19,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import TextButton from '../../../components/TextButton';
+import Header from '../../../components/layout/Header';
+import {ToastAndroid} from 'react-native';
 
 const NotificationApp = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -68,6 +70,10 @@ const NotificationApp = props => {
       const result = await ApiMethod.getData(url, token, null);
       console.log('resultRead', result?.data?.data, 'url', url);
       setIsRefreshing(false);
+      ToastAndroid.show(
+        'read all notification successfully',
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
       console.log('error', error);
     }
@@ -79,6 +85,11 @@ const NotificationApp = props => {
 
   return (
     <>
+      <Header
+        textHeader={'DASHBOARD'}
+        leftIcon={true}
+        onPressArrow={() => navigation.toggleDrawer()}
+      />
       <View style={{flexDirection: 'row'}}>
         <TextButton
           label={'Read All'}
@@ -89,7 +100,7 @@ const NotificationApp = props => {
             //   margin: 10,
             position: 'absolute',
             marginTop: -50,
-            marginLeft: '70%',
+            marginLeft: '80%',
             zIndex: 1,
           }}
           labelStyle={{
@@ -99,7 +110,7 @@ const NotificationApp = props => {
       </View>
 
       <FlatList
-        style={{backgroundColor: COLORS.primary, flex: 1}}
+        style={{backgroundColor: COLORS.support1, flex: 1}}
         data={Array.isArray(listState) ? listState : []}
         keyExtractor={item => item.id}
         refreshControl={

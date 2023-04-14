@@ -32,20 +32,20 @@ import NotificationApp from '../screen/mainscreen/notification/NotificationApp';
 import PermissionList from '../screen/mainscreen/permission/PermissionList';
 import Logout from '../screen/Authentication/Logout';
 import LogList from '../screen/logs/LogList';
+import {useCustomHook} from '../screen/theme/ThemeContext';
 
 const Drawer = createDrawerNavigator();
 
 const MyDrawer = () => {
+  const {dark} = useCustomHook();
   return (
     <Drawer.Navigator
       initialRouteName="DASHBOARD"
       screenOptions={{
-        // activeTintColor: 'red',
         itemStyle: {marginVertical: 5},
         drawerActiveBackgroundColor: COLORS.primary,
-        drawerActiveTintColor: 'white',
-        drawerInactiveTintColor: 'black',
-        activeTintColor: 'white',
+        drawerActiveTintColor: !dark ? 'white' : 'white',
+        drawerInactiveTintColor: !dark ? 'white' : 'black',
       }}
       drawerContent={props => <CustomDrawerContent {...props} />}
     >
@@ -54,9 +54,13 @@ const MyDrawer = () => {
         component={Dashboard}
         options={{
           drawerIcon: () => (
-            <AntDesign name="home" size={20} color={COLORS.dark} />
+            <AntDesign
+              name="home"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
           ),
-          //   headerShown: false,
+          headerShown: false,
         }}
       />
       <Drawer.Screen
@@ -64,29 +68,43 @@ const MyDrawer = () => {
         component={PermissionList}
         options={{
           drawerIcon: () => (
-            <AntDesign name="antdesign" size={20} color={COLORS.dark} />
+            <AntDesign
+              name="antdesign"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
           ),
-          //   headerShown: false,
+          headerShown: false,
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Setting"
         component={AppSetting}
         options={{
           drawerIcon: () => (
-            <AntDesign name="setting" size={20} color={COLORS.dark} />
+            <AntDesign
+              name="setting"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
           ),
           //   headerShown: false,
         }}
-      />
+      /> */}
       <Drawer.Screen
         name="Notification"
         component={NotificationApp}
         options={{
           drawerIcon: () => (
-            <AntDesign name="notification" size={20} color={COLORS.dark} />
+            <>
+              <AntDesign
+                name="notification"
+                size={20}
+                color={dark ? COLORS.dark : COLORS.light}
+              />
+            </>
           ),
-          //   headerShown: false,
+          headerShown: false,
         }}
       />
       <Drawer.Screen
@@ -94,7 +112,11 @@ const MyDrawer = () => {
         component={UserList}
         options={{
           drawerIcon: () => (
-            <AntDesign name="user" size={20} color={COLORS.dark} />
+            <AntDesign
+              name="user"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
           ),
           headerShown: false,
         }}
@@ -104,7 +126,11 @@ const MyDrawer = () => {
         component={Roles}
         options={{
           drawerIcon: () => (
-            <Feather name="command" size={20} color={COLORS.dark} />
+            <Feather
+              name="command"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
           ),
           headerShown: false,
         }}
@@ -114,7 +140,11 @@ const MyDrawer = () => {
         component={ActionList}
         options={{
           drawerIcon: () => (
-            <AntDesign name="contacts" size={20} color={COLORS.dark} />
+            <AntDesign
+              name="contacts"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
           ),
           headerShown: false,
         }}
@@ -124,7 +154,11 @@ const MyDrawer = () => {
         component={LogList}
         options={{
           drawerIcon: () => (
-            <AntDesign name="iconfontdesktop" size={20} color={COLORS.dark} />
+            <AntDesign
+              name="iconfontdesktop"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
           ),
           headerShown: false,
         }}

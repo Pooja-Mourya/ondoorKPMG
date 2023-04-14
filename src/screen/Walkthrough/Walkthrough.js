@@ -10,11 +10,13 @@ import {
 import React, {useState} from 'react';
 import {COLORS, constants, FONTS, SIZES} from '../../constants';
 import TextButton from '../../components/TextButton';
-import {useSelector} from 'react-redux';
+import {useCustomHook} from '../theme/ThemeContext';
 
 const height = Dimensions.get('screen').height;
 
 const Walkthrough = ({navigation}) => {
+  const {dark, color, themeFunction} = useCustomHook();
+
   const Dots = () => {
     const dotPosition = Animated.divide(scrollX, SIZES.width);
     return (
@@ -106,7 +108,12 @@ const Walkthrough = ({navigation}) => {
   }
   const scrollX = React.useRef(new Animated.Value(0)).current;
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.light}}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: dark ? COLORS.light : COLORS.dark,
+      }}
+    >
       <Animated.FlatList
         style={{flex: 1}}
         data={constants.walkthrough}

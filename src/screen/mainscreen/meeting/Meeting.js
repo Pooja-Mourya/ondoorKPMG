@@ -22,9 +22,13 @@ import moment from 'moment';
 import TextButton from '../../../components/TextButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ToastAndroid} from 'react-native';
+import {useCustomHook} from '../../theme/ThemeContext';
+import {Switch} from 'react-native';
 
 const Meeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
+
+  const {dark, color, themeFunction} = useCustomHook();
 
   //   console.log('token', token);
 
@@ -37,6 +41,10 @@ const Meeting = props => {
   const [loader, setLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [pageRe, setPageRe] = useState(false);
+
+  const ToggleThemeFunction = () => {
+    dark ? themeFunction('light') : themeFunction('dark');
+  };
 
   const handleMeetingList = async (page, refresh) => {
     const url = constants.endPoint.meetingList;
@@ -76,12 +84,19 @@ const Meeting = props => {
   return (
     <>
       <Header textHeader={'Meeting List '} />
+      <Switch
+        style={{position: 'absolute', alignSelf: 'flex-end', padding: 15}}
+        value={dark}
+        onValueChange={ToggleThemeFunction}
+        trackColor={!dark ? COLORS.light : COLORS.dark}
+        thumbColor={!dark ? COLORS.dark : COLORS.light}
+      />
       <View
         style={{
           flexDirection: 'row',
           padding: 10,
           justifyContent: 'space-evenly',
-          //   borderWidth: 1,
+          backgroundColor: dark ? COLORS.light : COLORS.dark,
         }}
       >
         <TextButton
@@ -142,7 +157,7 @@ const Meeting = props => {
       </View>
 
       <FlatList
-        style={{backgroundColor: COLORS.light}}
+        style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={
           Array.isArray(listState)
             ? listState.filter(e => e.status == activeStatus)
@@ -164,7 +179,7 @@ const Meeting = props => {
             <>
               <TouchableOpacity
                 style={{
-                  backgroundColor: COLORS.support3_08,
+                  backgroundColor: dark ? COLORS.secondary20 : COLORS.secondary,
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,

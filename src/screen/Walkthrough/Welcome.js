@@ -1,14 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image} from 'react-native';
+import {View, Text, Image, useColorScheme} from 'react-native';
 import TextButton from '../../components/TextButton';
 import {FONTS, SIZES, COLORS} from '../../constants';
 import {useSelector} from 'react-redux';
 import {CommonActions} from '@react-navigation/native';
+import {useCustomHook} from '../theme/ThemeContext';
 
 const Welcome = ({navigation}) => {
   const user = useSelector(state => state?.user?.user);
+
+  const {dark, color, themeFunction} = useCustomHook();
+
   const [loader, setLoader] = useState(false);
+
   async function myFunction() {
     setLoader(true);
     try {
@@ -33,54 +38,72 @@ const Welcome = ({navigation}) => {
   }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: COLORS.light,
-      }}
-    >
-      {/* Logo & Title */}
+    <>
       <View
         style={{
           flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
+          backgroundColor: dark ? COLORS.light : COLORS.dark,
+          //   backgroundColor: color.background,
         }}
       >
-        <Image
-          source={require('../../assets/images/logo.png')}
+        {/* Logo & Title */}
+        <View
           style={{
-            width: 150,
-            height: 150,
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
-        />
+        >
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={{
+              width: 150,
+              height: 150,
+            }}
+          />
 
-        <Text style={{marginTop: SIZES.padding, ...FONTS.h1}}>Welcome to</Text>
-        <Text style={{marginTop: SIZES.base, ...FONTS.h1}}>Meeting</Text>
-      </View>
+          <Text
+            style={{
+              marginTop: SIZES.padding,
+              ...FONTS.h1,
+              color: dark ? COLORS.dark : COLORS.light,
+            }}
+          >
+            Welcome to
+          </Text>
+          <Text
+            style={{
+              marginTop: SIZES.base,
+              ...FONTS.h1,
+              color: dark ? COLORS.dark : COLORS.light,
+            }}
+          >
+            Meeting
+          </Text>
+        </View>
 
-      {/* Footer Buttons */}
-      <View
-        style={{
-          paddingHorizontal: SIZES.padding,
-          marginBottom: 30,
-        }}
-      >
-        <TextButton
-          contentContainerStyle={{
-            height: 50,
-            borderRadius: SIZES.radius,
+        {/* Footer Buttons */}
+        <View
+          style={{
+            paddingHorizontal: SIZES.padding,
+            marginBottom: 30,
           }}
-          label="Get Started"
-          onPress={() =>
-            user == null
-              ? navigation.navigate('MyTab')
-              : navigation.navigate('Walkthrough')
-          }
-          //   onPress={() => navigation.navigate('MyTab')}
-        />
+        >
+          <TextButton
+            contentContainerStyle={{
+              height: 50,
+              borderRadius: SIZES.radius,
+            }}
+            label={'Get Started'}
+            onPress={() =>
+              user == null
+                ? navigation.navigate('MyTab')
+                : navigation.navigate('Walkthrough')
+            }
+            //   onPress={() => navigation.navigate('MyTab')}
+          />
 
-        {/* <TextButton
+          {/* <TextButton
           contentContainerStyle={{
             height: 50,
             marginTop: SIZES.base,
@@ -92,8 +115,9 @@ const Welcome = ({navigation}) => {
           }}
           onPress={() => navigation.navigate('Walkthrough')}
         /> */}
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
