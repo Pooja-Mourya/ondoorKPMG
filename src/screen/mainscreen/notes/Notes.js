@@ -241,7 +241,7 @@ const Notes = ({navigation}) => {
                           <AntDesign
                             name="eyeo"
                             size={25}
-                            color={COLORS.support3}
+                            color={COLORS.success}
                           />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -254,7 +254,7 @@ const Notes = ({navigation}) => {
                           <AntDesign
                             name="edit"
                             size={20}
-                            color={COLORS.support3}
+                            color={COLORS.dark}
                           />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -449,9 +449,11 @@ const Notes = ({navigation}) => {
           handelNotesList(page + 1, null, true);
         }}
         onEndReachedThreshold={0.1}
-        ListFooterComponent={() => (
-          <ActivityIndicator size={'large'} color={'rosybrown'} />
-        )}
+        ListFooterComponent={() =>
+          loader ? (
+            <ActivityIndicator size={'large'} color={'rosybrown'} />
+          ) : null
+        }
       />
       <FAB
         icon="plus"
@@ -459,7 +461,7 @@ const Notes = ({navigation}) => {
         onPress={() => setAddNotesModal(true)}
       />
 
-      <Modal
+      {/* <Modal
         animationType="slide"
         transparent={true}
         visible={filterModal}
@@ -493,7 +495,7 @@ const Notes = ({navigation}) => {
             />
           </View>
         </View>
-      </Modal>
+      </Modal> */}
 
       {/* add notes modal */}
       <Modal

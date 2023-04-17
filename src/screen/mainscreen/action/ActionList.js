@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  ToastAndroid,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
@@ -79,8 +80,8 @@ const ActionList = props => {
     } else {
       if (!page) setLoader(false);
       else setPageRe(false);
-      if (refresh) setIsRefreshing(false);
-      Alert.alert('error in pagination');
+      if (!refresh) setIsRefreshing(false);
+      ToastAndroid.show('error in action pagination', ToastAndroid.SHORT);
     }
   };
 
@@ -109,7 +110,7 @@ const ActionList = props => {
 
   useEffect(() => {
     handleActionList();
-  }, []);
+  }, [page]);
 
   if (loader) return <ActivityIndicator />;
   return (
@@ -360,9 +361,11 @@ const ActionList = props => {
           handleActionList(page + 1, null, true);
         }}
         onEndReachedThreshold={0.1}
-        ListFooterComponent={() => (
-          <ActivityIndicator size={'large'} color={'rosybrown'} />
-        )}
+        ListFooterComponent={() =>
+          loader ? (
+            <ActivityIndicator size={'large'} color={'rosybrown'} />
+          ) : null
+        }
       />
       <FAB
         icon="plus"

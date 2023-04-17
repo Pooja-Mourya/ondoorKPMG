@@ -109,7 +109,7 @@ const LogList = ({navigation}) => {
       >
         <ScrollView
           horizontal
-          showsHorizontalScrollIndicator={true}
+          showsHorizontalScrollIndicator={false}
           style={{
             margin: SIZES.padding,
           }}

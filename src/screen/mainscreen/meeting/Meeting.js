@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  Switch,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../../components/layout/Header';
@@ -23,7 +24,8 @@ import TextButton from '../../../components/TextButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ToastAndroid} from 'react-native';
 import {useCustomHook} from '../../theme/ThemeContext';
-import {Switch} from 'react-native';
+import axios from 'axios';
+import {loadPartialConfig} from '@babel/core';
 
 const Meeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -41,17 +43,31 @@ const Meeting = props => {
   const [loader, setLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [pageRe, setPageRe] = useState(false);
+  const [filterState, setFilterState] = useState({});
 
   const ToggleThemeFunction = () => {
     dark ? themeFunction('light') : themeFunction('dark');
   };
 
-  const handleMeetingList = async (page, refresh) => {
+  const handleMeetingList = async (page, refresh, meetingFilter) => {
     const url = constants.endPoint.meetingList;
     const params = {
       page: page ? page : 1,
       per_page_record: '10',
     };
+
+    // if (meetingFilter) {
+    //   params = {
+    //     meeting_date: filterState?.meeting_date ?? '',
+    //     meeting_ref_no: filterState?.meeting_ref_no ?? '',
+    //     meeting_time_end: filterState?.meeting_time_end ?? '',
+    //     meeting_time_start: filterState?.meeting_time_start ?? '',
+    //     meeting_title: filterState?.meeting_title ?? '',
+    //     status: filterState?.status ?? '',
+    //   };
+    // }
+
+    // console.log('meetingFilter', meetingFilter);
     const result = await ApiMethod.postData(url, params, token);
     //   console.log('result', result?.data?.data, 'url', url);
 
@@ -72,15 +88,27 @@ const Meeting = props => {
     } else {
       if (!page) setLoader(false);
       else setPageRe(false);
-      if (refresh) setIsRefreshing(false);
-      ToastAndroid.show('error in pagination', ToastAndroid.SHORT);
+      if (refresh) setIsRefreshing(true);
+      ToastAndroid.show('error in meeting pagination', ToastAndroid.SHORT);
     }
   };
 
   useEffect(() => {
     handleMeetingList();
-  }, []);
+  }, [listState]);
 
+  useEffect(() => {
+    const cancelToken = axios.CancelToken;
+    const source = cancelToken.source();
+
+    handleMeetingList({
+      cancelToken: source.token,
+    });
+
+    return () => {
+      source.cancel('axios request cancelled');
+    };
+  }, []);
   return (
     <>
       <Header textHeader={'Meeting List '} />
@@ -105,9 +133,8 @@ const Meeting = props => {
             height: 45,
             backgroundColor:
               activeStatus == '1' ? COLORS.primary : COLORS.grey80,
-            paddingHorizontal: 50,
-            borderRadius: 50,
-            width: '40%',
+            paddingHorizontal: 30,
+            borderRadius: SIZES.radius,
           }}
           labelStyle={{
             color: activeStatus == '1' ? COLORS.light : COLORS.primary,
@@ -124,9 +151,8 @@ const Meeting = props => {
             height: 45,
             backgroundColor:
               activeStatus == '2' ? COLORS.secondary : COLORS.grey80,
-            // paddingHorizontal: 50,
-            borderRadius: 50,
-            width: '40%',
+            paddingHorizontal: 30,
+            borderRadius: SIZES.radius,
           }}
           labelStyle={{
             color: activeStatus == '2' ? COLORS.light : COLORS.secondary,
@@ -142,8 +168,8 @@ const Meeting = props => {
             height: 45,
             backgroundColor: COLORS.light,
             paddingHorizontal: 10,
-            borderRadius: 18,
-            width: '15%',
+            borderRadius: SIZES.radius,
+            // width: '15%',
             alignItems: 'center',
           }}
         >
@@ -239,15 +265,16 @@ const Meeting = props => {
           );
         }}
         onEndReached={() => {
-          handleMeetingList(page + 1, null, true);
+          setPage(page + 1);
+          handleMeetingList(null, true);
         }}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0}
         ListFooterComponent={() => {
-          return (
+          return loader ? (
             <View style={{marginTop: 22}}>
               <ActivityIndicator size={'large'} color={'rosybrown'} />
             </View>
-          );
+          ) : null;
         }}
       />
       <FAB
@@ -286,6 +313,12 @@ const Meeting = props => {
               filterData={filterData}
               setFilterModal={setFilterModal}
               filterModal={filterModal}
+              activeStatus={activeStatus}
+              setListState={setListState}
+              listState={listState}
+              handleMeetingList={handleMeetingList}
+              setFilterState={setFilterState}
+              filterState={filterState}
             />
           </View>
         </View>

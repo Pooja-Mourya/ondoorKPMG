@@ -56,7 +56,7 @@ const PermissionList = props => {
   return (
     <>
       <Header
-        textHeader={'DASHBOARD'}
+        textHeader={'Permission List'}
         leftIcon={true}
         onPressArrow={() => navigation.toggleDrawer()}
       />

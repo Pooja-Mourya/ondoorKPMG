@@ -103,13 +103,17 @@ const AuthMain = ({navigation}) => {
         console.log(' 4', error.response.data.message);
         if (error.response.data.message) {
           //   Alert.alert('login error response', `${error.response.data.message}`);
-          Popup.show({
-            title: 'login error code',
-            textBody: `${error.response.data.message}`,
-            type: 'Warning',
-            buttonText: 'Ok',
-            callback: () => Popup.hide(),
-          });
+          //   Popup.show({
+          //     title: 'login error code',
+          //     textBody: ,
+          //     type: 'Warning',
+          //     buttonText: 'Ok',
+          //     callback: () => Popup.hide(),
+          //   });
+          ToastAndroid.show(
+            `${error.response.data.message}`,
+            ToastAndroid.SHORT,
+          );
           setLogged(error.response.data.message);
         }
         setLoader(false);
@@ -203,7 +207,7 @@ const AuthMain = ({navigation}) => {
     } else {
       Popup.show({
         type: 'Warning',
-        title: 'Enter correct otp',
+        title: 'warning correct otp',
         textBody: 'Unauthenticated',
         buttonText: 'Ok',
         callback: () => Popup.hide(),
@@ -226,29 +230,9 @@ const AuthMain = ({navigation}) => {
         <View
           style={{
             marginTop: SIZES.padding,
-            padding: 10,
-            // height: 400,
-            // backgroundColor: 'red',
           }}
         >
           <View style={styles.authContainer}>
-            {/* {logged && (
-              <Text
-                style={{
-                  ...FONTS.font1,
-                  color: COLORS.error,
-                  backgroundColor: COLORS.support4_08,
-                  fontWeight: '500',
-                  borderRadius: SIZES.radius,
-                  margin: 10,
-                  passing: 10,
-                }}
-              >
-                Too many fail login attempt your ip has restricted for 15
-                minutes.
-              </Text>
-            )} */}
-
             <Text
               style={{
                 width: '60%',
@@ -952,9 +936,12 @@ export default AuthMain;
 const styles = StyleSheet.create({
   authContainer: {
     // flex: 2,
-    width: SIZES.width - SIZES.padding * 2,
+    // width: SIZES.width - SIZES.padding * 2,
+
     borderRadius: SIZES.radius,
     backgroundColor: COLORS.light,
     marginTop: 30,
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
 });

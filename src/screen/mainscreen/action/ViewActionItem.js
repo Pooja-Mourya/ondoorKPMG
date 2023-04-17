@@ -11,6 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ApiMethod from '../../../Services/APIService';
 import {ScrollView} from 'react-native';
 import moment from 'moment/moment';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const STATUS = [
   {id: '1', status: 'In Progress'},
@@ -22,6 +23,7 @@ const STATUS = [
 const ViewActionItem = props => {
   const {navigation} = props;
   const items = props.route.params;
+  const {dark} = useCustomHook();
 
   const [openPer, setOpenPre] = useState(false);
   const [widthPre, setWidthPre] = useState(0);
@@ -53,7 +55,7 @@ const ViewActionItem = props => {
         <View
           style={{
             padding: SIZES.padding,
-            backgroundColor: COLORS.light20,
+            backgroundColor: dark ? COLORS.secondary : COLORS.light,
             borderRadius: SIZES.radius,
             margin: 10,
           }}

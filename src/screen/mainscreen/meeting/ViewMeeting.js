@@ -23,10 +23,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from 'moment';
 import TextButton from '../../../components/TextButton';
 import axios from 'axios';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const ViewMeeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
+  const {dark} = useCustomHook();
   const {navigation} = props;
   let routeParm = props?.route?.params;
 
@@ -133,7 +135,7 @@ const ViewMeeting = props => {
         style={{
           height: SIZES.height,
           flexDirection: 'column',
-          backgroundColor: COLORS.support3_08,
+          backgroundColor: dark ? COLORS.support1 : COLORS.secondary,
         }}
         refreshControl={
           <RefreshControl

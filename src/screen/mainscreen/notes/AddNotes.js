@@ -117,7 +117,7 @@ const AddMeeting = props => {
 
   const submitHandle = async () => {
     setIsLoading(true);
-    const res = await axios({
+    await axios({
       method: 'post',
       url: 'https://meeting-api.gofactz.com/api/note',
       headers: {

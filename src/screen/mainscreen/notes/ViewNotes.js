@@ -5,11 +5,13 @@ import Header from '../../../components/layout/Header';
 import moment from 'moment';
 import ApiMethod from '../../../Services/APIService';
 import {useSelector} from 'react-redux';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const ViewNotes = props => {
   let routeParm = props?.route?.params;
   //   console.log('viewNote', routeParm);
   const token = useSelector(state => state?.user?.user?.access_token);
+  const {dark} = useCustomHook();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [viewNote, setViewNote] = useState({});
@@ -39,7 +41,7 @@ const ViewNotes = props => {
       />
       <View
         style={{
-          backgroundColor: COLORS.support3_08,
+          backgroundColor: dark ? COLORS.dark : COLORS.secondary,
           height: SIZES.height,
           borderRadius: SIZES.radius,
         }}
@@ -502,9 +504,9 @@ const ViewNotes = props => {
                         Updated At :{' '}
                         <Text>{moment(n.updated_at).format('L')}</Text>
                       </Text>
-                      <Text>
-                        Owner ID: <Text>{n.owner.id}</Text>
-                      </Text>
+                      {/* <Text>
+                        Owner ID: <Text>{n.owner.id ? n.owner.id : null}</Text>
+                      </Text> */}
                       <Text>
                         Owner Name: <Text>{n.owner.name}</Text>
                       </Text>

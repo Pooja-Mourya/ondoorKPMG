@@ -28,6 +28,7 @@ import DocumentPicker, {types} from 'react-native-document-picker';
 import axios from 'axios';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {ToastAndroid} from 'react-native';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const data = [
   {id: '1', duration: 'Every day'},
@@ -41,6 +42,7 @@ const AddMeeting = props => {
   const editMeeting = props.route.params;
 
   const token = useSelector(state => state?.user?.user?.access_token);
+  const {dark} = useCustomHook();
 
   const [dPValues, setDPValues] = useState({mode: 'date', key: ''});
   const [enableCheck, setEnableCheck] = useState(false);
@@ -322,8 +324,18 @@ const AddMeeting = props => {
           borderRadius: SIZES.radius,
         }}
       >
-        <Text style={{...FONTS.body2, fontSize: SIZES.h2}}>Basic Details</Text>
-        <Text>Enter basic details of the meeting</Text>
+        <Text
+          style={{
+            ...FONTS.body2,
+            fontSize: SIZES.h2,
+            color: dark ? COLORS.dark : COLORS.light,
+          }}
+        >
+          Basic Details
+        </Text>
+        <Text style={{color: dark ? COLORS.dark : COLORS.light}}>
+          Enter basic details of the meeting
+        </Text>
         <KeyboardAwareScrollView>
           <FormInput
             containerStyle={{

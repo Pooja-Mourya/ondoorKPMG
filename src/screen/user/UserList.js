@@ -78,7 +78,7 @@ const UserList = ({navigation}) => {
       if (!page) setLoader(false);
       else setPageRe(false);
       if (refresh) setIsRefreshing(false);
-      Alert.alert('error in pagination');
+      Alert.alert('error in ');
     }
   };
 

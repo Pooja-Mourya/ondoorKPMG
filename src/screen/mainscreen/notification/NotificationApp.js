@@ -21,10 +21,12 @@ import moment from 'moment';
 import TextButton from '../../../components/TextButton';
 import Header from '../../../components/layout/Header';
 import {ToastAndroid} from 'react-native';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const NotificationApp = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
 
+  const {dark} = useCustomHook();
   //   const newly = props.route.params;
 
   //   console.log('newly', newly);
@@ -33,6 +35,7 @@ const NotificationApp = props => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [page, setPage] = useState(0);
   const [readModal, setReadModal] = useState(false);
+  const [isMark, setIsMark] = useState('Read');
 
   const handleNotificationList = async () => {
     const url = constants.endPoint.notifications;
@@ -108,6 +111,71 @@ const NotificationApp = props => {
           }}
         />
       </View>
+
+      {/* <View
+        style={{
+          flexDirection: 'row',
+          padding: 10,
+          //   justifyContent: 'space-evenly',
+          //   backgroundColor: 'null',
+          borderBottomColor: COLORS.support1,
+          borderBottomWidth: 2,
+        }}
+      >
+        <TextButton
+          label={'All'}
+          contentContainerStyle={{
+            height: 45,
+            // backgroundColor:
+            //   activeStatus == '1' ? COLORS.primary : COLORS.grey80,
+            paddingHorizontal: 20,
+            borderRadius: SIZES.radius,
+          }}
+          labelStyle={{
+            // color: activeStatus == '1' ? COLORS.light : COLORS.primary,
+            // ...FONTS.h4,
+            fontWeight: '500',
+            fontSize: 18,
+          }}
+          //   onPress={() => setActiveStatus('1')}
+        />
+
+        <TextButton
+          label={'Read'}
+          contentContainerStyle={{
+            height: 45,
+            // backgroundColor:
+            //   activeStatus == '2' ? COLORS.secondary : COLORS.grey80,
+            paddingHorizontal: 20,
+            marginHorizontal: 10,
+            borderRadius: SIZES.radius,
+          }}
+          labelStyle={{
+            // color: activeStatus == '2' ? COLORS.light : COLORS.secondary,
+            ...FONTS.h4,
+            fontWeight: '500',
+            fontSize: 20,
+          }}
+          //   onPress={() => setActiveStatus('2')}
+        />
+        <TextButton
+          label={'Unread'}
+          contentContainerStyle={{
+            height: 45,
+            // backgroundColor:
+            //   activeStatus == '1' ? COLORS.primary : COLORS.grey80,
+            paddingHorizontal: 30,
+            borderRadius: SIZES.radius,
+          }}
+          labelStyle={{
+            // color: activeStatus == '1' ? COLORS.light : COLORS.primary,
+            ...FONTS.h4,
+            fontWeight: '500',
+            fontSize: 18,
+          }}
+          //   onPress={() => setActiveStatus('1')}
+        />
+      </View> */}
 
       <FlatList
         style={{backgroundColor: COLORS.support1, flex: 1}}
@@ -295,10 +363,11 @@ const NotificationApp = props => {
 
             <Text
               style={{
-                color: COLORS.light,
-                fontWeight: '600',
-                paddingVertical: 12,
-                ...FONTS.body2,
+                color: COLORS.secondary,
+                fontWeight: '400',
+                paddingVertical: 14,
+                fontSize: 16,
+                // ...FONTS.body2,
               }}
             >
               {readId.message}
