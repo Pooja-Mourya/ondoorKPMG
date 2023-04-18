@@ -31,7 +31,8 @@ const PermissionList = props => {
   const [editModalData, setEditModalData] = useState({});
   const [activeStatus, setActiveStatus] = useState('1');
 
-  console.log('listState', listState);
+  //   console.log('listState', listState);
+
   const PermissionListFunction = async () => {
     const url = constants.endPoint.permissions;
     const params = {

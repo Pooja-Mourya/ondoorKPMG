@@ -14,8 +14,8 @@ const FormInput = ({
   onPress,
   editable,
   secureTextEntry,
-  autoCompleteType = 'off',
-  autoCapitalize = 'none',
+  autoCompleteType,
+  autoCapitalize,
   maxLength,
   placeholderTextColor,
   keyboardType,
@@ -25,10 +25,12 @@ const FormInput = ({
   numberOfLines,
   autoFocus,
   disabled,
+  onSubmitEditing,
+  reference,
   onFocus = () => {},
 }) => {
   const [isFocused, setIsFocused] = React.useState(false);
-  //   console.log('error', error);
+
   return (
     <>
       <View style={{...containerStyle}}>
@@ -62,8 +64,8 @@ const FormInput = ({
             placeholder={placeholder}
             placeholderTextColor={placeholderTextColor}
             secureTextEntry={secureTextEntry}
-            autoCapitalize={autoCapitalize}
-            autoCompleteType={autoCompleteType}
+            autoCapitalize={autoCapitalize ?? 'none'}
+            autoCompleteType={autoCompleteType ?? 'off'}
             maxLength={maxLength}
             onChangeText={text => onChange(text)}
             onPressIn={onPress}
@@ -80,6 +82,8 @@ const FormInput = ({
             numberOfLines={numberOfLines}
             disabled={disabled}
             onBlur={() => setIsFocused(false)}
+            onSubmitEditing={onSubmitEditing}
+            ref={reference}
           />
           {appendComponent}
         </View>

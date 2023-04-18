@@ -3,13 +3,9 @@ import {
   Text,
   View,
   Image,
-  FlatList,
   TouchableOpacity,
   Modal,
-  Animated,
   ActivityIndicator,
-  TextInput,
-  TouchableHighlight,
 } from 'react-native';
 
 import React, {useEffect, useState, useRef} from 'react';
@@ -48,7 +44,8 @@ const AuthMain = ({navigation}) => {
 
   const {dark} = useCustomHook();
 
-  //   console.log('token', token);
+  const inputRef1 = useRef(null);
+  const inputRef2 = useRef();
   const [changeModal, setChangeModal] = useState(false);
   const [enableCheck, setEnableCheck] = useState('');
   const [mode, setMode] = useState(false);
@@ -91,8 +88,8 @@ const AuthMain = ({navigation}) => {
         console.log(res);
         // Alert.alert(res.data.message);
         ToastAndroid.show(`${res.data.message}`, ToastAndroid.SHORT);
-        setPassword('');
-        setEnableCheck('');
+        // setPassword('');
+        // setEnableCheck('');
         setOtpState('');
         if (res.data.message) {
           setLoginOtpModal(true);
@@ -119,6 +116,7 @@ const AuthMain = ({navigation}) => {
         setLoader(false);
       });
   };
+
   const HandleSignUp = async () => {
     const url = constants.endPoint.registerForm;
     const params = {
@@ -267,6 +265,8 @@ const AuthMain = ({navigation}) => {
                   }}
                 />
               }
+              reference={inputRef1}
+              onSubmitEditing={() => inputRef2?.current?.focus()}
             />
             {check ? (
               <Text style={{color: COLORS.error}}>invalid email formate</Text>
@@ -275,6 +275,7 @@ const AuthMain = ({navigation}) => {
             )}
 
             <FormInput
+              reference={inputRef2}
               containerStyle={{
                 borderRadius: SIZES.radius,
                 backgroundColor: COLORS.error,
@@ -362,7 +363,7 @@ const AuthMain = ({navigation}) => {
               }}
               onPress={() => {
                 setLoader(false);
-                var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+                // var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
                 //   if (password.match(passW) && email) {
 
                 if (email) {
@@ -802,8 +803,9 @@ const AuthMain = ({navigation}) => {
                 paddingVertical: 25,
               }}
             >
-              otp time 3 minutes
+              Otp time 3 minutes
             </Text>
+
             <TextButton
               label={'Resend OTP'}
               contentContainerStyle={{

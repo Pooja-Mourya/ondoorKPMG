@@ -7,29 +7,17 @@ import {
   ToastAndroid,
 } from 'react-native';
 import React, {useState} from 'react';
-import Header from '../../../components/layout/Header';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {COLORS, constants, FONTS, SIZES} from '../../../constants';
+import {COLORS, FONTS, SIZES} from '../../../constants';
 import TextButton from '../../../components/TextButton';
 import FormInput from '../../../components/FormInput';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
-import ApiMethod from '../../../Services/APIService';
-import {useSelector} from 'react-redux';
 
-const MeetingFilter = ({
-  setFilterModal,
-  setActiveStatus,
-  activeStatus,
-  handleMeetingList,
-  setFilterState,
-  filterState,
-}) => {
-  const token = useSelector(state => state?.user?.user?.access_token);
-
+const MeetingFilter = ({setFilterModal, setFilterData, activeStatus}) => {
   const formFilterKeys = {
     meeting_date: 'meeting_date',
     meeting_ref_no: 'meeting_ref_no',
@@ -58,6 +46,8 @@ const MeetingFilter = ({
       [name]: value,
     });
   };
+
+  console.log('state', state);
   return (
     <View>
       <View
@@ -205,9 +195,8 @@ const MeetingFilter = ({
           ...FONTS.h4,
         }}
         onPress={() => {
-          setFilterState(state);
+          activeStatus === '1' ?? setFilterData(state);
           setFilterModal(false);
-          //   state ? handleMeetingList() : [];
         }}
       />
       {open && (

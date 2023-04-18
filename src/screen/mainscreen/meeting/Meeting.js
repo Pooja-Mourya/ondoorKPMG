@@ -26,6 +26,7 @@ import {ToastAndroid} from 'react-native';
 import {useCustomHook} from '../../theme/ThemeContext';
 import axios from 'axios';
 import {loadPartialConfig} from '@babel/core';
+import {Animatable} from 'react-native-animatable';
 
 const Meeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -39,76 +40,70 @@ const Meeting = props => {
   const [filterData, setFilterData] = useState({}); //filter data
   const [filterModal, setFilterModal] = useState(false);
   const [activeStatus, setActiveStatus] = useState('1');
-  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [loader, setLoader] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageRe, setPageRe] = useState(false);
-  const [filterState, setFilterState] = useState({});
+  const [isRefresh, setIsRefresh] = useState(false);
+  const [pageLoad, setPageLoad] = useState(false);
 
   const ToggleThemeFunction = () => {
     dark ? themeFunction('light') : themeFunction('dark');
   };
 
-  const handleMeetingList = async (page, refresh, meetingFilter) => {
-    const url = constants.endPoint.meetingList;
-    const params = {
-      page: page ? page : 1,
-      per_page_record: '10',
-    };
-
-    // if (meetingFilter) {
-    //   params = {
-    //     meeting_date: filterState?.meeting_date ?? '',
-    //     meeting_ref_no: filterState?.meeting_ref_no ?? '',
-    //     meeting_time_end: filterState?.meeting_time_end ?? '',
-    //     meeting_time_start: filterState?.meeting_time_start ?? '',
-    //     meeting_title: filterState?.meeting_title ?? '',
-    //     status: filterState?.status ?? '',
-    //   };
-    // }
-
-    // console.log('meetingFilter', meetingFilter);
-    const result = await ApiMethod.postData(url, params, token);
-    //   console.log('result', result?.data?.data, 'url', url);
-
-    if (result) {
+  const handleMeetingList = async (_page, refresh) => {
+    if (refresh) {
+      setIsRefresh(true);
+    } else if (_page) {
+      setPageLoad(true);
+    } else {
       setLoader(true);
-      if (!page) {
+    }
+    try {
+      const url = constants.endPoint.meetingList;
+      const params = {
+        page: _page ?? 1,
+        per_page_record: 20,
+        ...filterData,
+      };
+      const result = await ApiMethod.postData(url, params, token);
+      //   console.log('result', result?.data?.data, 'url', url);
+      if (_page) {
+        let tepList = [...listState, ...result?.data?.data?.data];
+        setListState(tepList);
+        setPage(_page);
+        setPageLoad(false);
+      } else {
         setPage(1);
         setListState(result?.data?.data?.data);
-        setLoader(false);
-        if (!refresh) setIsRefreshing(false);
-      } else {
-        let temp = [...listState];
-        temp = temp.concat(result?.data?.data?.data);
-        setPage(page);
-        setListState([...temp]);
-        setPageRe(false);
+        if (refresh) {
+          setIsRefresh(false);
+          setLoader(false);
+        } else {
+          setLoader(false);
+        }
       }
-    } else {
-      if (!page) setLoader(false);
-      else setPageRe(false);
-      if (refresh) setIsRefreshing(true);
-      ToastAndroid.show('error in meeting pagination', ToastAndroid.SHORT);
+    } catch (error) {
+      console.log('error', error);
     }
   };
 
   useEffect(() => {
     handleMeetingList();
-  }, [listState]);
+  }, [filterData]);
 
-  useEffect(() => {
-    const cancelToken = axios.CancelToken;
-    const source = cancelToken.source();
+  //   useEffect(() => {
+  //     const cancelToken = axios.CancelToken;
+  //     const source = cancelToken.source();
 
-    handleMeetingList({
-      cancelToken: source.token,
-    });
+  //     handleMeetingList({
+  //       cancelToken: source.token,
+  //     });
 
-    return () => {
-      source.cancel('axios request cancelled');
-    };
-  }, []);
+  //     return () => {
+  //       source.cancel('axios request cancelled');
+  //     };
+  //   }, []);
+
   return (
     <>
       <Header textHeader={'Meeting List '} />
@@ -119,6 +114,7 @@ const Meeting = props => {
         trackColor={!dark ? COLORS.light : COLORS.dark}
         thumbColor={!dark ? COLORS.dark : COLORS.light}
       />
+
       <View
         style={{
           flexDirection: 'row',
@@ -181,6 +177,9 @@ const Meeting = props => {
           />
         </TouchableOpacity>
       </View>
+      {loader ? (
+        <ActivityIndicator color={dark ? COLORS.dark : COLORS.light} />
+      ) : null}
 
       <FlatList
         style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
@@ -192,7 +191,7 @@ const Meeting = props => {
         keyExtractor={item => item.id}
         refreshControl={
           <RefreshControl
-            refreshing={isRefreshing}
+            refreshing={isRefresh}
             onRefresh={() => {
               handleMeetingList(null, true);
             }}
@@ -250,12 +249,20 @@ const Meeting = props => {
                   }}
                 >
                   <Text
-                    style={{...FONTS.font1, fontWeight: '600', color: 'black'}}
+                    style={{
+                      ...FONTS.font1,
+                      fontWeight: '600',
+                      color: 'black',
+                    }}
                   >
                     {meetingDateFormate}
                   </Text>
                   <Text
-                    style={{...FONTS.font1, fontWeight: '600', color: 'black'}}
+                    style={{
+                      ...FONTS.font1,
+                      fontWeight: '600',
+                      color: 'black',
+                    }}
                   >
                     {meetingTimeFormate}
                   </Text>
@@ -264,19 +271,19 @@ const Meeting = props => {
             </>
           );
         }}
-        onEndReached={() => {
-          setPage(page + 1);
-          handleMeetingList(null, true);
-        }}
-        onEndReachedThreshold={0}
+        onEndReached={() => handleMeetingList(!listState ? null : page + 1)}
+        onEndReachedThreshold={0.1}
         ListFooterComponent={() => {
-          return loader ? (
-            <View style={{marginTop: 22}}>
-              <ActivityIndicator size={'large'} color={'rosybrown'} />
+          return (
+            <View style={{width: '100%', height: 30, justifyContent: 'center'}}>
+              {pageLoad ? (
+                <ActivityIndicator size={'large'} color={'rosybrown'} />
+              ) : null}
             </View>
-          ) : null;
+          );
         }}
       />
+
       <FAB
         icon="plus"
         style={styles.fab}
@@ -312,13 +319,9 @@ const Meeting = props => {
             <MeetingFilter
               filterData={filterData}
               setFilterModal={setFilterModal}
-              filterModal={filterModal}
               activeStatus={activeStatus}
-              setListState={setListState}
-              listState={listState}
-              handleMeetingList={handleMeetingList}
-              setFilterState={setFilterState}
-              filterState={filterState}
+              filterModal={filterModal}
+              setFilterData={setFilterData}
             />
           </View>
         </View>

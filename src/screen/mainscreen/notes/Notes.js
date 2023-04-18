@@ -43,18 +43,24 @@ const Notes = ({navigation}) => {
   const [viewModal, setViewModal] = useState(false);
   const [iconModal, setIconModal] = useState('');
   const [lengthMore, setLengthMore] = useState('');
-  const [textShown, setTextShown] = useState(false);
   const [editable, setEditable] = useState([]);
   const [actionModal, setActionModal] = useState(false);
 
   const handelNotesList = async (page, refresh) => {
+    if (page) {
+      setPageRe(true);
+    } else if (refresh) {
+      setIsRefreshing(true);
+    } else {
+      setLoader(true);
+    }
     const url = constants.endPoint.notes;
     const params = {
       page: page ? page : 1,
       per_page_record: '10',
     };
     const result = await ApiMethod.postData(url, params, token);
-    //   console.log('result', result?.data?.data, 'url', url);
+    console.log('result', result?.data?.data, 'url', url);
 
     if (result) {
       if (!page) {
@@ -99,8 +105,6 @@ const Notes = ({navigation}) => {
       action: listState[0].status === 1 ? 'inactive' : 'active',
     };
     // console.log('parasdhbk', params);
-    console.log('listState.id', listState);
-    console.log('listState.status', listState);
     try {
       const ActionRes = await ApiMethod.postData(url, params, token);
       if (ActionRes) {
@@ -220,18 +224,17 @@ const Notes = ({navigation}) => {
                           flexDirection: 'row',
                         }}
                       >
-                        {/* <TouchableOpacity
-                        onPress={() => {
-                          handleDelete(item.id);
-                          navigation.navigate('Notes');
-                        }}
-                      >
-                        <AntDesign
-                          name="delete"
-                          size={20}
-                          color={COLORS.error}
-                        />
-                      </TouchableOpacity> */}
+                        <TouchableOpacity
+                          onPress={() => {
+                            setIconModal(false);
+                          }}
+                        >
+                          <AntDesign
+                            name="close"
+                            size={20}
+                            color={COLORS.error}
+                          />
+                        </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => {
                             navigation.navigate('ViewNotes', item);
@@ -294,7 +297,7 @@ const Notes = ({navigation}) => {
                   </Text>
                   <Text
                     onTextLayout={onTextLayout}
-                    numberOfLines={textShown ? undefined : 2}
+                    numberOfLines={2}
                     style={{
                       lineHeight: 21,
                       height: 45,
@@ -428,32 +431,21 @@ const Notes = ({navigation}) => {
                     </Modal>
                   </View>
                 </View>
-
-                {/* {!lengthMore ? (
-                  <Text
-                    onPress={() => setAgendaText(agendaText)}
-                    style={{
-                      lineHeight: 21,
-                      marginTop: 10,
-                      color: COLORS.support5,
-                    }}
-                  >
-                    {agendaText ? 'Read less...' : 'Read more...'}
-                  </Text>
-                ) : null} */}
               </View>
             </>
           );
         }}
         onEndReached={() => {
-          handelNotesList(page + 1, null, true);
+          handelNotesList(page + 1);
         }}
         onEndReachedThreshold={0.1}
-        ListFooterComponent={() =>
-          loader ? (
-            <ActivityIndicator size={'large'} color={'rosybrown'} />
-          ) : null
-        }
+        ListFooterComponent={() => (
+          <View style={{width: '100%', height: 30, justifyContent: 'center'}}>
+            {pageRe ? (
+              <ActivityIndicator size={'large'} color={'rosybrown'} />
+            ) : null}
+          </View>
+        )}
       />
       <FAB
         icon="plus"

@@ -30,12 +30,14 @@ import {
 } from '../screen/index';
 import {useCustomHook} from '../screen/theme/ThemeContext';
 import {colors} from 'react-native-elements';
+import {store} from '../redux/store';
+import {userLogoutFun} from '../redux/slice/UserSlice';
 
 const Stack = createStackNavigator();
 
 const navigationUseRef = createRef();
 export function handleNavigation() {
-  //   console.log('navigation');
+  store.dispatch(userLogoutFun);
   navigationUseRef.current.dispatch(
     CommonActions.reset({
       index: 0,

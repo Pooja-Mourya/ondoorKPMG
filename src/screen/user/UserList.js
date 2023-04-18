@@ -53,13 +53,20 @@ const UserList = ({navigation}) => {
   //   };
 
   const userListApi = async (page, refresh) => {
+    if (page) {
+      setPageRe(true);
+    } else if (refresh) {
+      setIsRefreshing(false);
+    } else {
+      setLoader(false);
+    }
     const url = constants.endPoint.userList;
     const params = {
       page: page ? page : 1,
       per_page_record: '10',
     };
     const result = await ApiMethod.postData(url, params, token);
-    //   console.log('result', result?.data?.data, 'url', url);
+    console.log('result', result?.data?.data, 'url', url);
 
     if (result) {
       if (!page) {
@@ -136,6 +143,7 @@ const UserList = ({navigation}) => {
         // onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
+
       <FlatList
         style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={listState}
@@ -375,12 +383,16 @@ const UserList = ({navigation}) => {
           );
         }}
         onEndReached={() => {
-          userListApi(page + 1, null, true);
+          userListApi(page + 1);
         }}
-        // onEndReachedThreshold={0.1}
-        // ListFooterComponent={() => (
-        //   <ActivityIndicator size={'large'} color={'rosybrown'} />
-        // )}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={() => (
+          <View style={{width: '100%', height: 30, justifyContent: 'center'}}>
+            {pageRe ? (
+              <ActivityIndicator size={'large'} color={'rosybrown'} />
+            ) : null}
+          </View>
+        )}
       />
       <FAB
         icon="plus"
