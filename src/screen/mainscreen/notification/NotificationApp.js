@@ -60,6 +60,7 @@ const NotificationApp = props => {
   const handleReadById = async () => {
     try {
       await ApiMethod.getData(`notification/${readId.id}/read`, token, null);
+      //   setIsMark(readId);
       setReadModal(true);
     } catch (error) {
       console.log('error', error);
@@ -86,10 +87,11 @@ const NotificationApp = props => {
     handleNotificationList();
   }, [page]);
 
+  console.log('isMark', readId.read_status);
   return (
     <>
       <Header
-        textHeader={'DASHBOARD'}
+        textHeader={'Notifications'}
         leftIcon={true}
         onPressArrow={() => navigation.toggleDrawer()}
       />
@@ -112,71 +114,6 @@ const NotificationApp = props => {
         />
       </View>
 
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          padding: 10,
-          //   justifyContent: 'space-evenly',
-          //   backgroundColor: 'null',
-          borderBottomColor: COLORS.support1,
-          borderBottomWidth: 2,
-        }}
-      >
-        <TextButton
-          label={'All'}
-          contentContainerStyle={{
-            height: 45,
-            // backgroundColor:
-            //   activeStatus == '1' ? COLORS.primary : COLORS.grey80,
-            paddingHorizontal: 20,
-            borderRadius: SIZES.radius,
-          }}
-          labelStyle={{
-            // color: activeStatus == '1' ? COLORS.light : COLORS.primary,
-            // ...FONTS.h4,
-            fontWeight: '500',
-            fontSize: 18,
-          }}
-          //   onPress={() => setActiveStatus('1')}
-        />
-
-        <TextButton
-          label={'Read'}
-          contentContainerStyle={{
-            height: 45,
-            // backgroundColor:
-            //   activeStatus == '2' ? COLORS.secondary : COLORS.grey80,
-            paddingHorizontal: 20,
-            marginHorizontal: 10,
-            borderRadius: SIZES.radius,
-          }}
-          labelStyle={{
-            // color: activeStatus == '2' ? COLORS.light : COLORS.secondary,
-            ...FONTS.h4,
-            fontWeight: '500',
-            fontSize: 20,
-          }}
-          //   onPress={() => setActiveStatus('2')}
-        />
-        <TextButton
-          label={'Unread'}
-          contentContainerStyle={{
-            height: 45,
-            // backgroundColor:
-            //   activeStatus == '1' ? COLORS.primary : COLORS.grey80,
-            paddingHorizontal: 30,
-            borderRadius: SIZES.radius,
-          }}
-          labelStyle={{
-            // color: activeStatus == '1' ? COLORS.light : COLORS.primary,
-            ...FONTS.h4,
-            fontWeight: '500',
-            fontSize: 18,
-          }}
-          //   onPress={() => setActiveStatus('1')}
-        />
-      </View> */}
-
       <FlatList
         style={{backgroundColor: COLORS.support1, flex: 1}}
         data={Array.isArray(listState) ? listState : []}
@@ -196,7 +133,10 @@ const NotificationApp = props => {
               <View>
                 <View
                   style={{
-                    backgroundColor: COLORS.light20,
+                    backgroundColor:
+                      readId.read_status === 0
+                        ? COLORS.primary
+                        : COLORS.primary20,
                     margin: 10,
                     borderRadius: SIZES.radius,
                     padding: 10,
@@ -211,9 +151,10 @@ const NotificationApp = props => {
                         width: 60,
                         height: 60,
                         borderRadius: 50,
-                        backgroundColor: !readId
-                          ? COLORS.secondary
-                          : COLORS.light20,
+                        backgroundColor:
+                          readId.read_status == 0
+                            ? COLORS.primary
+                            : COLORS.light20,
                       }}
                       onPress={() => handleReadById(item)}
                     >

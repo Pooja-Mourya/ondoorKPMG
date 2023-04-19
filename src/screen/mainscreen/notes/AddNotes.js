@@ -195,7 +195,7 @@ const AddMeeting = props => {
 
   useEffect(() => {
     handleMeetingList();
-  }, []);
+  }, [editable]);
 
   useEffect(() => {
     if (editable) {
@@ -337,8 +337,6 @@ const AddMeeting = props => {
               </TouchableOpacity>
             }
           />
-          {/* <Text>{editable.documents[0].document}</Text>
-          {editable ? <Text>{editable.duration}</Text> : null} */}
 
           {selectImage.length > 0 ? (
             <TextButton

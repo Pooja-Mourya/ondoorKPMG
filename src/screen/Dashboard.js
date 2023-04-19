@@ -43,7 +43,6 @@ const UserList = ({navigation}) => {
     userListApi();
   }, []);
 
-  if (isRefreshing === true) return <ActivityIndicator />;
   return (
     <>
       <Header
@@ -59,6 +58,12 @@ const UserList = ({navigation}) => {
           backgroundColor: dark ? COLORS.light : COLORS.dark,
         }}
       >
+        <View style={{marginBottom: 20}}>
+          {isRefreshing ? (
+            <ActivityIndicator color={!dark ? COLORS.light : COLORS.dark} />
+          ) : null}
+        </View>
+
         <Text
           style={{
             backgroundColor: COLORS.primary,

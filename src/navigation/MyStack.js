@@ -26,18 +26,18 @@ import {
   ActionItemAction,
   ViewPermission,
   AddPermission,
-  Changepassword,
+  ProfileUpdate,
 } from '../screen/index';
 import {useCustomHook} from '../screen/theme/ThemeContext';
 import {colors} from 'react-native-elements';
 import {store} from '../redux/store';
-import {userLogoutFun} from '../redux/slice/UserSlice';
+import {userLoginFun, userLogoutFun} from '../redux/slice/UserSlice';
 
 const Stack = createStackNavigator();
 
 const navigationUseRef = createRef();
 export function handleNavigation() {
-  store.dispatch(userLogoutFun);
+  store.dispatch(userLoginFun({}));
   navigationUseRef.current.dispatch(
     CommonActions.reset({
       index: 0,
@@ -79,7 +79,7 @@ const MyStack = () => {
         <Stack.Screen name="ActionItemAction" component={ActionItemAction} />
         <Stack.Screen name="ViewPermission" component={ViewPermission} />
         <Stack.Screen name="AddPermission" component={AddPermission} />
-        <Stack.Screen name="Changepassword" component={Changepassword} />
+        <Stack.Screen name="ProfileUpdate" component={ProfileUpdate} />
       </Stack.Navigator>
     </NavigationContainer>
   );

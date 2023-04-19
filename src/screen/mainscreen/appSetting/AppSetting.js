@@ -15,7 +15,6 @@ import FormInput from '../../../components/FormInput';
 import TextButton from '../../../components/TextButton';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Changepassword from '../../Authentication/Changepassword';
 
 const AppSetting = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -73,7 +72,7 @@ const AppSetting = ({navigation}) => {
           ...fonts.h4,
         }}
         onPress={() => {
-          navigation.navigate('Changepassword');
+          navigation.navigate('UpdatePassword');
         }}
       />
     </>

@@ -6,6 +6,7 @@ import {FONTS, SIZES, COLORS} from '../../constants';
 import {useSelector} from 'react-redux';
 import {CommonActions} from '@react-navigation/native';
 import {useCustomHook} from '../theme/ThemeContext';
+import {StatusBar} from 'react-native';
 
 const Welcome = ({navigation}) => {
   const user = useSelector(state => state?.user?.user);
@@ -39,6 +40,7 @@ const Welcome = ({navigation}) => {
 
   return (
     <>
+      <StatusBar animated={true} backgroundColor={COLORS.primary} />
       <View
         style={{
           flex: 1,

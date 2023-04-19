@@ -32,7 +32,6 @@ import {
   useCountdown,
   counterclockwise,
 } from 'react-native-countdown-circle-timer';
-import Changepassword from './Changepassword';
 import axios from 'axios';
 import {Root, Popup, Toast} from 'popup-ui';
 import {ToastAndroid} from 'react-native';
@@ -894,38 +893,6 @@ const AuthMain = ({navigation}) => {
                 }
               }}
             />
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={changeModal}
-        onRequestClose={() => {
-          //   Alert.alert('Modal has been closed.');
-          setChangeModal(!changeModal);
-        }}
-      >
-        <View
-          style={{
-            justifyContent: 'center',
-            flex: 1,
-            alignItems: 'center',
-            backgroundColor: COLORS.primary,
-          }}
-        >
-          <View
-            style={{
-              justifyContent: 'space-between',
-              marginBottom: 20,
-              backgroundColor: COLORS.light,
-              borderRadius: SIZES.radius,
-              borderWidth: 5,
-              borderColor: COLORS.secondary,
-            }}
-          >
-            <Changepassword setChangeModal={setChangeModal} />
           </View>
         </View>
       </Modal>

@@ -133,6 +133,12 @@ const ActionList = props => {
         userProfile={true}
       />
 
+      <View style={{marginHorizontal: 20}}>
+        {loader ? (
+          <ActivityIndicator color={!dark ? COLORS.light : COLORS.dark} />
+        ) : null}
+      </View>
+
       <FlatList
         style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={listState}

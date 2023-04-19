@@ -56,9 +56,9 @@ const UserList = ({navigation}) => {
     if (page) {
       setPageRe(true);
     } else if (refresh) {
-      setIsRefreshing(false);
+      setIsRefreshing(true);
     } else {
-      setLoader(false);
+      setLoader(true);
     }
     const url = constants.endPoint.userList;
     const params = {
@@ -144,6 +144,11 @@ const UserList = ({navigation}) => {
         userProfile={true}
       />
 
+      <View style={{marginVertical: 10}}>
+        {loader ? (
+          <ActivityIndicator color={!dark ? COLORS.light : COLORS.dark} />
+        ) : null}
+      </View>
       <FlatList
         style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}
         data={listState}

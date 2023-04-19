@@ -20,7 +20,7 @@ import LoaderFile from './LoaderFile';
 import ActionItemAction from './mainscreen/action/ActionItemAction';
 import ViewPermission from './mainscreen/permission/ViewPermission';
 import AddPermission from './mainscreen/permission/AddPermission';
-import Changepassword from './Authentication/Changepassword';
+import ProfileUpdate from './profile/ProfileUpdate';
 export {
   Welcome,
   Walkthrough,
@@ -44,5 +44,5 @@ export {
   ActionItemAction,
   ViewPermission,
   AddPermission,
-  Changepassword,
+  ProfileUpdate,
 };

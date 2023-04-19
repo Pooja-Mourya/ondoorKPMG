@@ -30,9 +30,9 @@ import AppSetting from '../screen/mainscreen/appSetting/AppSetting';
 import Dashboard from '../screen/Dashboard';
 import NotificationApp from '../screen/mainscreen/notification/NotificationApp';
 import PermissionList from '../screen/mainscreen/permission/PermissionList';
-import Logout from '../screen/Authentication/Logout';
 import LogList from '../screen/logs/LogList';
 import {useCustomHook} from '../screen/theme/ThemeContext';
+import Profile from '../screen/profile/Profile';
 
 const Drawer = createDrawerNavigator();
 
@@ -56,6 +56,20 @@ const MyDrawer = () => {
           drawerIcon: () => (
             <AntDesign
               name="home"
+              size={20}
+              color={dark ? COLORS.dark : COLORS.light}
+            />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          drawerIcon: () => (
+            <AntDesign
+              name="user"
               size={20}
               color={dark ? COLORS.dark : COLORS.light}
             />
@@ -108,12 +122,12 @@ const MyDrawer = () => {
         }}
       />
       <Drawer.Screen
-        name="User"
+        name="Users"
         component={UserList}
         options={{
           drawerIcon: () => (
             <AntDesign
-              name="user"
+              name="addusergroup"
               size={20}
               color={dark ? COLORS.dark : COLORS.light}
             />

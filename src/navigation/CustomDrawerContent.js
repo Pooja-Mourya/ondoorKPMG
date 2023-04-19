@@ -42,6 +42,7 @@ function CustomDrawerContent(props) {
       const result = await ApiMethod.postData(url, params, null);
       console.log('result', result?.data?.data);
       AsyncStorage.removeItem('@user');
+      dispatch(userLoginFun({}));
       //   AsyncStorage.clear();
       setLoader(false);
       navigation.navigate('AuthMain');

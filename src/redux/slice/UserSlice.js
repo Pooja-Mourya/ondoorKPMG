@@ -9,15 +9,15 @@ export const UserSlice = createSlice({
   initialState,
   reducers: {
     userLoginFun: (state, action) => {
-      console.log('sliceState', state.user);
+      console.log('sliceState', state.user.user);
       state.user = action.payload;
     },
     userLogoutFun: state => {
-      console.log('logout state', state);
-      (state.email = null),
-        (state.access_token = null),
-        (state.isLoggedIn = null);
-      AsyncStorage.removeItem('@user');
+      //   console.log('logout state', state);
+      //   (state.email = null),
+      //     (state.access_token = null),
+      //     (state.isLoggedIn = null);
+      //   AsyncStorage.removeItem('@user');
     },
   },
 });

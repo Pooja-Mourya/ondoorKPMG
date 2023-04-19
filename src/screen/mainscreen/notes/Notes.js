@@ -37,13 +37,11 @@ const Notes = ({navigation}) => {
   const [pageRe, setPageRe] = useState(false);
   const [loader, setLoader] = useState(false);
 
-  const [filterData, setFilterData] = useState({}); //filter data
-  const [filterModal, setFilterModal] = useState(false);
   const [addNotesModal, setAddNotesModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [iconModal, setIconModal] = useState('');
   const [lengthMore, setLengthMore] = useState('');
-  const [editable, setEditable] = useState([]);
+  const [editable, setEditable] = useState({});
   const [actionModal, setActionModal] = useState(false);
 
   const handelNotesList = async (page, refresh) => {
@@ -138,6 +136,12 @@ const Notes = ({navigation}) => {
         // onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
+
+      <View style={{marginHorizontal: 20}}>
+        {loader ? (
+          <ActivityIndicator color={!dark ? COLORS.light : COLORS.dark} />
+        ) : null}
+      </View>
 
       <FlatList
         style={{backgroundColor: dark ? COLORS.light : COLORS.dark}}

@@ -11,6 +11,7 @@ import React, {useState} from 'react';
 import {COLORS, constants, FONTS, SIZES} from '../../constants';
 import TextButton from '../../components/TextButton';
 import {useCustomHook} from '../theme/ThemeContext';
+import {StatusBar} from 'react-native';
 
 const height = Dimensions.get('screen').height;
 
@@ -108,103 +109,107 @@ const Walkthrough = ({navigation}) => {
   }
   const scrollX = React.useRef(new Animated.Value(0)).current;
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: dark ? COLORS.light : COLORS.dark,
-      }}
-    >
-      <Animated.FlatList
-        style={{flex: 1}}
-        data={constants.walkthrough}
-        keyExtractor={item => item.id}
-        horizontal
-        snapToInterval={SIZES.width}
-        decelerationRate="fast"
-        showsHorizontalScrollIndicator={false}
-        // onViewableItemsChanged={viewAnimatedChange.current}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {x: scrollX}}}],
-          {useNativeDriver: false},
-        )}
-        renderItem={({item, index}) => {
-          //   console.log('index', index);
-          return (
-            <>
-              <View
-                style={{
-                  width: SIZES.width,
-                  justifyContent: 'center',
-                }}
-              >
-                {/* image section  */}
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    width: SIZES.width,
-                    height: 300,
-                    alignItems: 'center',
-                    zIndex: 2,
-                  }}
-                >
-                  {index == 0 && (
-                    <Image
-                      source={require('../../assets/icons/chat.png')}
-                      style={{width: 200, height: 200}}
-                    />
-                  )}
-                  {index == 1 && (
-                    <Image
-                      source={require('../../assets/icons/qr-code.png')}
-                      style={{width: 200, height: 200}}
-                    />
-                  )}
-                  {index == 2 && (
-                    <Image
-                      source={require('../../assets/icons/live-streaming.png')}
-                      style={{width: 200, height: 200}}
-                    />
-                  )}
-                  {index == 3 && (
-                    <Image
-                      source={require('../../assets/icons/fire.png')}
-                      style={{width: 200, height: 200}}
-                    />
-                  )}
-                </View>
+    <>
+      <StatusBar animated={true} backgroundColor={COLORS.primary} />
 
-                {/* title & description  */}
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: dark ? COLORS.light : COLORS.dark,
+        }}
+      >
+        <Animated.FlatList
+          style={{flex: 1}}
+          data={constants.walkthrough}
+          keyExtractor={item => item.id}
+          horizontal
+          snapToInterval={SIZES.width}
+          decelerationRate="fast"
+          showsHorizontalScrollIndicator={false}
+          // onViewableItemsChanged={viewAnimatedChange.current}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{nativeEvent: {contentOffset: {x: scrollX}}}],
+            {useNativeDriver: false},
+          )}
+          renderItem={({item, index}) => {
+            //   console.log('index', index);
+            return (
+              <>
                 <View
                   style={{
-                    justifyContent: 'flex-start',
-                    alignContent: 'center',
-                    height: SIZES.height * 0.35,
-                    paddingHorizontal: SIZES.padding,
+                    width: SIZES.width,
+                    justifyContent: 'center',
                   }}
                 >
-                  <Text style={{textAlign: 'center', ...FONTS.h1}}>
-                    {item.title}
-                  </Text>
-                  <Text
+                  {/* image section  */}
+                  <View
                     style={{
-                      color: COLORS.grey,
-                      ...FONTS.body3,
-                      textAlign: 'center',
-                      marginTop: SIZES.radius,
+                      flex: 1,
+                      justifyContent: 'center',
+                      width: SIZES.width,
+                      height: 300,
+                      alignItems: 'center',
+                      zIndex: 2,
                     }}
                   >
-                    {item.sub_title}
-                  </Text>
+                    {index == 0 && (
+                      <Image
+                        source={require('../../assets/icons/chat.png')}
+                        style={{width: 200, height: 200}}
+                      />
+                    )}
+                    {index == 1 && (
+                      <Image
+                        source={require('../../assets/icons/qr-code.png')}
+                        style={{width: 200, height: 200}}
+                      />
+                    )}
+                    {index == 2 && (
+                      <Image
+                        source={require('../../assets/icons/live-streaming.png')}
+                        style={{width: 200, height: 200}}
+                      />
+                    )}
+                    {index == 3 && (
+                      <Image
+                        source={require('../../assets/icons/fire.png')}
+                        style={{width: 200, height: 200}}
+                      />
+                    )}
+                  </View>
+
+                  {/* title & description  */}
+                  <View
+                    style={{
+                      justifyContent: 'flex-start',
+                      alignContent: 'center',
+                      height: SIZES.height * 0.35,
+                      paddingHorizontal: SIZES.padding,
+                    }}
+                  >
+                    <Text style={{textAlign: 'center', ...FONTS.h1}}>
+                      {item.title}
+                    </Text>
+                    <Text
+                      style={{
+                        color: COLORS.grey,
+                        ...FONTS.body3,
+                        textAlign: 'center',
+                        marginTop: SIZES.radius,
+                      }}
+                    >
+                      {item.sub_title}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            </>
-          );
-        }}
-      />
-      {renderFooter()}
-    </View>
+              </>
+            );
+          }}
+        />
+        {renderFooter()}
+      </View>
+    </>
   );
 };
 

@@ -19,22 +19,51 @@ const App = () => {
 
 export default App;
 
-// import React, {useRef} from 'react';
-// import {View, TextInput} from 'react-native';
-
-// const App = () => {
-//   const inputRef1 = useRef(null);
-//   const inputRef2 = useRef(null);
-
+// import React, {useState} from 'react';
+// import {TextInput, Button, View, Text} from 'react-native';
+// const string = 'abcdefghijklmnopqrstuvwxyz';
+// const numeric = '0123456789';
+// const punctuation = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+// export default function App() {
+//   const [length, setLength] = useState(10);
+//   const [password, setPassword] = useState('');
+//   const generatePassword = () => {
+//     const formValid = +length > 0;
+//     if (!formValid) {
+//       return;
+//     }
+//     let character = '';
+//     let password = '';
+//     while (password.length < length) {
+//       const entity1 = Math.ceil(string.length * Math.random() * Math.random());
+//       const entity2 = Math.ceil(numeric.length * Math.random() * Math.random());
+//       const entity3 = Math.ceil(
+//         punctuation.length * Math.random() * Math.random(),
+//       );
+//       let hold = string.charAt(entity1);
+//       hold = password.length % 2 === 0 ? hold.toUpperCase() : hold;
+//       character += hold;
+//       character += numeric.charAt(entity2);
+//       character += punctuation.charAt(entity3);
+//       password = character;
+//     }
+//     password = password
+//       .split('')
+//       .sort(() => {
+//         return 0.5 - Math.random();
+//       })
+//       .join('');
+//     setPassword(password.substr(0, length));
+//   };
 //   return (
-//     <View>
-//   <TextInput
-//     ref={inputRef1}
-//     onSubmitEditing={() => inputRef2.current.focus()}
-//   />
-//   <TextInput ref={inputRef2} />
+//     <View className="App">
+//       <View>
+//         <Text>length</Text>
+//         <TextInput value={length} onChange={e => setLength(e)} />
+//       </View>
+//       <Button title="submit" onPress={() => generatePassword()} />
+
+//       <Text>{password}</Text>
 //     </View>
 //   );
-// };
-
-// export default App;
+// }

@@ -27,6 +27,7 @@ import {useCustomHook} from '../../theme/ThemeContext';
 import axios from 'axios';
 import {loadPartialConfig} from '@babel/core';
 import {Animatable} from 'react-native-animatable';
+import {StatusBar} from 'react-native';
 
 const Meeting = props => {
   const token = useSelector(state => state?.user?.user?.access_token);
