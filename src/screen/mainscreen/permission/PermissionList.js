@@ -58,7 +58,7 @@ const PermissionList = props => {
     <>
       <Header
         textHeader={'Permission List'}
-        leftIcon={true}
+        menuBar={true}
         onPressArrow={() => navigation.toggleDrawer()}
       />
       <FlatList

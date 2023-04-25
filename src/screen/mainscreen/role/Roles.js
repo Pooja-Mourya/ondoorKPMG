@@ -65,13 +65,9 @@ const Meeting = ({navigation}) => {
   return (
     <>
       <Header
-        userName={true}
-        userTitle={true}
         textHeader={'Roles List'}
-        // rightIcon={true}
-        leftIcon={true}
+        menuBar={true}
         onPressArrow={() => navigation.toggleDrawer()}
-        // onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
       />
 

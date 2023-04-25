@@ -10,6 +10,7 @@ import {ImageUpload} from '../screen';
 import {useCustomHook} from '../screen/theme/ThemeContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import ScanScreen from '../screen/qrcode/ScanScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -56,7 +57,7 @@ export default function MyTab() {
         component={Notes}
       />
 
-      {/* <Tab.Screen
+      <Tab.Screen
         options={() => ({
           tabBarIcon: () => {
             return (
@@ -74,8 +75,8 @@ export default function MyTab() {
           },
         })}
         name="Upload"
-        component={ImageUpload}
-      /> */}
+        component={ScanScreen}
+      />
 
       <Tab.Screen
         options={() => ({

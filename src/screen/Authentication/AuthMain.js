@@ -339,9 +339,11 @@ const AuthMain = ({navigation}) => {
                   backgroundColor: 'null',
                 }}
                 labelStyle={{
-                  color: COLORS.support1,
+                  color: COLORS.primary,
                   ...FONTS.h4,
                   paddingHorizontal: SIZES.padding,
+                  marginBottom: 10,
+                  fontWeight: '600',
                 }}
                 onPress={() => setForgetModal(true)}
               />
@@ -353,8 +355,7 @@ const AuthMain = ({navigation}) => {
               contentContainerStyle={{
                 height: 55,
                 borderRadius: SIZES.radius,
-                // margin: 10,
-                width: '95%',
+                marginBottom: 10,
               }}
               labelStyle={{
                 color: COLORS.light,
@@ -428,6 +429,7 @@ const AuthMain = ({navigation}) => {
           containerStyle={{
             borderRadius: SIZES.radius,
             backgroundColor: COLORS.error,
+            marginVertical: 5,
           }}
           placeholder="Email"
           value={email}
@@ -469,6 +471,7 @@ const AuthMain = ({navigation}) => {
           containerStyle={{
             borderRadius: SIZES.radius,
             backgroundColor: COLORS.error,
+            marginVertical: 5,
           }}
           placeholder="Password"
           secureTextEntry={true}
@@ -529,6 +532,7 @@ const AuthMain = ({navigation}) => {
           containerStyle={{
             borderRadius: SIZES.radius,
             backgroundColor: COLORS.error,
+            marginVertical: 5,
           }}
           placeholder="Designation"
           value={designation}
@@ -549,7 +553,7 @@ const AuthMain = ({navigation}) => {
           contentContainerStyle={{
             height: 55,
             borderRadius: SIZES.radius,
-            margin: 10,
+            marginTop: 10,
           }}
           labelStyle={{
             color: COLORS.light,
@@ -584,18 +588,32 @@ const AuthMain = ({navigation}) => {
         backgroundColor: dark ? COLORS.lightGrey : COLORS.dark,
       }}
     >
-      <Image
-        source={require('../../assets/images/logo.png')}
+      <View
         style={{
-          alignSelf: 'center',
-          marginTop: SIZES.padding * 2,
-          width: 50,
-          height: 50,
+          width: 100,
+          height: 100,
+          //   backgroundColor: dark ? COLORS.primary : COLORS.light,
+          marginTop: 30,
+          justifyContent: 'center',
+          borderRadius: 50,
+          marginHorizontal: 130,
         }}
-      />
+      >
+        <Image
+          source={require('../../assets/images/logo.png')}
+          style={{
+            alignSelf: 'center',
+            marginTop: SIZES.padding * 2,
+            width: 100,
+            height: 100,
+            resizeMode: 'center',
+            position: 'absolute',
+          }}
+        />
+      </View>
 
       <KeyboardAwareScrollView>
-        <View style={styles.authContainer}>{AuthContainer()}</View>
+        <View style={{}}>{AuthContainer()}</View>
       </KeyboardAwareScrollView>
 
       <View
@@ -613,15 +631,15 @@ const AuthMain = ({navigation}) => {
               : 'if you are already register so login '
           }
           contentContainerStyle={{
-            marginTop: 80,
-            backgroundColor: !dark ? COLORS.light : COLORS.primary,
+            marginTop: mode ? 140 : 80,
+            backgroundColor: null,
             borderRadius: SIZES.radius,
             padding: 10,
           }}
           labelStyle={{
-            color: COLORS.support1,
-            ...FONTS.h4,
-            paddingHorizontal: SIZES.padding,
+            color: !dark ? COLORS.light : COLORS.primary,
+            ...FONTS.h3,
+            paddingHorizontal: 10,
           }}
           onPress={() => {
             mode == false ? setMode(true) : setMode(false);

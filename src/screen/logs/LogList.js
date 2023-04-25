@@ -34,24 +34,6 @@ const LogList = ({navigation}) => {
   const [pageRe, setPageRe] = useState(false);
   const [loader, setLoader] = useState(false);
 
-  //   const userListApi = async () => {
-  //     const url = constants.endPoint.logsList;
-  //     const params = {
-  //       page: page + 1 ?? page,
-  //       per_page_record: '20',
-  //     };
-  //     setIsRefreshing(true);
-  //     try {
-  //       const result = await ApiMethod.postData(url, params, token);
-  //       //   console.log('result', result?.data?.data?.data, 'url', url);
-  //       setListState(result?.data?.data?.data);
-  //       setIsRefreshing(false);
-  //       return;
-  //     } catch (error) {
-  //       console.log('error', error);
-  //     }
-  //   };
-
   const userListApi = async (page, refresh) => {
     const url = constants.endPoint.logsList;
     const params = {
@@ -94,8 +76,8 @@ const LogList = ({navigation}) => {
         userName={true}
         userTitle={true}
         textHeader={'Logs'}
-        // rightIcon={true}
-        leftIcon={true}
+        // leftIcon={true}
+        menuBar={true}
         onPressArrow={() => navigation.toggleDrawer()}
         onPressSort={() => setFilterModal(!filterModal)}
         userProfile={true}
@@ -239,12 +221,14 @@ const LogList = ({navigation}) => {
                   );
                 }}
                 onEndReached={() => {
-                  userListApi(page + 1, null, true);
+                  userListApi(page + 1);
                 }}
                 onEndReachedThreshold={0.1}
                 ListFooterComponent={() => (
                   <View style={{marginRight: 900, marginTop: 10}}>
-                    <ActivityIndicator size={'large'} color={'rosybrown'} />
+                    {pageRe ? (
+                      <ActivityIndicator size={'large'} color={'rosybrown'} />
+                    ) : null}
                   </View>
                 )}
               />

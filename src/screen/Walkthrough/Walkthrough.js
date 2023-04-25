@@ -59,7 +59,7 @@ const Walkthrough = ({navigation}) => {
           left: 0,
           right: 0,
           height: height * 0.2,
-          alignItems: 'center',
+          alignItems: 'center',              
           justifyContent: 'space-between',
           paddingHorizontal: 20,
           paddingVertical: 20,
@@ -73,13 +73,15 @@ const Walkthrough = ({navigation}) => {
             flexDirection: 'row',
           }}
         >
-          <TextButton
+          {/* <TextButton
             label="Join Now"
             contentContainerStyle={{
               flex: 1,
               marginLeft: SIZES.radius,
               borderRadius: SIZES.radius,
-              backgroundColor: COLORS.light,
+              backgroundColor: COLORS.dark,
+              borderWidth: 1,
+              borderColor: COLORS.primary,
             }}
             labelStyle={{...FONTS.h3, color: COLORS.primary}}
             onPress={() => {
@@ -88,7 +90,7 @@ const Walkthrough = ({navigation}) => {
                 routes: [{name: 'AuthMain'}],
               });
             }}
-          />
+          /> */}
           <TextButton
             label="Log In"
             contentContainerStyle={{

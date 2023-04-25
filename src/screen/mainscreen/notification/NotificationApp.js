@@ -92,7 +92,7 @@ const NotificationApp = props => {
     <>
       <Header
         textHeader={'Notifications'}
-        leftIcon={true}
+        menuBar={true}
         onPressArrow={() => navigation.toggleDrawer()}
       />
       <View style={{flexDirection: 'row'}}>

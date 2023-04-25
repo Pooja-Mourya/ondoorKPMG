@@ -66,6 +66,10 @@ const Meeting = props => {
         per_page_record: 20,
         ...filterData,
       };
+
+      //   console.log('params', params);
+
+      //   return;
       const result = await ApiMethod.postData(url, params, token);
       //   console.log('result', result?.data?.data, 'url', url);
       if (_page) {
@@ -88,6 +92,7 @@ const Meeting = props => {
     }
   };
 
+  //   console.log('listState', item.meeting_date);
   useEffect(() => {
     handleMeetingList();
   }, [filterData]);
@@ -129,7 +134,7 @@ const Meeting = props => {
           contentContainerStyle={{
             height: 45,
             backgroundColor:
-              activeStatus == '1' ? COLORS.primary : COLORS.grey80,
+              activeStatus == '1' ? COLORS.primary : COLORS.primary20,
             paddingHorizontal: 30,
             borderRadius: SIZES.radius,
           }}
@@ -199,13 +204,16 @@ const Meeting = props => {
           />
         }
         renderItem={({item}) => {
-          const meetingDateFormate = moment(item.meeting_date).format('L');
+          let meetingDateFormate = moment(item.meeting_date).format('L');
+          if (meetingDateFormate === 'Invalid date') meetingDateFormate = '';
           const meetingTimeFormate = moment(item.meeting_time).format('LT');
           return (
             <>
               <TouchableOpacity
                 style={{
-                  backgroundColor: dark ? COLORS.secondary20 : COLORS.secondary,
+                  backgroundColor: dark
+                    ? COLORS.secondary20
+                    : COLORS.lightGrey80,
                   margin: 10,
                   borderRadius: SIZES.radius,
                   padding: SIZES.padding,
@@ -257,6 +265,7 @@ const Meeting = props => {
                     }}
                   >
                     {meetingDateFormate}
+                    {/* {item.meeting_date} */}
                   </Text>
                   <Text
                     style={{
@@ -272,7 +281,7 @@ const Meeting = props => {
             </>
           );
         }}
-        onEndReached={() => handleMeetingList(!listState ? null : page + 1)}
+        onEndReached={() => handleMeetingList(page + 1)}
         onEndReachedThreshold={0.1}
         ListFooterComponent={() => {
           return (
@@ -307,12 +316,13 @@ const Meeting = props => {
             padding: SIZES.padding,
             borderRadius: SIZES.radius,
             backgroundColor: COLORS.gray,
+            justifyContent: 'center',
           }}
         >
           <View
             style={{
               marginBottom: 20,
-              backgroundColor: COLORS.support1,
+              backgroundColor: COLORS.grey,
               padding: SIZES.padding,
               borderRadius: SIZES.radius,
             }}

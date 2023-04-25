@@ -61,6 +61,7 @@ const Welcome = ({navigation}) => {
             style={{
               width: 150,
               height: 150,
+              resizeMode: 'center',
             }}
           />
 

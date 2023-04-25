@@ -26,6 +26,7 @@ const Header = ({
   iconNotification,
   textHeader,
   userProfile,
+  menuBar,
 }) => {
   const userToken = useSelector(state => state?.user?.user);
 
@@ -44,9 +45,23 @@ const Header = ({
           style={{
             flexDirection: 'row',
             marginHorizontal: 10,
-            width: leftIcon ? '80%' : '97%',
+            width: leftIcon || menuBar ? '80%' : '97%',
           }}
         >
+          {menuBar ? (
+            <TouchableOpacity
+              style={{
+                borderRadius: SIZES.radius,
+                backgroundColor: COLORS.light20,
+                padding: 10,
+                marginLeft: 10,
+              }}
+              onPress={menuBar ? onPressArrow : null}
+            >
+              <Ionicons name="list-sharp" size={30} color={COLORS.dark} />
+            </TouchableOpacity>
+          ) : null}
+
           {leftIcon ? (
             <TouchableOpacity
               style={{
@@ -99,7 +114,7 @@ const Header = ({
             <Text
               style={{
                 backgroundColor: COLORS.light20,
-                width: rightIcon == true ? '75%' : '95%',
+                width: rightIcon == true || !menuBar == true ? '75%' : '95%',
                 paddingHorizontal: 10,
                 marginHorizontal: 10,
                 borderRadius: SIZES.radius,

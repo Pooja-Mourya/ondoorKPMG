@@ -23,7 +23,7 @@ const Profile = ({navigation}) => {
       <Header
         textHeader={'User Profile'}
         onPressArrow={() => navigation.toggleDrawer()}
-        leftIcon={true}
+        menuBar={true}
       />
 
       <View style={{flex: 1, justifyContent: 'center'}}>

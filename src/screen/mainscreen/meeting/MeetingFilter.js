@@ -35,6 +35,7 @@ const MeetingFilter = ({setFilterModal, setFilterData, activeStatus}) => {
     [formFilterKeys.meeting_title]: '',
     [formFilterKeys.status]: '',
   };
+
   const [date, setDate] = useState(new Date());
   const [DPMode, setDPMode] = useState({key: '', mode: 'date'});
   const [open, setOpen] = useState(false);
@@ -47,7 +48,7 @@ const MeetingFilter = ({setFilterModal, setFilterData, activeStatus}) => {
     });
   };
 
-  console.log('state', state);
+  //   console.log('state', state);
   return (
     <View>
       <View
@@ -195,7 +196,7 @@ const MeetingFilter = ({setFilterModal, setFilterData, activeStatus}) => {
           ...FONTS.h4,
         }}
         onPress={() => {
-          activeStatus === '1' ?? setFilterData(state);
+          setFilterData(state);
           setFilterModal(false);
         }}
       />

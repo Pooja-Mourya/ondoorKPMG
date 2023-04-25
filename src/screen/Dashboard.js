@@ -16,7 +16,8 @@ import {useSelector} from 'react-redux';
 import {useCustomHook} from './theme/ThemeContext';
 import Header from '../components/layout/Header';
 
-const UserList = ({navigation}) => {
+const UserList = props => {
+  const {navigation} = props;
   const token = useSelector(state => state?.user?.user?.access_token);
   const {dark} = useCustomHook();
 
@@ -47,7 +48,7 @@ const UserList = ({navigation}) => {
     <>
       <Header
         textHeader={'DASHBOARD'}
-        leftIcon={true}
+        menuBar={true}
         onPressArrow={() => navigation.toggleDrawer()}
       />
       <View

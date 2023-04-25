@@ -123,11 +123,9 @@ const ActionList = props => {
   return (
     <>
       <Header
-        userName={true}
-        userTitle={true}
         textHeader={'Action List '}
         rightIcon={true}
-        leftIcon={true}
+        menuBar={true}
         onPressArrow={() => navigation.toggleDrawer()}
         onPressSort={() => setActionModal(true)}
         userProfile={true}
