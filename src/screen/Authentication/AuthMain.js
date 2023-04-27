@@ -25,7 +25,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Alert} from 'react-native';
 import LoaderFile from '../LoaderFile';
-import {CommonActions} from '@react-navigation/native';
+import {CommonActions, useIsFocused} from '@react-navigation/native';
+
 import CheckBox from '../../components/CheckBox';
 import {
   CountdownCircleTimer,
@@ -38,14 +39,20 @@ import {ToastAndroid} from 'react-native';
 import OtpInputs from 'react-native-otp-inputs';
 import {useCustomHook} from '../theme/ThemeContext';
 
-const AuthMain = ({navigation}) => {
+const AuthMain = props => {
+  const {navigation} = props;
   const token = useSelector(state => state?.user?.user?.access_token);
 
   const {dark} = useCustomHook();
 
+  const joinButton = props.name;
+
+  const isFocused = useIsFocused();
+
+  //   console.log('routeParams', props.name);
+
   const inputRef1 = useRef(null);
   const inputRef2 = useRef();
-  const [changeModal, setChangeModal] = useState(false);
   const [enableCheck, setEnableCheck] = useState('');
   const [mode, setMode] = useState(false);
   const [name, setName] = useState('');
@@ -154,6 +161,7 @@ const AuthMain = ({navigation}) => {
         navigation.navigate('Resetpassword');
       }
     } catch (error) {
+      Alert.alert('gdhdubg', []);
       console.log('error', error);
     }
   };
@@ -165,7 +173,7 @@ const AuthMain = ({navigation}) => {
       console.log('variable***', variable);
       if (!variable) {
         AsyncStorage.removeItem('@user');
-        navigation.navigate('AuthMain');
+        // navigation.navigate('AuthMain');
       } else {
         navigation.dispatch({
           ...CommonActions.reset({
@@ -579,7 +587,6 @@ const AuthMain = ({navigation}) => {
       return SignInFunction();
     }
   };
-
   return (
     <View
       style={{
@@ -646,21 +653,6 @@ const AuthMain = ({navigation}) => {
           }}
         />
       </View>
-      {/* {mode == true ? (
-        <TouchableOpacity
-          onPress={() => setMode(false)}
-          style={{
-            marginBottom: 15,
-            alignSelf: 'center',
-            backgroundColor: !dark ? COLORS.light : COLORS.support3_08,
-            padding: SIZES.padding,
-            borderRadius: SIZES.radius,
-          }}
-        >
-          <Text>if you are already register so login </Text>
-        </TouchableOpacity>
-      ) : // <AntDesign name="user" color="blue" size={130} />
-      null} */}
 
       <Modal
         animationType="slide"

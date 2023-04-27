@@ -167,7 +167,7 @@ const Resetpassword = ({navigation}) => {
                 borderRadius: SIZES.radius,
                 marginTop: 10,
               }}
-              placeholder={'New password'}
+              placeholder={'Confirm password'}
               onChange={p => setNewPassword(p)}
               value={newPassword}
               secureTextEntry={true}

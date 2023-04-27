@@ -18,6 +18,8 @@ const height = Dimensions.get('screen').height;
 const Walkthrough = ({navigation}) => {
   const {dark, color, themeFunction} = useCustomHook();
 
+  const [resetRegister, setResetRegister] = useState(false);
+
   const Dots = () => {
     const dotPosition = Animated.divide(scrollX, SIZES.width);
     return (
@@ -59,7 +61,7 @@ const Walkthrough = ({navigation}) => {
           left: 0,
           right: 0,
           height: height * 0.2,
-          alignItems: 'center',              
+          alignItems: 'center',
           justifyContent: 'space-between',
           paddingHorizontal: 20,
           paddingVertical: 20,
