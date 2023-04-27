@@ -128,7 +128,7 @@ const ActionList = props => {
         menuBar={true}
         onPressArrow={() => navigation.toggleDrawer()}
         onPressSort={() => setActionModal(true)}
-        userProfile={true}
+        // userProfile={true}
       />
 
       <View style={{marginHorizontal: 20}}>

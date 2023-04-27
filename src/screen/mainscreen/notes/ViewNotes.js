@@ -507,12 +507,13 @@ const ViewNotes = props => {
                       {/* <Text>
                         Owner ID: <Text>{n.owner.id ? n.owner.id : null}</Text>
                       </Text> */}
-                      <Text>
-                        Owner Name: <Text>{n.owner.name}</Text>
-                      </Text>
-                      <Text>
+                      {/* <Text>
+                        Owner Name:{' '}
+                        <Text>{n.owner.name ? n.owner.name : null}</Text>
+                      </Text> */}
+                      {/* <Text>
                         Owner Email: <Text>{n.owner.email}</Text>
-                      </Text>
+                      </Text> */}
                     </View>
                   );
                 })

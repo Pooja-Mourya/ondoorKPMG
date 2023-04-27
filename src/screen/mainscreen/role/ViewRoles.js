@@ -3,11 +3,14 @@ import React from 'react';
 import Header from '../../../components/layout/Header';
 import moment from 'moment';
 import {COLORS, FONTS, SIZES} from '../../../constants';
+import {useCustomHook} from '../../theme/ThemeContext';
 
 const ViewRoles = props => {
   const {navigation} = props;
 
   const roleView = props.route.params;
+
+  const {dark} = useCustomHook();
 
   return (
     <>
@@ -19,7 +22,7 @@ const ViewRoles = props => {
       <View
         style={{
           padding: SIZES.padding,
-          backgroundColor: COLORS.support2_08,
+          backgroundColor: dark ? COLORS.support2_08 : COLORS.light,
           borderRadius: SIZES.radius,
           margin: 10,
         }}
@@ -99,7 +102,7 @@ const ViewRoles = props => {
             return (
               <View
                 style={{
-                  backgroundColor: COLORS.secondary20,
+                  backgroundColor: dark ? COLORS.secondary20 : COLORS.grey,
                   width: 300,
                   margin: SIZES.padding,
                   padding: SIZES.padding,

@@ -11,6 +11,7 @@ import {COLORS, SIZES} from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector} from 'react-redux';
 import {StatusBar} from 'react-native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const Header = ({
   userName,
@@ -28,8 +29,6 @@ const Header = ({
   userProfile,
   menuBar,
 }) => {
-  const userToken = useSelector(state => state?.user?.user);
-
   return (
     <>
       <StatusBar animated={true} backgroundColor={COLORS.primary} />
@@ -56,7 +55,7 @@ const Header = ({
                 padding: 10,
                 marginLeft: 10,
               }}
-              onPress={menuBar ? onPressArrow : null}
+              onPress={onPressArrow}
             >
               <Ionicons name="list-sharp" size={30} color={COLORS.dark} />
             </TouchableOpacity>
@@ -70,7 +69,7 @@ const Header = ({
                 padding: 10,
                 marginLeft: 10,
               }}
-              onPress={leftIcon ? onPressArrow : null}
+              onPress={onPressArrow}
             >
               <Ionicons name="arrow-back" size={30} color={COLORS.dark} />
             </TouchableOpacity>
@@ -130,7 +129,7 @@ const Header = ({
           )}
           {rightIcon ? (
             <TouchableOpacity
-              onPress={leftIcon ? onPressSort : null}
+              onPress={onPressSort}
               style={{
                 //   width: 30,
                 //   height: 30,
@@ -139,7 +138,7 @@ const Header = ({
                 padding: 10,
               }}
             >
-              <Ionicons name="filter-sharp" size={27} color={COLORS.dark} />
+              <AntDesign name="filter" size={27} color={COLORS.dark} />
             </TouchableOpacity>
           ) : null}
         </View>
