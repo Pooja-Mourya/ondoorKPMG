@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {Alert} from 'react-native';
 import {constants} from '../constants';
-import {handleNavigation} from '../../src/navigation/MyStack';
+// import {handleNavigation} from '../../src/navigation/MyStack';
 import {ToastAndroid} from 'react-native';
 import {Popup} from 'popup-ui';
 
@@ -35,7 +35,7 @@ const ApiMethod = {
           callback: () => Popup.hide(),
         });
         AsyncStorage.removeItem('@user');
-        handleNavigation();
+        // handleNavigation();
         // dispatch(userLoginFun({}));
       }
       //   console.log(error.response.data.code, 'c');
@@ -103,7 +103,7 @@ const ApiMethod = {
           callback: () => Popup.hide(),
         });
         AsyncStorage.removeItem('@user');
-        handleNavigation();
+        // handleNavigation();
         // dispatch(userLoginFun({}));
       } else {
         ToastAndroid.show(`Api ${error}`, ToastAndroid.SHORT);
@@ -147,7 +147,7 @@ const ApiMethod = {
           callback: () => Popup.hide(),
         });
         AsyncStorage.removeItem('@user');
-        handleNavigation();
+        // handleNavigation();
         // dispatch(userLoginFun({}));
       }
       //   console.log(error.response.data.code, 'c');
@@ -189,7 +189,7 @@ const ApiMethod = {
           callback: () => Popup.hide(),
         });
         AsyncStorage.removeItem('@user');
-        handleNavigation();
+        // handleNavigation();
         // dispatch(userLoginFun({}));
       }
       //   console.log(error.response.data.code, 'c');

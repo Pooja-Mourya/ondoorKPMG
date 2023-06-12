@@ -55,22 +55,17 @@ const AddMeeting = props => {
   const [openStart, setOpenStart] = useState(false);
   const [isUploadLoading, setIsUploading] = useState(false);
   const [state, setState] = useState({
-    meeting_title: '',
-    meeting_date: '',
-    meeting_time: '',
-    meeting_ref_no: '',
-    agenda_of_meeting: '',
-    is_repeat: '',
-    eventNumber: '',
+    title: '',
+    agenda: '',
+    link: '',
+    date: '',
+    time_start: '',
+    time_end: '',
     attendees: '',
-    documents: '',
-    inviteEmail: '',
-    checkValidEmail: false,
-    is_multiple: '',
-    meeting_time_end: '',
-    meeting_time_start: '',
-    meeting_link: '',
+    invitation: '',
+    photo: '',
   });
+
   const [inputRecode, setInputRecode] = useState(false);
 
   const uniEmail = invitation => {
@@ -100,39 +95,29 @@ const AddMeeting = props => {
   };
 
   const submitHandle = async () => {
-    const url = constants.endPoint.meeting;
+    const url = 'http://10.0.2.2:5000/api/meeting/createMeeting';
     const params = {
-      meeting_title: state.meeting_title,
-      meeting_date: state.meeting_date,
-      meeting_time_end: state.meeting_time_end,
-      meeting_time_start: state.meeting_time_start,
-      meeting_ref_no: state.meeting_ref_no,
-      agenda_of_meeting: state.agenda_of_meeting,
-      meeting_link: state.meeting_link,
-      is_repeat: state.is_repeat,
-      attendees: state.attendees?.map(e => ({
-        email: e,
-      })),
-      documents: [
-        {
-          file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
-          file_extension: '',
-          file_name: '',
-          uploading_file_name: '',
-        },
-      ],
-      //   documents: uploadFiles,
+      title: 'native title',
+      agenda: 'native agenda',
+      link: 'native link',
+      date: 'native date',
+      time_start: 'native time_start',
+      time_end: 'native time_end',
+      attendees: 'native attendees',
+      invitation: 'native invitation',
+      photo: 'native path',
     };
-    try {
-      const result = await ApiMethod.postData(url, params, token);
-      //   return;
-      if (result?.data?.data?.access_token) {
-        navigation.navigate('Meeting');
-      }
-      navigation.navigate('Meeting');
-    } catch (error) {
-      Alert.alert('error', error);
-    }
+
+    console.log('params', params);
+    console.log('url', url);
+    const result = await ApiMethod.postData(url, params, null);
+    Alert.alert('ok');
+    console.log('result', result);
+    //   return;
+    //   if (result?.data?.data?.access_token) {
+    //     navigation.navigate('Meeting');
+    //   }
+    navigation.navigate('Meeting');
   };
 
   const ListUser = async () => {
@@ -182,79 +167,40 @@ const AddMeeting = props => {
   const validate = () => {
     Keyboard.dismiss();
     let isValid = true;
-    if (!state.meeting_title) {
-      onErrorChange('this field is required ', 'meeting_title');
+    if (!state.title) {
+      onErrorChange('this field is required ', 'title');
       isValid = false;
     }
-    if (!state.meeting_date) {
-      onErrorChange('this field is required', 'meeting_date');
+    if (!state.agenda) {
+      onErrorChange('this field is required ', 'agenda');
       isValid = false;
     }
-    if (!state.meeting_time_end) {
-      onErrorChange('this field is required', 'meeting_time_end');
+    if (!state.date) {
+      onErrorChange('this field is required', 'date');
       isValid = false;
     }
-    if (!state.meeting_time_start) {
-      onErrorChange('this field is required', 'meeting_time_start');
+    if (!state.time_start) {
+      onErrorChange('this field is required', 'time_start');
+      isValid = false;
+    }
+    if (!state.time_end) {
+      onErrorChange('this field is required', 'time_end');
       isValid = false;
     }
     if (!state.attendees) {
       onErrorChange('this field is required', 'attendees');
       isValid = false;
     }
-    // if (!state.meeting_link) {
-    //   onErrorChange('this field is required', 'meeting_link');
-    //   isValid = false;
-    // } else if (state.meeting_link == state.meeting_link.includes('https://')) {
-    //   isValid = false;
-    // } else {
-    //   Alert.alert('incorrect meeting url');
-    // }
+    if (!state.invitation) {
+      onErrorChange('this field is required', 'invitation');
+      isValid = false;
+    }
+    if (!state.photo) {
+      onErrorChange('this field is required', 'photo');
+      isValid = false;
+    }
     if (isValid) {
       return isValid;
-    }
-  };
-
-  const uploadFile = async imagePath => {
-    let url = constants.base_url + constants.endPoint.uploadFile;
-    let formDataRes = new FormData();
-    formDataRes.append('is_multiple', 1);
-    imagePath?.map((e, i) => {
-      let obj = e;
-      if (!obj.size) {
-        obj['size'] = e.fileSize;
-      }
-      if (!e?.name) {
-        obj['name'] =
-          e.fileName ?? e.uri.substr(e.uri.lastIndexOf('/'), e.uri.length);
-      }
-      //   if (!e?.value) {
-      //     obj['value'] = e?.uri;
-      //   }
-      formDataRes.append(`file[${i}]`, obj);
-    });
-    let headers = {
-      Accept: '*/*',
-      'content-type': 'multipart/form-data',
-    };
-
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-
-    let config = {
-      headers: headers,
-    };
-
-    console.log('url', url);
-    console.log('formDataRes', formDataRes);
-    console.log('headers', headers);
-    let imageResponse = '';
-    try {
-      imageResponse = await axios.post(url, formDataRes, config);
-      console.log('imageResponse', imageResponse);
-      setUploadFiles(imageResponse);
-    } catch (error) {
-      console.log('error', error);
-      console.log('imageResponse', imageResponse);
     }
   };
 
@@ -263,7 +209,7 @@ const AddMeeting = props => {
       const res = await DocumentPicker.pickMultiple({
         presentationStyle: 'fullScreen',
         allowMultiSelection: true,
-        type: [types.doc, types.docx],
+        // type: [types.doc, types.docx],
       });
       console.log('res', res);
       setSelectImage(res);
@@ -280,32 +226,32 @@ const AddMeeting = props => {
     }
   };
 
-  useEffect(() => {
-    if (editMeeting) {
-      setState({
-        ...state,
-        meeting_title: editMeeting.meeting_title,
-        meeting_date: editMeeting.meeting_date,
-        meeting_time_end: editMeeting.meeting_time_end,
-        meeting_time_start: editMeeting.meeting_time_start,
-        meeting_ref_no: editMeeting.meeting_ref_no,
-        agenda_of_meeting: editMeeting.agenda_of_meeting,
-        is_repeat: editMeeting.is_repeat,
-        // attendees: editMeeting.attendees[0].email,
-        attendees: editMeeting.attendees?.map(e => ({
-          email: e,
-        })),
-        documents: [
-          //   {
-          //     file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
-          //     file_extension: '',
-          //     file_name: '',
-          //     uploading_file_name: '',
-          //   },
-        ],
-      });
-    }
-  }, []);
+  //   useEffect(() => {
+  //     if (editMeeting) {
+  //       setState({
+  //         ...state,
+  //         title: editMeeting.title,
+  //         meeting_date: editMeeting.meeting_date,
+  //         meeting_time_end: editMeeting.meeting_time_end,
+  //         time_start: editMeeting.time_start,
+  //         meeting_ref_no: editMeeting.meeting_ref_no,
+  //         agenda_of_meeting: editMeeting.agenda_of_meeting,
+  //         is_repeat: editMeeting.is_repeat,
+  //         // attendees: editMeeting.attendees[0].email,
+  //         attendees: editMeeting.attendees?.map(e => ({
+  //           email: e,
+  //         })),
+  //         documents: [
+  //           //   {
+  //           //     file: 'http://localhost:8000/uploads/uploads/1676106286-94986.docx',
+  //           //     file_extension: '',
+  //           //     file_name: '',
+  //           //     uploading_file_name: '',
+  //           //   },
+  //         ],
+  //       });
+  //     }
+  //   }, []);
 
   if (isUploadLoading) return <ActivityIndicator />;
   return (
@@ -315,6 +261,7 @@ const AddMeeting = props => {
         leftIcon={true}
         onPressArrow={() => navigation.navigate('Meeting')}
       />
+      <Button title="submit button" onPress={() => submitHandle()} />
       <View
         style={{
           backgroundColor: COLORS.support3_08,
@@ -344,10 +291,10 @@ const AddMeeting = props => {
               marginTop: 10,
             }}
             placeholder="Meeting Title *"
-            value={state.meeting_title}
-            error={inputRecode.meeting_title}
-            onChange={m => onchangeState('meeting_title', m)}
-            onFocus={m => onErrorChange(m, 'meeting_title')}
+            value={state.title}
+            error={inputRecode.title}
+            onChange={m => onchangeState('title', m)}
+            onFocus={m => onErrorChange(m, 'title')}
           />
           <FormInput
             containerStyle={{
@@ -356,9 +303,9 @@ const AddMeeting = props => {
               marginTop: 10,
             }}
             placeholder="Agenda of meeting"
-            value={state.agenda_of_meeting}
+            value={state.agenda}
             numberOfLines={10}
-            onChange={o => onchangeState('agenda_of_meeting', o)}
+            onChange={o => onchangeState('agenda', o)}
           />
           <FormInput
             containerStyle={{
@@ -367,8 +314,8 @@ const AddMeeting = props => {
               marginTop: 10,
             }}
             placeholder="Meeting Link"
-            value={state.meeting_link}
-            onChange={r => onchangeState('meeting_link', r)}
+            value={state.link}
+            onChange={r => onchangeState('link', r)}
           />
           <FormInput
             containerStyle={{
@@ -379,17 +326,17 @@ const AddMeeting = props => {
             }}
             placeholderTextColor={COLORS.dark}
             placeholder="mm/dd/yyyy *"
-            value={state.meeting_date}
-            error={inputRecode.meeting_date}
+            value={state.date}
+            error={inputRecode.date}
             onChange={d => {
-              onchangeState('meeting_date', d);
+              onchangeState('date', d);
             }}
-            onFocus={f => onErrorChange(f, 'meeting_date')}
+            onFocus={f => onErrorChange(f, 'date')}
             editable={false}
             appendComponent={
               <TouchableOpacity
                 onPress={() => {
-                  setDPValues({mode: 'date', key: 'meeting_date'});
+                  setDPValues({mode: 'date', key: 'date'});
                   setOpen(true);
                 }}
               >
@@ -407,16 +354,16 @@ const AddMeeting = props => {
             }}
             placeholder="time start * "
             editable={false}
-            value={state.meeting_time_start}
+            value={state.time_start}
             onChange={d => {
-              onchangeState('meeting_time_start', d);
+              onchangeState('time_start', d);
             }}
-            onFocus={f => onErrorChange(f, 'meeting_time_start')}
-            error={inputRecode.meeting_time_start}
+            onFocus={f => onErrorChange(f, 'time_start')}
+            error={inputRecode.time_start}
             appendComponent={
               <TouchableOpacity
                 onPress={() => {
-                  setDPValues({mode: 'time', key: 'meeting_time_start'});
+                  setDPValues({mode: 'time', key: 'time_start'});
                   setOpen(true);
                 }}
               >
@@ -437,16 +384,16 @@ const AddMeeting = props => {
             }}
             placeholder="time end * "
             editable={false}
-            value={state.meeting_time_end}
+            value={state.time_end}
             onChange={d => {
-              onchangeState('meeting_time_end', d);
+              onchangeState('time_end', d);
             }}
-            error={inputRecode.meeting_time_end}
-            onFocus={f => onErrorChange(f, 'meeting_time_end')}
+            error={inputRecode.time_end}
+            onFocus={f => onErrorChange(f, 'time_end')}
             appendComponent={
               <TouchableOpacity
                 onPress={() => {
-                  setDPValues({mode: 'time', key: 'meeting_time_end'});
+                  setDPValues({mode: 'time', key: 'time_end'});
                   setOpen(true);
                 }}
               >
@@ -454,80 +401,7 @@ const AddMeeting = props => {
               </TouchableOpacity>
             }
           />
-          {/* </View> */}
-          {/* <FormInput
-            containerStyle={{
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.error,
-              marginTop: 10,
-            }}
-            placeholder="Meeting reference no."
-            value={state.meeting_ref_no}
-            onChange={r => onchangeState('meeting_ref_no', r)}
-          /> */}
-          {/* <View style={{marginHorizontal: 12}}>
-            <CheckBox
-              CheckBoxText={'Enable Repeat'}
-              containerStyle={{backgroundColor: '', lineHeight: 20}}
-              isSelected={enableCheck}
-              onPress={() => setEnableCheck(!enableCheck)}
-            />
-          </View>
-          {enableCheck == true ? (
-            <View>
-              <Dropdown
-                style={styles.dropdown}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                iconStyle={styles.iconStyle}
-                data={data}
-                search
-                maxHeight={300}
-                labelField="duration"
-                valueField="id"
-                placeholder="Select item"
-                searchPlaceholder="Search..."
-                value={state.is_repeat}
-                onChange={item => {
-                  onchangeState('is_repeat', item);
-                }}
-                renderLeftIcon={() => (
-                  <AntDesign
-                    style={styles.icon}
-                    color="black"
-                    name="Safety"
-                    size={20}
-                  />
-                )}
-              />
-              <FormInput
-                containerStyle={{
-                  borderRadius: SIZES.radius,
-                  backgroundColor: COLORS.error,
-                  marginTop: 10,
-                }}
-                inputMode="numeric"
-                keyboardType="numeric"
-                placeholder="Event Number"
-                value={state.eventNumber}
-                onChange={a => onchangeState('eventNumber', a)}
-              />
-              <Text
-                style={{
-                  ...FONTS.body3,
-                  fontSize: SIZES.h3,
-                  textAlign: 'center',
-                  marginVertical: 10,
-                  fontWeight: '900',
-                  color: COLORS.primary,
-                }}
-              >
-                The meeting will be repeated for {state.eventNumber} Days
-              </Text>
-            </View>
-          ) : null} */}
-          <MultiSelect
+          {/* <MultiSelect
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
@@ -545,12 +419,28 @@ const AddMeeting = props => {
               onchangeState('attendees', item);
             }}
             onFocus={f => onErrorChange(f, 'attendees')}
+          /> */}
+
+          <FormInput
+            containerStyle={{
+              borderRadius: SIZES.radius,
+              backgroundColor: COLORS.error,
+              marginTop: 10,
+            }}
+            // error={stateError.email}
+            inputMode="email"
+            placeholder="Add attendees Email"
+            keyboardType="email-address"
+            value={state.attendees}
+            onChange={invitation => {
+              onchangeState('attendees', invitation);
+            }}
           />
-          {!inputRecode == state.attendees ? (
+          {/* {!inputRecode == state.attendees ? (
             <Text style={{color: COLORS.error, marginHorizontal: 10}}>
               please select any one option
             </Text>
-          ) : null}
+          ) : null} */}
           <FormInput
             containerStyle={{
               borderRadius: SIZES.radius,
@@ -561,12 +451,12 @@ const AddMeeting = props => {
             inputMode="email"
             placeholder="Add Invitational Email"
             keyboardType="email-address"
-            value={state.inviteEmail}
+            value={state.invitation}
             onChange={invitation => {
-              onchangeState('inviteEmail', invitation);
+              onchangeState('invitation', invitation);
             }}
             appendComponent={
-              !state.inviteEmail ? (
+              !state.invitation ? (
                 <TouchableOpacity
                   onPress={() =>
                     ToastAndroid.show(
@@ -586,7 +476,7 @@ const AddMeeting = props => {
                     borderRadius: SIZES.radius,
                   }}
                   onPress={() => {
-                    AddEmailFunction();
+                    // AddEmailFunction();
                   }}
                 />
               )
@@ -600,7 +490,7 @@ const AddMeeting = props => {
             }}
             placeholder="Upload Document"
             value={selectImage?.[0]?.uri}
-            onChange={d => onchangeState('documents', d)}
+            onChange={d => onchangeState('photo', d)}
             appendComponent={
               <AntDesign
                 name={'upload'}
@@ -654,7 +544,7 @@ const AddMeeting = props => {
               display: !selectImage ? 'none' : 'flex',
             }}
           />
-          {selectImage ? (
+          {/* {selectImage ? (
             <TextButton
               label={'upload Image'}
               contentContainerStyle={{
@@ -666,7 +556,7 @@ const AddMeeting = props => {
               }}
               onPress={() => uploadFile(selectImage)}
             />
-          ) : null}
+          ) : null} */}
         </View>
         <TextButton
           label={editMeeting ? 'Edit' : 'Save'}
@@ -720,39 +610,6 @@ const AddMeeting = props => {
           setOpen(false);
         }}
       />
-      {/* )} */}
-      {/* {openStart ? (
-        <DatePicker
-          modal
-          open={openStart}
-          date={date}
-          mode={'time'}
-          onConfirm={date => {
-            setOpenStart(false);
-            setDate(date);
-            onchangeState('meeting_time_start', moment(date).format('LTS'));
-          }}
-          onCancel={() => {
-            setOpenStart(false);
-          }}
-        />
-      ) : null}
-      {openTime ? (
-        <DatePicker
-          modal
-          open={openTime}
-          date={date}
-          mode={'time'}
-          onConfirm={date => {
-            setOpenTime(false);
-            setDate(date);
-            onchangeState('meeting_time_end', moment(date).format('LTS'));
-          }}
-          onCancel={() => {
-            setOpenTime(false);
-          }}
-        />
-      ) : null} */}
     </>
   );
 };
@@ -767,14 +624,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 1,
-    // },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 1.41,
-
-    // elevation: 2,
   },
   icon: {
     marginRight: 5,

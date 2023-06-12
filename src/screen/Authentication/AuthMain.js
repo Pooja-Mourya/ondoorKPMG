@@ -26,6 +26,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Alert} from 'react-native';
 import LoaderFile from '../LoaderFile';
 import {CommonActions, useIsFocused} from '@react-navigation/native';
+import DocumentPicker, {types} from 'react-native-document-picker';
 
 import CheckBox from '../../components/CheckBox';
 import {
@@ -43,6 +44,7 @@ const AuthMain = props => {
   const {navigation} = props;
   const token = useSelector(state => state?.user?.user?.access_token);
 
+  const dispatch = useDispatch();
   const {dark} = useCustomHook();
 
   const joinButton = props.name;
@@ -61,6 +63,7 @@ const AuthMain = props => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [number, setNumber] = useState('');
   const [designation, setDesignation] = useState('');
+  const [photo, setPhoto] = useState('');
   const [errors, setErrors] = useState(false);
   const [click, setClick] = useState(false);
   const [forgetModal, setForgetModal] = useState(false);
@@ -81,153 +84,80 @@ const AuthMain = props => {
     }
   };
 
-  const dispatch = useDispatch();
-
   const submitHandle = async () => {
-    await axios
-      .post(`https://meeting-api.gofactz.com/public/api/login`, {
-        email,
-        password,
-        logout_from_all_devices: enableCheck && 'yes',
-      })
-      .then(res => {
-        console.log(res);
-        // Alert.alert(res.data.message);
-        ToastAndroid.show(`${res.data.message}`, ToastAndroid.SHORT);
-        // setPassword('');
-        // setEnableCheck('');
-        setOtpState('');
-        if (res.data.message) {
-          setLoginOtpModal(true);
-        }
-        setLoader(false);
-      })
-      .catch(error => {
-        console.log(' 4', error.response.data.message);
-        if (error.response.data.message) {
-          //   Alert.alert('login error response', `${error.response.data.message}`);
-          //   Popup.show({
-          //     title: 'login error code',
-          //     textBody: ,
-          //     type: 'Warning',
-          //     buttonText: 'Ok',
-          //     callback: () => Popup.hide(),
-          //   });
-          ToastAndroid.show(
-            `${error.response.data.message}`,
-            ToastAndroid.SHORT,
-          );
-          setLogged(error.response.data.message);
-        }
-        setLoader(false);
-      });
+    try {
+      await axios
+        .post(`http://10.0.2.2:5000/api/users/login`, {
+          email,
+          password,
+        })
+        .then(res => {
+          console.log('login response', res);
+        });
+      ToastAndroid.show('user login successfully', ToastAndroid.SHORT);
+      navigation.navigate('MyTab');
+    } catch (error) {
+      console.log('login error', error);
+    }
   };
 
   const HandleSignUp = async () => {
-    const url = constants.endPoint.registerForm;
-    const params = {
-      role_id: '2',
-      name: name,
-      email: email,
-      password: password,
-      'confirm-password': confirmPassword,
-      mobile_number: number,
-      designation: designation,
-    };
     try {
-      const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result, 'param', params);
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
-  const resetPassword = async () => {
-    try {
-      const url = constants.endPoint.forgetPassword;
+      const url = `http://10.0.2.2:5000/api/users/register`;
       const params = {
-        email: forgetPassword,
-        // email: 'admin@gmail.com',
+        // name: name,
+        // email: email,
+        // password: password,
+        // phone: number,
+        // bio: designation,
+        name: 'pooja',
+        email: `p${Math.random()}@gmail.com`,
+        password: 'password',
+        phone: '9876543210',
+        bio: 'student',
+        photo: photo.name,
       };
-
-      // return
-      const result = await ApiMethod.postData(url, params, token);
-      console.log('result', result);
-      if (result) {
-        // result.message;
-        Alert.alert(
-          'Password reset link send to your email address, please check your mail',
-        );
-        navigation.navigate('Resetpassword');
-      }
-    } catch (error) {
-      Alert.alert('gdhdubg', []);
-      console.log('error', error);
-    }
-  };
-
-  async function myFunction() {
-    setLoader(true);
-    try {
-      const variable = await AsyncStorage.getItem('@user');
-      console.log('variable***', variable);
-      if (!variable) {
-        AsyncStorage.removeItem('@user');
-        // navigation.navigate('AuthMain');
-      } else {
-        navigation.dispatch({
-          ...CommonActions.reset({
-            index: 0,
-            routes: [{name: 'MyTab'}],
-          }),
-        });
-        setLoader(false);
-      }
-    } catch (error) {
-      console.log('AppError', error);
-    }
-  }
-
-  useEffect(() => {
-    myFunction();
-  }, [token]);
-
-  const verifyOtp = async () => {
-    setLoader(true);
-    let url = constants.endPoint.verifyOtp;
-    let params = {
-      email,
-      otp: otpState,
-    };
-
-    const otpResult = await ApiMethod.postData(url, params, null);
-    if (otpResult) {
-      ToastAndroid.show(`${otpResult.data.message}`, ToastAndroid.SHORT);
-      AsyncStorage.setItem('@user', otpResult.data.data.access_token);
-      dispatch(userLoginFun(otpResult?.data.data));
-      setLoader(false);
-      setLoginOtpModal(false);
-      setEmail('');
-      navigation.navigate('MyTab');
-    } else {
-      Popup.show({
-        type: 'Warning',
-        title: 'warning correct otp',
-        textBody: 'Unauthenticated',
-        buttonText: 'Ok',
-        callback: () => Popup.hide(),
+      //   console.log('first', url);
+      //   console.log('param', params);
+      //   return;
+      const result = await axios.post(url, params, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-      AsyncStorage.removeItem('@user');
+      ToastAndroid.show('user register successfully', ToastAndroid.SHORT);
+      userLoginFun(dispatch(result?.data?.token));
+      AsyncStorage.setItem(result?.data?.token);
+      console.log('result data', result?.data?.post);
+      console.log('token', result?.data?.token);
+    } catch (error) {
+      console.log('error', error);
+      console.log('error-message', error.message);
+      ToastAndroid.show('server error', ToastAndroid.SHORT);
     }
-    setLoader(false);
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoginOtpModal(false);
-      setOtpState('');
-    }, 180000);
-  }, [loginOtpModal]);
+  const selectFile = async () => {
+    try {
+      const res = await DocumentPicker.pickSingle({
+        presentationStyle: 'fullScreen',
+        allowMultiSelection: true,
+        // type: [types.doc, types.docx],
+      });
+      //   console.log('res', res);
+      setPhoto(res);
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        alert('cancelled');
+      } else if (isInProgress(err)) {
+        console.warn(
+          'multiple pickers were opened, only the last will be considered',
+        );
+      } else {
+        throw err;
+      }
+    }
+  };
 
   function SignInFunction() {
     return (
@@ -370,24 +300,7 @@ const AuthMain = props => {
                 ...FONTS.h4,
               }}
               onPress={() => {
-                setLoader(false);
-                // var passW = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
-                //   if (password.match(passW) && email) {
-
-                if (email) {
-                  submitHandle();
-                } else {
-                  Alert.alert(
-                    'validation failed',
-                    'Password must be at least 8 characters and contain at least 1 uppercase character, 1 number, and 1 special character',
-                    [
-                      ({text: 'ok', onPress: () => {}},
-                      {
-                        text: '',
-                      }),
-                    ],
-                  );
-                }
+                submitHandle();
               }}
             />
           </View>
@@ -419,7 +332,7 @@ const AuthMain = props => {
           }}
           placeholder="Name"
           value={name}
-          onChange={() => setName()}
+          onChange={n => setName(n)}
           error={errors}
           onFocus={() => setErrors()}
           prependComponent={
@@ -556,6 +469,36 @@ const AuthMain = props => {
             />
           }
         />
+        <FormInput
+          containerStyle={{
+            borderRadius: SIZES.radius,
+            backgroundColor: COLORS.error,
+          }}
+          placeholder="upload photo"
+          value={photo.name}
+          onChange={p => setPhoto(p)}
+          error={errors}
+          onFocus={() => setErrors()}
+          prependComponent={
+            <AntDesign name="upload" color={'gray'} size={25} />
+          }
+          appendComponent={
+            <TouchableOpacity onPress={() => selectFile()}>
+              <Text
+                style={{
+                  backgroundColor: COLORS.primary,
+                  color: COLORS.light,
+                  padding: 5,
+                  borderRadius: 5,
+                  fontSize: 18,
+                }}
+              >
+                upload image
+              </Text>
+            </TouchableOpacity>
+          }
+        />
+
         <TextButton
           label={'Sign Up'}
           contentContainerStyle={{
@@ -568,12 +511,12 @@ const AuthMain = props => {
             ...FONTS.h4,
           }}
           onPress={() => {
-            if ((email, password, confirmPassword, name, number, designation)) {
-              HandleSignUp();
-              Alert.alert('locally form submitted');
-            } else {
-              Alert.alert('validation failed');
-            }
+            // if ((email, password, confirmPassword, name, number, designation)) {
+            //   HandleSignUp();
+            // } else {
+            //   Alert.alert('validation failed');
+            // }
+            HandleSignUp();
           }}
         />
       </KeyboardAwareScrollView>

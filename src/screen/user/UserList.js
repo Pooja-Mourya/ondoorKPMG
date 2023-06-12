@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Modal,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from '../../components/layout/Header';
@@ -20,6 +21,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import UserFilter from './UserFilter';
 import TextButton from '../../components/TextButton';
 import {useCustomHook} from '../theme/ThemeContext';
+import axios from 'axios';
 
 const UserList = ({navigation}) => {
   const token = useSelector(state => state?.user?.user?.access_token);
@@ -34,24 +36,6 @@ const UserList = ({navigation}) => {
   const [page, setPage] = useState(1);
   const [pageRe, setPageRe] = useState(false);
 
-  //   const userListApi = async () => {
-  //     const url = constants.endPoint.userList;
-  //     const params = {
-  //       //   page: 1,
-  //       //   per_page_record: '10',
-  //     };
-  //     setIsRefreshing(true);
-  //     try {
-  //       const result = await ApiMethod.postData(url, params, token);
-  //       console.log('result', result?.data?.data, 'url', url);
-  //       setListState(result?.data?.data);
-  //       setIsRefreshing(false);
-  //       return;
-  //     } catch (error) {
-  //       console.log('error', error);
-  //     }
-  //   };
-
   const userListApi = async (page, refresh) => {
     if (page) {
       setPageRe(true);
@@ -60,23 +44,24 @@ const UserList = ({navigation}) => {
     } else {
       setLoader(true);
     }
-    const url = constants.endPoint.userList;
+    const url = 'http://10.0.2.2:5000/api/users/getuser';
     const params = {
-      page: page ? page : 1,
-      per_page_record: '10',
+      //   page: page ? page : 1,
+      //   per_page_record: '10',
     };
-    const result = await ApiMethod.postData(url, params, token);
-    console.log('result', result?.data?.data, 'url', url);
+    const result = await axios.get(url, params);
+    // console.log('result', result?.data);
 
+    // return;
     if (result) {
       if (!page) {
         setPage(1);
-        setListState(result?.data?.data?.data);
+        setListState(result?.data);
         setLoader(false);
         if (refresh) setIsRefreshing(false);
       } else {
         let temp = [...listState];
-        temp = temp.concat(result?.data?.data?.data);
+        temp = temp.concat(result?.data);
         setPage(page);
         setListState([...temp]);
         setPageRe(false);
@@ -160,6 +145,7 @@ const UserList = ({navigation}) => {
           />
         }
         renderItem={({item, index}) => {
+          //   console.log('item.photo', item.photo);
           return (
             <>
               <View
@@ -192,6 +178,10 @@ const UserList = ({navigation}) => {
                   >
                     {item.name}
                   </Text>
+                  {/* <Image
+                    source={require('http://10.0.2.2:5000/' + item.photo)}
+                  /> */}
+                  {/* <Image source={{uri: item.photo}} /> */}
                   {/* <TouchableOpacity onPress={() => handleDelete(item.id)}>
                     <AntDesign name="delete" size={20} color={COLORS.error} />
                   </TouchableOpacity> */}
